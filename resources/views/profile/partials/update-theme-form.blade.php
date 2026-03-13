@@ -1,12 +1,8 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Theme') }}
-        </h2>
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Profil sayfanız için bir tema seçin.') }}
-        </p>
-    </header>
+    <x-section-header 
+        :title="__('Görünüm ve Tema')" 
+        :subtitle="__('Profil sayfanızın tasarımını, renklerini ve genel stilini kişiselleştirin.')" 
+    />
 
     <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-8" enctype="multipart/form-data" x-data="{ 
         themeType: '{{ $user->profile?->theme_type ?? 'preset' }}',
@@ -26,13 +22,13 @@
                 @click="themeType = 'preset'" 
                 :class="themeType === 'preset' ? 'bg-white dark:bg-gray-800 shadow text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700'"
                 class="px-4 py-2 rounded-lg text-sm font-bold transition-all">
-                Preset Themes
+                {{ __('Preset Themes') }}
             </button>
             <button type="button" 
                 @click="themeType = 'custom'" 
                 :class="themeType === 'custom' ? 'bg-white dark:bg-gray-800 shadow text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700'"
                 class="px-4 py-2 rounded-lg text-sm font-bold transition-all ml-1">
-                Custom Design
+                {{ __('Custom Design') }}
             </button>
         </div>
         <input type="hidden" name="theme_type" :value="themeType">
@@ -55,15 +51,23 @@
                 $currentTheme = $user->profile?->theme ?? 'minimal';
             @endphp
 
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
                 @foreach($themes as $key => $theme)
-                    <label class="cursor-pointer">
+                    <label class="cursor-pointer group">
                         <input type="radio" name="theme" value="{{ $key }}" class="sr-only peer" {{ $currentTheme === $key ? 'checked' : '' }}>
-                        <div class="rounded-lg border-2 p-3 text-center transition-all peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-200 border-gray-200 dark:border-gray-600 hover:border-gray-300">
-                            <div class="mx-auto w-full h-8 rounded-md mb-2 flex items-center justify-center" style="background-color: {{ $theme['bg'] }}; border: 1px solid {{ $theme['accent'] }};">
-                                <span class="text-xs font-bold" style="color: {{ $theme['text'] }};">Aa</span>
+                        <div class="relative rounded-2xl border-2 p-1 transition-all bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 peer-checked:border-indigo-500 peer-checked:shadow-xl peer-checked:shadow-indigo-500/10 hover:border-gray-200 dark:hover:border-gray-600">
+                            <!-- Preview Box -->
+                            <div class="w-full h-16 rounded-xl mb-1 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-[0.98]" style="background-color: {{ $theme['bg'] }}; border: 1px solid {{ $theme['accent'] }};">
+                                <div class="flex flex-col gap-1 w-full px-3">
+                                    <div class="h-1.5 w-full rounded-full opacity-30" style="background-color: {{ $theme['text'] }};"></div>
+                                    <div class="h-1.5 w-2/3 rounded-full opacity-30" style="background-color: {{ $theme['text'] }};"></div>
+                                    <div class="mt-1 h-3 w-full rounded-md" style="background-color: {{ $theme['accent'] }};"></div>
+                                </div>
                             </div>
-                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">{{ $theme['label'] }}</span>
+                            <div class="px-2 py-1.5 flex items-center justify-between">
+                                <span class="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">{{ $theme['label'] }}</span>
+                                <div class="w-2 h-2 rounded-full hidden peer-checked:block bg-indigo-500"></div>
+                            </div>
                         </div>
                     </label>
                 @endforeach
@@ -84,6 +88,7 @@
                         <x-input-label value="Arka Plan Tipi" />
                         <select name="bg_type" x-model="bgType" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
                             <option value="color">Düz Renk</option>
+                            <option value="gradient">Gradyan</option>
                             <option value="image">Görsel</option>
                         </select>
                     </div>
@@ -93,6 +98,29 @@
                         <div class="mt-1 flex gap-2">
                             <input type="color" id="bg_color" name="bg_color" value="{{ $user->profile?->bg_color ?? '#f9fafb' }}" class="h-10 w-20 rounded p-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
                             <x-text-input value="{{ $user->profile?->bg_color ?? '#f9fafb' }}" class="flex-1 text-sm" />
+                        </div>
+                    </div>
+
+                    <div x-show="bgType === 'gradient'" class="col-span-2">
+                        <x-input-label value="Gradyan Seçimi" />
+                        @php
+                            $gradients = [
+                                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' => 'Oceanic',
+                                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' => 'Sunset',
+                                'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)' => 'Skyline',
+                                'linear-gradient(135deg, #130f40 0%, #000000 100%)' => 'Deep Midnight',
+                                'linear-gradient(135deg, #09203f 0%, #537895 100%)' => 'Steel',
+                                'linear-gradient(135deg, #0ba360 0%, #3cba92 100%)' => 'Forest Green',
+                            ];
+                        @endphp
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-2">
+                            @foreach($gradients as $grad => $label)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="bg_gradient" value="{{ $grad }}" class="sr-only peer" {{ ($user->profile?->bg_gradient ?? '') === $grad ? 'checked' : '' }}>
+                                    <div class="h-12 rounded-xl border-2 border-transparent peer-checked:border-indigo-500 shadow-sm overflow-hidden" style="background: {{ $grad }}"></div>
+                                    <span class="text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase mt-1 block text-center">{{ $label }}</span>
+                                </label>
+                            @endforeach
                         </div>
                     </div>
 
@@ -139,7 +167,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                     <div>
                         <x-input-label value="Buton Stili" />
                         <select name="button_style" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
@@ -152,12 +180,21 @@
                     <div>
                         <x-input-label value="Yazı Tipi (Font)" />
                         <select name="font_family" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm text-sm">
-                            <option value="sans" {{ ($user->profile?->font_family ?? 'sans') === 'sans' ? 'selected' : '' }}>Modern (Sans)</option>
-                            <option value="inter" {{ ($user->profile?->font_family ?? 'sans') === 'inter' ? 'selected' : '' }}>Inter</option>
-                            <option value="poppins" {{ ($user->profile?->font_family ?? 'sans') === 'poppins' ? 'selected' : '' }}>Poppins</option>
-                            <option value="serif" {{ ($user->profile?->font_family ?? 'sans') === 'serif' ? 'selected' : '' }}>Klasik (Serif)</option>
-                            <option value="mono" {{ ($user->profile?->font_family ?? 'sans') === 'mono' ? 'selected' : '' }}>Teknik (Mono)</option>
+                            <option value="inter" {{ ($user->profile?->font_family ?? 'inter') === 'inter' ? 'selected' : '' }}>Inter (Standart)</option>
+                            <option value="outfit" {{ ($user->profile?->font_family ?? 'inter') === 'outfit' ? 'selected' : '' }}>Outfit</option>
+                            <option value="roboto" {{ ($user->profile?->font_family ?? 'inter') === 'roboto' ? 'selected' : '' }}>Roboto</option>
+                            <option value="montserrat" {{ ($user->profile?->font_family ?? 'inter') === 'montserrat' ? 'selected' : '' }}>Montserrat</option>
+                            <option value="playfair" {{ ($user->profile?->font_family ?? 'inter') === 'playfair' ? 'selected' : '' }}>Playfair Display</option>
+                            <option value="serif" {{ ($user->profile?->font_family ?? 'inter') === 'serif' ? 'selected' : '' }}>Klasik (Serif)</option>
+                            <option value="mono" {{ ($user->profile?->font_family ?? 'inter') === 'mono' ? 'selected' : '' }}>Teknik (Mono)</option>
                         </select>
+                    </div>
+                    <div class="flex items-center pt-6">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="button_shadow" value="1" class="sr-only peer" {{ $user->profile?->button_shadow ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            <span class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-300">Buton Gölgesi</span>
+                        </label>
                     </div>
                 </div>
             </div>

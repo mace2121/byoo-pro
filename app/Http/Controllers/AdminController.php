@@ -42,7 +42,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
         
-        $users = User::with('profile')
+        $users = User::with(['profile', 'links'])
             ->withCount(['links'])
             ->when($search, function($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")

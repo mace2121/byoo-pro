@@ -3,13 +3,11 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div class="col-span-1 md:col-span-2">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 mb-6">
-                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-xl">B</span>
-                    </div>
+                    <x-application-logo class="h-8 w-auto" />
                     <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">byoo<span class="text-indigo-600">.pro</span></span>
                 </a>
                 <p class="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
-                    {{ __('The only tool you need to centralize your digital world. Beautiful, fast, and secure.') }}
+                    {{ __('Dijital dünyanızı merkezileştirmek için ihtiyacınız olan tek araç. Şık, hızlı ve güvenli.') }}
                 </p>
                 <div class="flex gap-4">
                     <a href="#" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fab fa-twitter text-xl"></i></a>
@@ -19,32 +17,32 @@
             </div>
             
             <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Product') }}</h4>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Ürün') }}</h4>
                 <ul class="space-y-4">
-                    <li><a href="#features" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Features') }}</a></li>
-                    <li><a href="#showcase" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Showcase') }}</a></li>
-                    <li><a href="{{ route('pricing') }}" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Pricing') }}</a></li>
+                    <li><a href="#features" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Özellikler') }}</a></li>
+                    <li><a href="#showcase" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Örnekler') }}</a></li>
+                    <li><a href="{{ route('pricing') }}" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Fiyatlandırma') }}</a></li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Legal') }}</h4>
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Yasal') }}</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Privacy Policy') }}</a></li>
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Terms of Service') }}</a></li>
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Contact') }}</a></li>
+                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Gizlilik Politikası') }}</a></li>
+                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Kullanım Şartları') }}</a></li>
+                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('İletişim') }}</a></li>
                 </ul>
             </div>
         </div>
         
         <div class="border-t border-gray-100 dark:border-gray-900 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-gray-400 text-sm">
-                &copy; {{ date('Y') }} byoo.pro. {{ __('All rights reserved.') }}
+                &copy; {{ date('Y') }} byoo.pro. {{ __('Tüm hakları saklıdır.') }}
             </p>
             <div class="flex items-center gap-2 text-sm text-gray-400">
-                <span>{{ __('Made with') }}</span>
+                <span>{{ __('Üreticiler için') }}</span>
                 <i class="fas fa-heart text-rose-500"></i>
-                <span>{{ __('for creators') }}</span>
+                <span>{{ __('ile yapıldı') }}</span>
             </div>
         </div>
     </div>

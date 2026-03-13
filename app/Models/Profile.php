@@ -21,6 +21,7 @@ class Profile extends Model
         'theme_type',
         'bg_type',
         'bg_color',
+        'bg_gradient',
         'bg_image',
         'bg_blur',
         'bg_overlay',
@@ -28,8 +29,11 @@ class Profile extends Model
         'button_color',
         'button_text_color',
         'button_style',
+        'button_shadow',
         'font_family',
         'custom_css',
+        'meta_title',
+        'meta_description',
         'custom_domain',
         'custom_domain_verified',
         'is_active',
@@ -43,10 +47,16 @@ class Profile extends Model
     {
         return Attribute::get(function () {
             if ($this->avatar) {
+                // If it's already a URL, return it
+                if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
+                    return $this->avatar;
+                }
+                
+                // Ensure the path is correct for Storage
                 return Storage::disk('public')->url($this->avatar);
             }
 
-            return "https://ui-avatars.com/api/?name=" . urlencode($this->user->name) . "&size=512&background=random";
+            return "https://ui-avatars.com/api/?name=" . urlencode($this->user->name ?? $this->username) . "&size=512&background=random&color=fff";
         });
     }
 
@@ -57,6 +67,9 @@ class Profile extends Model
     {
         return Attribute::get(function () {
             if ($this->bg_image) {
+                if (filter_var($this->bg_image, FILTER_VALIDATE_URL)) {
+                    return $this->bg_image;
+                }
                 return Storage::disk('public')->url($this->bg_image);
             }
             return null;
@@ -71,5 +84,13 @@ class Profile extends Model
     public function viewLogs()
     {
         return $this->hasMany(ViewLog::class);
+    }
+
+    /**
+     * Sanitize custom CSS to prevent XSS.
+     */
+    protected function customCss(): Attribute
+    {
+        return Attribute::set(fn ($value) => strip_tags($value));
     }
 }

@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $profile->username ?? $user->name }} - byoo.pro</title>
-    <meta name="description" content="{{ $profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' adlı kullanıcının byoo.pro profili.' }}">
+    <title>{{ $profile->meta_title ?: ($profile->username ?? $user->name) . ' - byoo.pro' }}</title>
+    <meta name="description" content="{{ $profile->meta_description ?: ($profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' adlı kullanıcının byoo.pro profili.') }}">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url('/' . $user->username) }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -37,10 +37,22 @@
 
     <!-- Theme Fonts -->
     @if($profile->theme_type === 'custom')
-        @if($profile->font_family === 'poppins')
-            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        @elseif($profile->font_family === 'inter')
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        @php
+            $google_fonts = [
+                'outfit' => 'Outfit:wght@400;500;600;700;800',
+                'inter' => 'Inter:wght@400;500;600;700;800',
+                'roboto' => 'Roboto:wght@400;500;700',
+                'montserrat' => 'Montserrat:wght@400;500;600;700',
+                'playfair' => 'Playfair+Display:wght@400;700',
+            ];
+            $selected_font = $profile->font_family;
+            $font_query = $google_fonts[$selected_font] ?? null;
+        @endphp
+
+        @if($font_query)
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family={{ $font_query }}&display=swap" rel="stylesheet">
         @endif
     @endif
 
@@ -99,6 +111,8 @@
         .theme-custom {
             @if($profile->bg_type === 'color')
                 --bg: {{ $profile->bg_color ?? '#f9fafb' }};
+            @elseif($profile->bg_type === 'gradient')
+                --bg: {{ $profile->bg_gradient ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }};
             @endif
             --text: {{ $profile->text_color ?? '#111827' }};
             --text-secondary: {{ ($profile->text_color ?? '#111827') . 'cc' }}; /* 80% opacity */
@@ -107,15 +121,22 @@
             --card-hover: {{ ($profile->button_color ?? '#ffffff') . 'ee' }};
             --link-color: {{ $profile->button_text_color ?? '#111827' }};
             --footer-color: {{ ($profile->text_color ?? '#111827') . '88' }};
+            --card-shadow: {{ $profile->button_shadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none' }};
             
-            @if($profile->font_family === 'poppins')
-                --font-family: 'Poppins', sans-serif;
+            @if($profile->font_family === 'outfit')
+                --font-family: 'Outfit', sans-serif;
+            @elseif($profile->font_family === 'inter')
+                --font-family: 'Inter', sans-serif;
+            @elseif($profile->font_family === 'roboto')
+                --font-family: 'Roboto', sans-serif;
+            @elseif($profile->font_family === 'montserrat')
+                --font-family: 'Montserrat', sans-serif;
+            @elseif($profile->font_family === 'playfair')
+                --font-family: 'Playfair Display', serif;
             @elseif($profile->font_family === 'serif')
                 --font-family: Georgia, serif;
             @elseif($profile->font_family === 'mono')
-                --font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
-            @elseif($profile->font_family === 'inter')
-                --font-family: 'Inter', sans-serif;
+                --font-family: 'JetBrains Mono', SFMono-Regular, Consolas, monospace;
             @endif
 
             @if($profile->button_style === 'pill')
@@ -137,7 +158,7 @@
             justify-content: center;
             padding: 3rem 1rem;
             position: relative;
-            background-color: var(--bg);
+            background: var(--bg);
             @if($profile->theme_type === 'custom' && $profile->bg_type === 'image')
                 background-image: url('{{ $profile->bg_image_url }}');
                 background-size: cover;
@@ -192,7 +213,7 @@
             box-shadow: var(--card-shadow, none);
         }
 
-        /* Custom CSS */
+        /* Custom CSS Injection */
         {!! $profile->custom_css !!}
 
         /* Glass effect for specific themes */
@@ -250,27 +271,7 @@
                     <a href="{{ route('public.redirect', $link->id) }}" target="_blank" rel="noopener noreferrer" 
                        class="flex items-center p-3 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg theme-card group relative">
                         <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800/50 text-indigo-500 group-hover:scale-110 transition-transform">
-                            @if($link->platform === 'instagram')
-                                <i class="fab fa-instagram text-xl"></i>
-                            @elseif($link->platform === 'twitter')
-                                <i class="fab fa-twitter text-xl"></i>
-                            @elseif($link->platform === 'facebook')
-                                <i class="fab fa-facebook text-xl"></i>
-                            @elseif($link->platform === 'linkedin')
-                                <i class="fab fa-linkedin text-xl"></i>
-                            @elseif($link->platform === 'youtube')
-                                <i class="fab fa-youtube text-xl"></i>
-                            @elseif($link->platform === 'tiktok')
-                                <i class="fab fa-tiktok text-xl"></i>
-                            @elseif($link->platform === 'whatsapp')
-                                <i class="fab fa-whatsapp text-xl"></i>
-                            @elseif($link->platform === 'github')
-                                <i class="fab fa-github text-xl"></i>
-                            @elseif($link->platform === 'telegram')
-                                <i class="fab fa-telegram text-xl"></i>
-                            @else
-                                <i class="fas fa-link text-xl"></i>
-                            @endif
+                            <i class="{{ $link->icon_class }} text-xl"></i>
                         </div>
                         <div class="flex-1 text-center font-bold pr-10">
                             {{ $link->title }}

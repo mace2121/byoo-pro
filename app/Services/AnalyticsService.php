@@ -70,11 +70,16 @@ class AnalyticsService
 
         // Combined Browser Stats
         $viewBrowsers = ViewLog::where('profile_id', $profile->id)
-            ->select('browser', DB::raw('count(*) as count'));
-        
-        $topBrowsers = ClickLog::whereIn('link_id', $linkIds)
             ->select('browser', DB::raw('count(*) as count'))
-            ->unionAll($viewBrowsers)
+            ->groupBy('browser');
+        
+        $browserUnion = ClickLog::whereIn('link_id', $linkIds)
+            ->select('browser', DB::raw('count(*) as count'))
+            ->groupBy('browser')
+            ->unionAll($viewBrowsers);
+
+        $topBrowsers = DB::table(DB::raw("({$browserUnion->toSql()}) as combined_browsers"))
+            ->mergeBindings($browserUnion->getQuery())
             ->select('browser', DB::raw('SUM(count) as total'))
             ->groupBy('browser')
             ->orderByDesc('total')
@@ -83,11 +88,16 @@ class AnalyticsService
 
         // Combined OS Stats
         $viewOS = ViewLog::where('profile_id', $profile->id)
-            ->select('os', DB::raw('count(*) as count'));
-        
-        $topOS = ClickLog::whereIn('link_id', $linkIds)
             ->select('os', DB::raw('count(*) as count'))
-            ->unionAll($viewOS)
+            ->groupBy('os');
+        
+        $osUnion = ClickLog::whereIn('link_id', $linkIds)
+            ->select('os', DB::raw('count(*) as count'))
+            ->groupBy('os')
+            ->unionAll($viewOS);
+
+        $topOS = DB::table(DB::raw("({$osUnion->toSql()}) as combined_os"))
+            ->mergeBindings($osUnion->getQuery())
             ->select('os', DB::raw('SUM(count) as total'))
             ->groupBy('os')
             ->orderByDesc('total')

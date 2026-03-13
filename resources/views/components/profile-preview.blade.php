@@ -1,10 +1,19 @@
 <div class="sticky top-8">
-    <div class="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[600px] w-[300px] shadow-xl">
-        <div class="w-[148px] h-[18px] bg-gray-800 top-0 left-1/2 -translate-x-1/2 absolute rounded-b-[1rem]"></div>
-        <div class="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[124px] rounded-s-lg"></div>
-        <div class="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[178px] rounded-s-lg"></div>
-        <div class="h-[64px] w-[3px] bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
-        <div class="rounded-[2rem] overflow-hidden w-full h-full bg-white dark:bg-gray-900">
+    <!-- Natural Preview Container -->
+    <div class="relative mx-auto bg-white dark:bg-gray-900 rounded-[2rem] h-[650px] w-full max-w-[340px] shadow-2xl border-[8px] border-gray-100 dark:border-gray-800 overflow-hidden group">
+        
+        <!-- Browser/Device Header Decorator -->
+        <div class="absolute top-0 left-0 right-0 h-10 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 flex items-center px-4 gap-1.5 z-10 transition-colors group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/10">
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400/50"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-400/50"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400/50"></div>
+            <div class="ml-2 flex-1 h-5 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-700 flex items-center px-2">
+                <div class="w-full h-1 bg-gray-100 dark:bg-gray-800 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Iframe Content -->
+        <div class="pt-10 w-full h-full">
             <iframe id="preview-iframe" src="{{ route('public.profile', $user->username) }}" class="w-full h-full border-none"></iframe>
         </div>
     </div>

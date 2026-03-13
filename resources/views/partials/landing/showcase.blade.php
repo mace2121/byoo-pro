@@ -2,11 +2,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
             <div class="max-w-2xl">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ __('One link to rule them all') }}</h2>
-                <p class="text-gray-600 dark:text-gray-400">{{ __('Join thousands of creators, entrepreneurs, and artists who trust byoo to showcase their work.') }}</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ __('Hepsine hükmedecek tek bir link') }}</h2>
+                <p class="text-gray-600 dark:text-gray-400">{{ __('İşlerini sergilemek için Byoo\'ya güvenen binlerce içerik üreticisi, girişimci ve sanatçıya katılın.') }}</p>
             </div>
             <a href="{{ route('register') }}" class="text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-2 group">
-                {{ __('Start building your own') }}
+                {{ __('Kendi sayfanızı oluşturmaya başlayın') }}
                 <i class="fas fa-arrow-right transition-transform group-hover:translate-x-1"></i>
             </a>
         </div>

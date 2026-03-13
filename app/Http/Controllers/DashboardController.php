@@ -52,6 +52,7 @@ class DashboardController extends Controller
             'top_browsers' => $top_browsers,
             'top_os' => $top_os,
             'top_countries' => $top_countries,
+            'qr_code_url' => "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode(route('public.profile', $user->username)),
         ]);
     }
 }

@@ -1,13 +1,8 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Profile Information') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
+    <x-section-header 
+        :title="__('Profil Bilgileri')" 
+        :subtitle="__('Hesabınızın temel bilgilerini ve profil resminizi buradan güncelleyebilirsiniz.')" 
+    />
 
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
@@ -55,6 +50,27 @@
             <textarea id="bio" name="bio" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">{{ old('bio', $user->profile->bio ?? '') }}</textarea>
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('Write a few sentences about yourself.') }}</p>
             <x-input-error class="mt-2" :messages="$errors->get('bio')" />
+        </div>
+
+        <div class="border-t border-gray-100 dark:border-gray-800 pt-6 space-y-6">
+            <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <i class="fas fa-search-dollar text-indigo-500"></i>
+                {{ __('SEO Ayarları') }}
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <x-input-label for="meta_title" :value="__('Sayfa Başlığı (Meta Title)')" />
+                    <x-text-input id="meta_title" name="meta_title" type="text" class="mt-1 block w-full" :value="old('meta_title', $user->profile->meta_title ?? '')" placeholder="Örn: John Doe | Bio Link" />
+                    <x-input-error class="mt-2" :messages="$errors->get('meta_title')" />
+                </div>
+
+                <div>
+                    <x-input-label for="meta_description" :value="__('Sayfa Açıklaması (Meta Description)')" />
+                    <textarea id="meta_description" name="meta_description" rows="2" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" placeholder="Arama motorları için kısa bir açıklama.">{{ old('meta_description', $user->profile->meta_description ?? '') }}</textarea>
+                    <x-input-error class="mt-2" :messages="$errors->get('meta_description')" />
+                </div>
+            </div>
         </div>
 
         <div>

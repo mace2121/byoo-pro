@@ -20,6 +20,26 @@ class Link extends Model
         'type',
     ];
 
+    public function getIconClassAttribute()
+    {
+        if ($this->icon) return $this->icon;
+
+        $platforms = [
+            'instagram' => 'fab fa-instagram',
+            'twitter'   => 'fab fa-twitter',
+            'facebook'  => 'fab fa-facebook',
+            'linkedin'  => 'fab fa-linkedin',
+            'youtube'   => 'fab fa-youtube',
+            'tiktok'    => 'fab fa-tiktok',
+            'whatsapp'  => 'fab fa-whatsapp',
+            'github'    => 'fab fa-github',
+            'telegram'  => 'fab fa-telegram',
+            'link'      => 'fas fa-link',
+        ];
+
+        return $platforms[$this->platform] ?? 'fas fa-link';
+    }
+
     public function getPlatformAttribute()
     {
         $url = strtolower($this->url);
