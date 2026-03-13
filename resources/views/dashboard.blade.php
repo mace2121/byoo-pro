@@ -54,7 +54,7 @@
             </aside>
 
             <!-- Main Content Area -->
-            <main class="flex-1 overflow-y-auto bg-[hsl(var(--background))] border-l border-[hsl(var(--border))]">
+            <main class="flex-1 min-w-0 overflow-y-auto bg-[hsl(var(--background))] border-l border-[hsl(var(--border))]">
                 <div class="max-w-4xl mx-auto p-4 md:p-10 space-y-10">
                     <div x-show="tab === 'links'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
                         @include('dashboard.partials.links-management')

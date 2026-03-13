@@ -25,8 +25,8 @@
                     </div>
                     <div class="md:col-span-2">
                         <x-input-label for="icon" :value="__('İkon')" class="text-xs font-medium mb-1.5" />
-                        <div class="relative" x-data="{ showIconsList: false }">
-                            <button type="button" @click="showIconsList = !showIconsList" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent flex items-center justify-center text-[hsl(var(--muted-foreground))]">
+                        <div class="relative">
+                            <button type="button" @click.stop="showIconsList = !showIconsList" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent flex items-center justify-center text-[hsl(var(--muted-foreground))]">
                                 <template x-if="newIcon"><i :class="newIcon"></i></template>
                                 <template x-if="!newIcon"><i class="fas fa-icons"></i></template>
                                 <i class="fas fa-chevron-down ml-2 text-[10px] opacity-20"></i>
@@ -157,6 +157,7 @@
             if (!Alpine.data('linksManager')) {
                 Alpine.data('linksManager', () => ({
                     newIcon: '',
+                    showIconsList: false,
                     iconOptions: [
                         'fab fa-instagram', 'fab fa-twitter', 'fab fa-facebook', 'fab fa-linkedin', 
                         'fab fa-youtube', 'fab fa-tiktok', 'fab fa-whatsapp', 'fab fa-github', 
