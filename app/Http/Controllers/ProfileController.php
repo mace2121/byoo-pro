@@ -79,38 +79,57 @@ class ProfileController extends Controller
 
             // Avatar Upload
             if ($request->hasFile('avatar')) {
-                if ($user->profile->avatar) {
-                    Storage::disk('public')->delete($user->profile->avatar);
-                }
+                try {
+                    if ($user->profile->avatar) {
+                        Storage::disk('public')->delete($user->profile->avatar);
+                    }
 
-                $file = $request->file('avatar');
-                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                $image = $manager->read($file);
-                $image->scale(512, 512);
-                $encoded = $image->toWebp(80);
-                $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.webp';
-                Storage::disk('public')->put($filename, (string) $encoded);
-                $profileData['avatar'] = $filename;
+                    $file = $request->file('avatar');
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->read($file);
+                    $image->scale(512, 512);
+                    $encoded = $image->toWebp(80);
+                    $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.webp';
+                    
+                    // Ensure directory exists
+                    if (!Storage::disk('public')->exists('avatars')) {
+                        Storage::disk('public')->makeDirectory('avatars');
+                    }
+                    
+                    Storage::disk('public')->put($filename, (string) $encoded);
+                    $profileData['avatar'] = $filename;
+                } catch (\Exception $e) {
+                    \Log::error('Avatar processing failed: ' . $e->getMessage());
+                }
             }
 
             // Background Image Upload
             if ($request->hasFile('bg_image')) {
-                if ($user->profile->bg_image) {
-                    Storage::disk('public')->delete($user->profile->bg_image);
-                }
+                try {
+                    if ($user->profile->bg_image) {
+                        Storage::disk('public')->delete($user->profile->bg_image);
+                    }
 
-                $file = $request->file('bg_image');
-                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                $image = $manager->read($file);
-                
-                // Max height 1080 while maintaining aspect ratio
-                $image->scale(null, 1080);
-                
-                $encoded = $image->toWebp(70); // lower quality for backgrounds
-                $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
-                
-                Storage::disk('public')->put($filename, (string) $encoded);
-                $profileData['bg_image'] = $filename;
+                    $file = $request->file('bg_image');
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->read($file);
+                    
+                    // Max height 1080 while maintaining aspect ratio
+                    $image->scale(null, 1080);
+                    
+                    $encoded = $image->toWebp(70); 
+                    $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
+                    
+                    // Ensure directory exists
+                    if (!Storage::disk('public')->exists('backgrounds')) {
+                        Storage::disk('public')->makeDirectory('backgrounds');
+                    }
+                    
+                    Storage::disk('public')->put($filename, (string) $encoded);
+                    $profileData['bg_image'] = $filename;
+                } catch (\Exception $e) {
+                    \Log::error('Background processing failed: ' . $e->getMessage());
+                }
             }
 
             $user->profile->update($profileData);

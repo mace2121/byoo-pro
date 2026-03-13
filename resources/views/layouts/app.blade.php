@@ -15,17 +15,28 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+        <style>
+            /* Minimalist Scrollbar */
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
+            .dark ::-webkit-scrollbar-thumb { background: #374151; }
+            .dark ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+        </style>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-950">
+    <body class="font-sans antialiased text-gray-900 dark:text-gray-100 bg-white dark:bg-black selection:bg-black selection:text-white">
         @if(session('impersonator_id'))
-            <div class="bg-indigo-600 text-white py-2 px-4 flex items-center justify-between sticky top-0 z-50 shadow-lg">
+            <div class="bg-black text-white py-2 px-4 flex items-center justify-between sticky top-0 z-50 shadow-lg border-b border-white/10">
                 <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg>
+                    <i class="fas fa-user-secret w-4 h-4"></i>
                     <span class="text-xs font-bold uppercase tracking-wider">
-                        {{ __('Impersonating') }}: <span class="text-indigo-200">{{ auth()->user()->name }}</span>
+                        {{ __('Impersonating') }}: <span class="text-gray-400">{{ auth()->user()->name }}</span>
                     </span>
                 </div>
                 <a href="{{ route('admin.stop-impersonating') }}" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-lg text-xs font-black uppercase transition-all">
@@ -41,5 +52,7 @@
                 {{ $slot }}
             </main>
         </div>
+
+        @stack('scripts')
     </body>
 </html>

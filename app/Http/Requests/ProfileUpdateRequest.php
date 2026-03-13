@@ -45,7 +45,7 @@ class ProfileUpdateRequest extends FormRequest
             'button_color' => ['nullable', 'string', 'max:50'],
             'button_text_color' => ['nullable', 'string', 'max:50'],
             'button_style' => ['nullable', 'string', 'in:rounded,pill,square,soft'],
-            'font_family' => ['nullable', 'string', 'in:sans,serif,mono,poppins,inter'],
+            'font_family' => ['nullable', 'string', 'in:sans,serif,mono,poppins,inter,outfit,roboto,montserrat,playfair'],
             'custom_css' => ['nullable', 'string', 'max:5000'],
             'custom_domain' => [
                 'nullable',
