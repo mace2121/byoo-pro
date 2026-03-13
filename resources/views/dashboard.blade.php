@@ -106,7 +106,7 @@
                     <div class="relative mx-auto w-full max-w-[300px] aspect-[9/19] bg-white dark:bg-black rounded-[3rem] border-[10px] border-black shadow-2xl overflow-hidden ring-4 ring-gray-100 dark:ring-gray-900"
                          x-on:links-updated.window="$refs.previewIframe.src = $refs.previewIframe.src"
                          x-on:profile-updated.window="$refs.previewIframe.src = $refs.previewIframe.src">
-                        <iframe x-ref="previewIframe" src="{{ route('profile.show', auth()->user()->username) }}" class="w-full h-full border-none"></iframe>
+                        <iframe x-ref="previewIframe" src="{{ route('public.profile', auth()->user()->username) }}" class="w-full h-full border-none"></iframe>
                     </div>
                     <div class="mt-6 text-center">
                         <p class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">{{ __('Gerçek Zamanlı Senkronize') }}</p>

@@ -17,7 +17,7 @@
 
             <!-- Settings Dropdown -->
             <div class="flex items-center sm:ms-6 gap-3">
-                <a href="{{ route('profile.show', auth()->user()->username) }}" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-wider hover:opacity-80 transition-all shadow-lg shadow-black/5">
+                <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-black dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-wider hover:opacity-80 transition-all shadow-lg shadow-black/5">
                     <i class="fas fa-external-link-alt text-[10px]"></i>
                     {{ __('Sayfamı Gör') }}
                 </a>
