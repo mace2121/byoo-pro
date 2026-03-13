@@ -18,6 +18,18 @@ class Profile extends Model
         'avatar',
         'bio',
         'theme',
+        'theme_type',
+        'bg_type',
+        'bg_color',
+        'bg_image',
+        'bg_blur',
+        'bg_overlay',
+        'text_color',
+        'button_color',
+        'button_text_color',
+        'button_style',
+        'font_family',
+        'custom_css',
         'custom_domain',
         'custom_domain_verified',
         'is_active',
@@ -38,8 +50,26 @@ class Profile extends Model
         });
     }
 
+    /**
+     * Get the profile's background image URL.
+     */
+    protected function bgImageUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->bg_image) {
+                return Storage::disk('public')->url($this->bg_image);
+            }
+            return null;
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function viewLogs()
+    {
+        return $this->hasMany(ViewLog::class);
     }
 }

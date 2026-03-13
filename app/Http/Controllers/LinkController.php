@@ -6,8 +6,17 @@ use App\Models\Link;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Services\ProfileService;
+
 class LinkController extends Controller
 {
+    protected $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     public function index()
     {
         $links = Auth::user()->links()->orderBy('order')->get();
@@ -41,6 +50,8 @@ class LinkController extends Controller
             'is_active' => true,
         ]);
 
+        $this->profileService->clearProfileCache(Auth::user());
+
         return redirect()->route('links.index')->with('success', 'Link added successfully.');
     }
 
@@ -63,6 +74,8 @@ class LinkController extends Controller
              $link->update($validated);
         }
 
+        $this->profileService->clearProfileCache(Auth::user());
+
         return redirect()->route('links.index')->with('success', 'Link updated successfully.');
     }
 
@@ -72,6 +85,8 @@ class LinkController extends Controller
 
         $link->update(['is_active' => !$link->is_active]);
 
+        $this->profileService->clearProfileCache(Auth::user());
+
         return response()->json(['success' => true, 'is_active' => $link->is_active]);
     }
 
@@ -79,6 +94,8 @@ class LinkController extends Controller
     {
         Auth::user()->links()->findOrFail($link->id);
         $link->delete();
+
+        $this->profileService->clearProfileCache(Auth::user());
 
         return redirect()->route('links.index')->with('success', 'Link deleted successfully.');
     }
@@ -90,6 +107,8 @@ class LinkController extends Controller
         foreach ($orderedIds as $index => $id) {
             Auth::user()->links()->where('id', $id)->update(['order' => $index]);
         }
+
+        $this->profileService->clearProfileCache(Auth::user());
 
         return response()->json(['success' => true]);
     }

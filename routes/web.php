@@ -33,6 +33,9 @@ Route::middleware('auth')->group(function () {
 
     // Pricing
     Route::get('/pricing', [\App\Http\Controllers\PricingController::class, 'index'])->name('pricing');
+
+    // Analytics
+    Route::get('/analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
 });
 
 use App\Http\Controllers\AdminController;
@@ -41,7 +44,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminController::class, 'users'])->name('users.index');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleStatus'])->name('users.toggle');
+    Route::get('/users/{user}/impersonate', [AdminController::class, 'impersonate'])->name('users.impersonate');
 });
+
+Route::get('/admin/stop-impersonating', [AdminController::class, 'stopImpersonating'])
+    ->middleware('auth')
+    ->name('admin.stop-impersonating');
 
 require __DIR__.'/auth.php';
 

@@ -7,8 +7,17 @@ use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+use App\Services\ProfileService;
+
 class PublicProfileController extends Controller
 {
+    protected $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     public function show($username)
     {
         // Kullanıcıyı username üzerinden bul, bulamazsa 404 dön
@@ -30,28 +39,28 @@ class PublicProfileController extends Controller
 
     protected function renderProfile(User $user)
     {
-        $profile = $user->profile;
-        if (!$profile || !$profile->is_active) {
+        $data = $this->profileService->getProfileData($user);
+        
+        if (!$data) {
             abort(404);
         }
 
-        // Görüş sayısını 1 arttır
-        $profile->increment('views');
+        $profile = $data['profile'];
+        $links = $data['links'];
 
-        // Kullanıcının SADECE aktif ve zamanlanmış linklerini, order siralamasına gore getir
-        $now = now();
-        $links = $user->links()
-            ->where('is_active', true)
-            ->where(function($query) use ($now) {
-                $query->whereNull('starts_at')
-                      ->orWhere('starts_at', '<=', $now);
-            })
-            ->where(function($query) use ($now) {
-                $query->whereNull('expires_at')
-                      ->orWhere('expires_at', '>=', $now);
-            })
-            ->orderBy('order')
-            ->get();
+        // Analytics logging
+        $request = request();
+        $ua = $request->userAgent();
+        $parsedUA = $this->profileService->parseUserAgent($ua);
+        
+        $this->profileService->logView($profile, [
+            'ip' => $request->ip(),
+            'device' => substr($ua, 0, 255),
+            'country' => $request->header('CF-IPCountry'),
+            'browser' => $parsedUA['browser'],
+            'os' => $parsedUA['os'],
+            'referer' => $request->headers->get('referer'),
+        ]);
 
         return view('public.profile', compact('user', 'profile', 'links'));
     }
@@ -78,47 +87,21 @@ class PublicProfileController extends Controller
         // Tıklama sayısını 1 arttır
         $link->increment('clicks');
 
-        // Analytics helpers (Simple extraction from User Agent)
+        // Analytics helpers
         $ua = $request->userAgent();
-        $browser = $this->getBrowser($ua);
-        $os = $this->getOS($ua);
-        $referer = $request->headers->get('referer');
-
-        // Extract IP & Country if available
-        $ip = $request->ip();
-        $country = $request->header('CF-IPCountry'); 
+        $parsedUA = $this->profileService->parseUserAgent($ua);
 
         // ClickLog oluştur
         $link->clickLogs()->create([
-            'ip' => $ip,
+            'ip' => $request->ip(),
             'device' => substr($ua, 0, 255),
-            'country' => $country,
-            'browser' => $browser,
-            'os' => $os,
-            'referer' => $referer,
+            'country' => $request->header('CF-IPCountry'),
+            'browser' => $parsedUA['browser'],
+            'os' => $parsedUA['os'],
+            'referer' => $request->headers->get('referer'),
         ]);
 
         return redirect()->away($link->url);
-    }
-
-    protected function getBrowser($ua)
-    {
-        if (preg_match('/MSIE/i', $ua) && !preg_match('/Opera/i', $ua)) return 'MSIE';
-        if (preg_match('/Firefox/i', $ua)) return 'Firefox';
-        if (preg_match('/Chrome/i', $ua)) return 'Chrome';
-        if (preg_match('/Safari/i', $ua)) return 'Safari';
-        if (preg_match('/Opera/i', $ua)) return 'Opera';
-        return 'Other';
-    }
-
-    protected function getOS($ua)
-    {
-        if (preg_match('/windows|win32/i', $ua)) return 'Windows';
-        if (preg_match('/macintosh|mac os x/i', $ua)) return 'Mac OS';
-        if (preg_match('/linux/i', $ua)) return 'Linux';
-        if (preg_match('/iphone|ipad|ipod/i', $ua)) return 'iOS';
-        if (preg_match('/android/i', $ua)) return 'Android';
-        return 'Other';
     }
 
     public function verifyPassword(Link $link, Request $request)

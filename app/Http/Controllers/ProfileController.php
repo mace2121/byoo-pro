@@ -10,8 +10,16 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
+use App\Services\ProfileService;
+
 class ProfileController extends Controller
 {
+    protected $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
     /**
      * Display the user's profile form.
      */
@@ -46,6 +54,17 @@ class ProfileController extends Controller
                 'username' => $user->username,
                 'bio' => $request->bio,
                 'theme' => $request->input('theme', 'minimal'),
+                'theme_type' => $request->input('theme_type', 'preset'),
+                'bg_type' => $request->input('bg_type'),
+                'bg_color' => $request->input('bg_color'),
+                'bg_blur' => $request->input('bg_blur', 0),
+                'bg_overlay' => $request->input('bg_overlay', 0),
+                'text_color' => $request->input('text_color'),
+                'button_color' => $request->input('button_color'),
+                'button_text_color' => $request->input('button_text_color'),
+                'button_style' => $request->input('button_style', 'rounded'),
+                'font_family' => $request->input('font_family', 'sans'),
+                'custom_css' => $request->input('custom_css'),
                 'custom_domain' => $request->input('custom_domain'),
             ];
 
@@ -54,35 +73,44 @@ class ProfileController extends Controller
                 $profileData['custom_domain_verified'] = false;
             }
 
+            // Avatar Upload
             if ($request->hasFile('avatar')) {
-                // Delete old avatar
                 if ($user->profile->avatar) {
                     Storage::disk('public')->delete($user->profile->avatar);
                 }
 
                 $file = $request->file('avatar');
-                $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
-
-                // Image processing (Resize and Optimize)
-                $manager = new \Intervention\Image\ImageManager(
-                    new \Intervention\Image\Drivers\Gd\Driver()
-                );
-                
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $image = $manager->read($file);
-                
-                // Scale to 512x512 max while maintaining aspect ratio
                 $image->scale(512, 512);
-
-                // Encode as webp for better compression if possible, otherwise keep original extension
                 $encoded = $image->toWebp(80);
                 $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.webp';
-
                 Storage::disk('public')->put($filename, (string) $encoded);
-                
                 $profileData['avatar'] = $filename;
             }
 
+            // Background Image Upload
+            if ($request->hasFile('bg_image')) {
+                if ($user->profile->bg_image) {
+                    Storage::disk('public')->delete($user->profile->bg_image);
+                }
+
+                $file = $request->file('bg_image');
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->read($file);
+                
+                // Max height 1080 while maintaining aspect ratio
+                $image->scale(null, 1080);
+                
+                $encoded = $image->toWebp(70); // lower quality for backgrounds
+                $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
+                
+                Storage::disk('public')->put($filename, (string) $encoded);
+                $profileData['bg_image'] = $filename;
+            }
+
             $user->profile->update($profileData);
+            $this->profileService->clearProfileCache($user);
         }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');

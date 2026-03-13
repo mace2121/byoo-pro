@@ -77,8 +77,8 @@
                     <span class="text-xs font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full">{{ $item->count }}</span>
                 </div>
             @empty
-                <div class="text-center py-4 text-xs text-gray-400 italic">No data yet</div>
-            @endforelse
+                <div class="text-center py-4 text-xs text-gray-400 italic">{{ __('No data yet') }}</div>
+@endforelse
         </div>
     </div>
 
@@ -95,8 +95,8 @@
                     <span class="text-xs font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">{{ $item->count }}</span>
                 </div>
             @empty
-                <div class="text-center py-4 text-xs text-gray-400 italic">No data yet</div>
-            @endforelse
+                <div class="text-center py-4 text-xs text-gray-400 italic">{{ __('No data yet') }}</div>
+@endforelse
         </div>
     </div>
 
@@ -109,11 +109,11 @@
         <div class="space-y-3">
             @forelse($top_countries as $item)
                 <div class="flex items-center justify-between">
-                    <span class="text-xs text-gray-600 dark:text-gray-400">{{ $item->country ?: 'Global' }}</span>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">{{ $item->country ?: __('Global') }}</span>
                     <span class="text-xs font-bold bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full">{{ $item->count }}</span>
                 </div>
             @empty
-                <div class="text-center py-4 text-xs text-gray-400 italic">No data yet</div>
+                <div class="text-center py-4 text-xs text-gray-400 italic">{{ __('No data yet') }}</div>
             @endforelse
         </div>
     </div>

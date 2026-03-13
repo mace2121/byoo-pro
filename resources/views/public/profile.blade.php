@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $profile->username ?? $user->name }} - byoo.pro</title>
     <meta name="description" content="{{ $profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' adlı kullanıcının byoo.pro profili.' }}">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url('/' . $user->username) }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -25,7 +26,7 @@
     <meta property="og:site_name" content="byoo.pro">
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $user->name }} - byoo.pro">
     <meta name="twitter:description" content="{{ $profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' - byoo.pro' }}">
     @if($profile->avatar)
@@ -34,9 +35,14 @@
         <meta name="twitter:image" content="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=512">
     @endif
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <!-- Theme Fonts -->
+    @if($profile->theme_type === 'custom')
+        @if($profile->font_family === 'poppins')
+            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        @elseif($profile->font_family === 'inter')
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        @endif
+    @endif
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -54,6 +60,8 @@
             --avatar-ring: #ffffff;
             --link-color: #374151;
             --footer-color: #9ca3af;
+            --font-family: 'Inter', sans-serif;
+            --btn-radius: 0.75rem; /* rounded-xl */
         }
 
         /* Minimal (default) */
@@ -86,15 +94,71 @@
         /* Obsidian */
         .theme-obsidian { --bg: #121212; --text: #e0e0e0; --text-secondary: #888888; --card-bg: #1e1e1e; --card-border: #333333; --card-hover: #2a2a2a; --avatar-ring: #555555; --link-color: #cccccc; --footer-color: #555555; }
 
-        /* Apply Theme */
+        /* Custom Theme Overrides */
+        @if($profile->theme_type === 'custom')
+        .theme-custom {
+            @if($profile->bg_type === 'color')
+                --bg: {{ $profile->bg_color ?? '#f9fafb' }};
+            @endif
+            --text: {{ $profile->text_color ?? '#111827' }};
+            --text-secondary: {{ ($profile->text_color ?? '#111827') . 'cc' }}; /* 80% opacity */
+            --card-bg: {{ $profile->button_color ?? '#ffffff' }};
+            --card-border: transparent;
+            --card-hover: {{ ($profile->button_color ?? '#ffffff') . 'ee' }};
+            --link-color: {{ $profile->button_text_color ?? '#111827' }};
+            --footer-color: {{ ($profile->text_color ?? '#111827') . '88' }};
+            
+            @if($profile->font_family === 'poppins')
+                --font-family: 'Poppins', sans-serif;
+            @elseif($profile->font_family === 'serif')
+                --font-family: Georgia, serif;
+            @elseif($profile->font_family === 'mono')
+                --font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+            @elseif($profile->font_family === 'inter')
+                --font-family: 'Inter', sans-serif;
+            @endif
+
+            @if($profile->button_style === 'pill')
+                --btn-radius: 9999px;
+            @elseif($profile->button_style === 'square')
+                --btn-radius: 0px;
+            @elseif($profile->button_style === 'soft')
+                --btn-radius: 2rem;
+            @endif
+        }
+        @endif
+
+        /* Apply Styles */
+        body { font-family: var(--font-family); }
+
         .theme-page {
             min-height: 100vh;
             display: flex;
             justify-content: center;
             padding: 3rem 1rem;
+            position: relative;
+            background-color: var(--bg);
+            @if($profile->theme_type === 'custom' && $profile->bg_type === 'image')
+                background-image: url('{{ $profile->bg_image_url }}');
+                background-size: cover;
+                background-position: center;
+                background-attachment: fixed;
+            @endif
         }
 
-        /* Solid backgrounds */
+        @if($profile->theme_type === 'custom' && $profile->bg_type === 'image')
+        .theme-page::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0, {{ ($profile->bg_overlay ?? 0) / 100 }});
+            backdrop-filter: blur({{ $profile->bg_blur ?? 0 }}px);
+            z-index: 0;
+        }
+        .theme-page > div { position: relative; z-index: 10; }
+        @endif
+
+        /* Solid backgrounds for presets */
         .theme-minimal .theme-page,
         .theme-dark .theme-page,
         .theme-neon .theme-page,
@@ -120,12 +184,16 @@
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--link-color);
+            border-radius: var(--btn-radius);
             transition: all 0.2s ease;
         }
         .theme-card:hover {
             background: var(--card-hover);
             box-shadow: var(--card-shadow, none);
         }
+
+        /* Custom CSS */
+        {!! $profile->custom_css !!}
 
         /* Glass effect for specific themes */
         .theme-glass .theme-card,
@@ -153,7 +221,7 @@
 @php
     $theme = $profile->theme ?? 'minimal';
 @endphp
-<body class="h-full theme-{{ $theme }}">
+<body class="h-full theme-{{ $theme }} {{ $profile->theme_type === 'custom' ? 'theme-custom' : '' }}">
     <div class="theme-page">
         <div class="max-w-md w-full space-y-8">
             

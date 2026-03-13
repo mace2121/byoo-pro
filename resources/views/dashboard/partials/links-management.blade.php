@@ -24,7 +24,7 @@
             <div x-data="{ open: false }">
                 <button type="button" @click="open = !open" class="text-xs text-indigo-500 hover:text-indigo-600 font-medium flex items-center gap-1">
                     <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                    Advanced Options (Scheduling, Password)
+                    {{ __('Advanced Options (Scheduling, Password)') }}
                 </button>
                 
                 <div x-show="open" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
@@ -38,7 +38,7 @@
                     </div>
                     <div>
                         <x-input-label for="password" :value="__('Password Protection')" />
-                        <x-text-input id="password" name="password" type="text" class="mt-1 block w-full text-xs" placeholder="Optional" />
+                        <x-text-input id="password" name="password" type="text" class="mt-1 block w-full text-xs" :placeholder="__('Optional')" />
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                         <div class="truncate max-w-[200px] sm:max-w-md">
                             <p class="font-semibold text-gray-900 dark:text-gray-100" :class="{ 'opacity-50 line-through': !active }">{{ $link->title }}</p>
                             <p class="text-xs text-indigo-500 truncate">{{ $link->url }}</p>
-                            <p class="text-[10px] text-gray-400 mt-1">{{ $link->clicks }} clicks</p>
+                            <p class="text-[10px] text-gray-400 mt-1">{{ $link->clicks }} {{ __('clicks') }}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <!-- Toggle Switch -->
@@ -92,7 +92,7 @@
                         <div x-data="{ open: false }">
                             <button type="button" @click="open = !open" class="text-[10px] text-gray-500 hover:text-indigo-500 flex items-center gap-1">
                                 <svg class="w-3 h-3 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                                Advanced Settings
+                                {{ __('Advanced Settings') }}
                             </button>
                             <div x-show="open" x-cloak class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                                 <div>
@@ -111,15 +111,15 @@
                         </div>
 
                         <div class="flex justify-end gap-2">
-                            <x-secondary-button @click="editing = false" class="py-1 px-3 text-xs">Cancel</x-secondary-button>
-                            <x-primary-button class="py-1 px-3 text-xs font-bold">Save</x-primary-button>
+                             <x-secondary-button @click="editing = false" class="py-1 px-3 text-xs">{{ __('Cancel') }}</x-secondary-button>
+                            <x-primary-button class="py-1 px-3 text-xs font-bold">{{ __('Save') }}</x-primary-button>
                         </div>
                     </form>
                 </div>
 
                 <!-- Silme Butonu -->
                 <div class="flex items-center">
-                    <form method="post" action="{{ route('links.destroy', $link) }}" onsubmit="return confirm('Are you sure you want to delete this link?');">
+                    <form method="post" action="{{ route('links.destroy', $link) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this link?') }}');">
                         @csrf
                         @method('delete')
                         <button type="submit" class="p-1 text-red-400 hover:text-red-600 transition-colors">
@@ -133,8 +133,8 @@
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 italic">No links yet</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by adding your first link above.</p>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100 italic">{{ __('No links yet') }}</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('Get started by adding your first link above.') }}</p>
             </div>
         @endforelse
     </div>

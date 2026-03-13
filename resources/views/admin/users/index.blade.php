@@ -23,6 +23,18 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     
+                    <div class="mb-6">
+                        <form action="{{ route('admin.users.index') }}" method="GET" class="flex gap-2">
+                            <x-text-input name="search" value="{{ $search ?? '' }}" placeholder="Search name, username or email..." class="w-full md:w-1/3" />
+                            <x-primary-button type="submit">{{ __('Search') }}</x-primary-button>
+                            @if($search)
+                                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none transition ease-in-out duration-150">
+                                    {{ __('Clear') }}
+                                </a>
+                            @endif
+                        </form>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-700">
@@ -33,8 +45,11 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         User
                                     </th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Role
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Links
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Views / Clicks
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Status
@@ -42,7 +57,7 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Joined
                                     </th>
-                                    <th scope="col" class="relative px-6 py-3">
+                                    <th scope="col" class="relative px-6 py-3 text-right">
                                         <span class="sr-only">Actions</span>
                                     </th>
                                 </tr>
@@ -55,47 +70,65 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
+                                                <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3 text-xs font-bold">
+                                                    {{ substr($user->name, 0, 1) }}
+                                                </div>
                                                 <div>
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $user->name }}
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                                            {{ $user->name }}
+                                                        </div>
+                                                        @if($user->is_admin)
+                                                            <span class="px-1.5 py-0.5 text-[10px] font-black rounded bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 uppercase tracking-tighter">
+                                                                Admin
+                                                            </span>
+                                                        @endif
                                                     </div>
-                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    <div class="text-xs text-gray-500 dark:text-gray-400">
                                                         {{ $user->username }} | {{ $user->email }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($user->is_admin)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                                                    Admin
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                                {{ $user->links_count }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                                    {{ number_format($user->profile->views ?? 0) }}
                                                 </span>
-                                            @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                                    User
+                                                <span class="text-[10px] text-gray-400 uppercase tracking-tighter font-bold">
+                                                    / {{ number_format($user->links->sum('clicks')) }}
                                                 </span>
-                                            @endif
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($user->is_active)
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                <span class="px-2 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700 uppercase tracking-wider">
                                                     Active
                                                 </span>
                                             @else
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                                <span class="px-2 py-1 text-[10px] font-bold rounded-full bg-red-100 text-red-700 uppercase tracking-wider">
                                                     Suspended
                                                 </span>
                                             @endif
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $user->created_at->format('M d, Y') }}
+                                        <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $user->created_at->format('d M Y') }}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                                             @if($user->id !== auth()->id())
+                                                <a href="{{ route('admin.users.impersonate', $user) }}" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold text-xs uppercase" title="Login as User">
+                                                    Login
+                                                </a>
+                                                
                                                 <form action="{{ route('admin.users.toggle', $user) }}" method="POST" class="inline">
                                                     @csrf
                                                     @method('PATCH')
-                                                    <button type="submit" class="{{ $user->is_active ? 'text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300' : 'text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300' }}">
+                                                    <button type="submit" class="{{ $user->is_active ? 'text-red-400 hover:text-red-600' : 'text-green-400 hover:text-green-600' }} font-bold text-xs uppercase">
                                                         {{ $user->is_active ? 'Suspend' : 'Activate' }}
                                                     </button>
                                                 </form>
