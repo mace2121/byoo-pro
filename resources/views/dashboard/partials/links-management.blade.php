@@ -5,191 +5,148 @@
         :subtitle="__('Sayfanızda görünecek olan tüm bağlantıları buradan yönetebilirsiniz.')" 
     />
 
-    <!-- Link Ekle Formu -->
-    <div class="mb-10 p-2 sm:p-0">
-        <header class="mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-plus-circle text-black dark:text-white"></i>
-                <h2 class="text-xs font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ __('Yeni Link Ekle') }}</h2>
-            </div>
-        </header>
-        <div class="p-6 bg-white dark:bg-black rounded-3xl border border-gray-100 dark:border-gray-800">
-            <form method="post" action="{{ route('links.store') }}" class="space-y-4">
+    <!-- Link Ekle Formu (Card) -->
+    <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm mb-10 overflow-hidden">
+        <div class="p-6 border-b border-[hsl(var(--border))]">
+            <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Yeni Link Ekle') }}</h3>
+            <p class="text-sm text-[hsl(var(--muted-foreground))] mt-1.5">{{ __('Bağlantı başlığını ve linkini girerek anında yayına alın.') }}</p>
+        </div>
+        <div class="p-6">
+            <form method="post" action="{{ route('links.store') }}" class="space-y-6">
                 @csrf
-                <div class="flex flex-col md:flex-row gap-5 items-end">
-                    <div class="w-full md:flex-1">
-                        <x-input-label for="title" :value="__('Başlık')" class="text-[10px] font-black uppercase text-gray-400" />
-                        <x-text-input id="title" name="title" type="text" class="mt-1 block w-full rounded-2xl border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:ring-black focus:border-black" placeholder="Örn: Web Sitem" required />
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                    <div class="md:col-span-4">
+                        <x-input-label for="title" :value="__('Başlık')" class="text-xs font-medium mb-1.5" />
+                        <x-text-input id="title" name="title" type="text" placeholder="Örn: Portfolyom" required />
                     </div>
-                    <div class="w-full md:flex-1">
-                        <x-input-label for="url" :value="__('URL (Bağlantı)')" class="text-[10px] font-black uppercase text-gray-400" />
-                        <x-text-input id="url" name="url" type="url" class="mt-1 block w-full rounded-2xl border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 focus:ring-black focus:border-black" placeholder="https://example.com" required 
-                            @input="detectPlatform($event.target.value)" />
+                    <div class="md:col-span-5">
+                        <x-input-label for="url" :value="__('URL (Bağlantı)')" class="text-xs font-medium mb-1.5" />
+                        <x-text-input id="url" name="url" type="url" placeholder="https://example.com" required @input="detectPlatform($event.target.value)" />
                     </div>
-                    <div class="w-full md:w-32" x-data="{ showIconsList: false }">
-                        <x-input-label for="icon" :value="__('İkon')" class="text-[10px] font-black uppercase text-gray-400" />
-                        <div class="relative mt-1">
-                            <button type="button" @click="showIconsList = !showIconsList" class="w-full h-12 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-500 hover:text-black dark:hover:text-white transition-colors">
-                                <template x-if="newIcon">
-                                    <i :class="newIcon" class="text-lg"></i>
-                                </template>
-                                <template x-if="!newIcon">
-                                    <i class="fas fa-icons text-lg"></i>
-                                </template>
+                    <div class="md:col-span-2">
+                        <x-input-label for="icon" :value="__('İkon')" class="text-xs font-medium mb-1.5" />
+                        <div class="relative" x-data="{ showIconsList: false }">
+                            <button type="button" @click="showIconsList = !showIconsList" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors hover:bg-accent flex items-center justify-center text-[hsl(var(--muted-foreground))]">
+                                <template x-if="newIcon"><i :class="newIcon"></i></template>
+                                <template x-if="!newIcon"><i class="fas fa-icons"></i></template>
+                                <i class="fas fa-chevron-down ml-2 text-[10px] opacity-20"></i>
                             </button>
                             <input type="hidden" name="icon" x-model="newIcon">
                             
                             <!-- Icon Picker Dropdown -->
-                            <div x-show="showIconsList" @click.away="showIconsList = false" class="absolute z-50 mt-2 p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 grid grid-cols-4 gap-2 w-48 max-h-60 overflow-y-auto custom-scrollbar" x-cloak>
+                            <div x-show="showIconsList" @click.away="showIconsList = false" class="absolute z-50 mt-2 p-2 bg-[hsl(var(--popover))] text-[hsl(var(--popover-foreground))] rounded-md shadow-md border border-border grid grid-cols-4 gap-1 w-48 max-h-60 overflow-y-auto" x-cloak>
                                 <template x-for="iconItem in iconOptions">
-                                    <button type="button" @click="newIcon = iconItem; showIconsList = false" class="p-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black rounded-xl text-gray-500 transition-all text-center">
+                                    <button type="button" @click="newIcon = iconItem; showIconsList = false" class="inline-flex items-center justify-center rounded-sm p-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-all">
                                         <i :class="iconItem"></i>
                                     </button>
                                 </template>
                             </div>
                         </div>
                     </div>
-                    <div class="w-full md:w-auto">
-                        <x-primary-button class="w-full h-12 justify-center px-8 rounded-2xl bg-black dark:bg-white text-white dark:text-black hover:opacity-80 shadow-xl shadow-black/10">
-                            {{ __('Ekle') }}
-                        </x-primary-button>
+                    <div class="md:col-span-1">
+                        <x-primary-button class="w-full">{{ __('Ekle') }}</x-primary-button>
                     </div>
                 </div>
 
                 <!-- Advanced Settings Toggle -->
-                <div x-data="{ open: false }" class="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800/50">
-                    <button type="button" @click="open = !open" class="text-[10px] text-gray-400 hover:text-black dark:hover:text-white font-black uppercase tracking-widest flex items-center gap-1 transition-colors">
+                <div x-data="{ open: false }" class="pt-4 border-t border-[hsl(var(--border))]">
+                    <button type="button" @click="open = !open" class="text-xs text-[hsl(var(--muted-foreground))] hover:text-foreground font-medium flex items-center gap-1 transition-colors">
                         <i class="fas h-3 w-3 transition-transform" :class="open ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
                         {{ __('Gelişmiş Seçenekler') }}
                     </button>
                     
-                    <div x-show="open" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-5 bg-gray-50 dark:bg-gray-900 rounded-2xl">
-                        <div>
-                            <x-input-label for="starts_at" :value="__('Başlangıç')" class="text-[10px] font-black uppercase text-gray-400" />
-                            <x-text-input id="starts_at" name="starts_at" type="datetime-local" class="mt-1 block w-full text-xs rounded-xl" />
+                    <div x-show="open" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 p-4 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
+                        <div class="space-y-1.5">
+                            <x-input-label for="starts_at" :value="__('Başlangıç')" class="text-xs font-medium" />
+                            <x-text-input id="starts_at" name="starts_at" type="datetime-local" class="bg-card" />
                         </div>
-                        <div>
-                            <x-input-label for="expires_at" :value="__('Bitiş')" class="text-[10px] font-black uppercase text-gray-400" />
-                            <x-text-input id="expires_at" name="expires_at" type="datetime-local" class="mt-1 block w-full text-xs rounded-xl" />
+                        <div class="space-y-1.5">
+                            <x-input-label for="expires_at" :value="__('Bitiş')" class="text-xs font-medium" />
+                            <x-text-input id="expires_at" name="expires_at" type="datetime-local" class="bg-card" />
                         </div>
-                        <div>
-                            <x-input-label for="password" :value="__('Şifre')" class="text-[10px] font-black uppercase text-gray-400" />
-                            <x-text-input id="password" name="password" type="text" class="mt-1 block w-full text-xs rounded-xl" :placeholder="__('Opsiyonel')" />
+                        <div class="space-y-1.5">
+                            <x-input-label for="password" :value="__('Şifre')" class="text-xs font-medium" />
+                            <x-text-input id="password" name="password" type="text" class="bg-card" :placeholder="__('Opsiyonel')" />
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        <x-input-error class="mt-2" :messages="$errors->get('title')" />
-        <x-input-error class="mt-2" :messages="$errors->get('url')" />
     </div>
 
     <!-- Link Listesi (Sortable) -->
-    <div x-ref="sortableList" class="space-y-4">
+    <div x-ref="sortableList" class="space-y-3">
         @forelse($links as $link)
-            <div class="flex items-center gap-4 bg-white dark:bg-black p-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm link-item relative group hover:border-black dark:hover:border-white transition-all duration-300" data-id="{{ $link->id }}">
+            <div class="flex items-center gap-4 bg-[hsl(var(--card))] p-3 rounded-lg border border-[hsl(var(--border))] shadow-sm link-item relative group hover:border-[hsl(var(--ring))] transition-all duration-200" data-id="{{ $link->id }}">
                 
                 <!-- Drag Handle -->
-                <div class="cursor-grab sort-handle text-gray-200 hover:text-black dark:hover:text-white active:cursor-grabbing transition-colors p-2">
-                    <i class="fas fa-grip-vertical"></i>
+                <div class="cursor-grab sort-handle text-[hsl(var(--muted-foreground))] hover:text-foreground transition-colors p-2">
+                    <i class="fas fa-grip-vertical text-xs"></i>
                 </div>
 
-                <!-- Link Bilgileri -->
-                <div class="flex items-center gap-4 w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 flex-shrink-0 justify-center text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors">
-                    <i class="{{ $link->icon_class }} text-xl"></i>
+                <!-- Icon -->
+                <div class="flex items-center justify-center w-10 h-10 rounded-md border border-[hsl(var(--border))] bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] flex-shrink-0">
+                    <i class="{{ $link->icon_class }} text-lg"></i>
                 </div>
 
-                <div class="flex-1" x-data="{ editing: false, active: {{ $link->is_active ? 'true' : 'false' }} }">
-                    <div x-show="!editing" class="flex justify-between items-center text-left">
-                        <div class="truncate max-w-[200px] sm:max-w-md">
-                            <p class="text-sm font-black text-gray-900 dark:text-white" :class="{ 'opacity-30 line-through': !active }">{{ $link->title }}</p>
-                            <p class="text-[10px] font-black text-gray-400 truncate mt-0.5">{{ str_replace(['https://','http://'], '', $link->url) }}</p>
-                            
-                            <div class="flex items-center gap-3 mt-2">
-                                <span class="text-[9px] font-black uppercase text-gray-400 bg-gray-50 dark:bg-black/50 px-2 py-0.5 rounded-lg border border-gray-100 dark:border-gray-800">
-                                    {{ $link->clicks }} {{ __('tıklama') }}
-                                </span>
-                                @if($link->starts_at || $link->expires_at)
-                                    <span class="text-[9px] font-black uppercase text-black dark:text-white bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-lg">
-                                        <i class="fas fa-calendar-alt mr-1"></i> {{ __('Planlı') }}
-                                    </span>
-                                @endif
-                            </div>
+                <div class="flex-1 flex items-center justify-between" x-data="{ editing: false, active: {{ $link->is_active ? 'true' : 'false' }} }">
+                    <div x-show="!editing" class="flex-1 min-w-0 pr-4">
+                        <div class="flex items-center gap-2">
+                            <p class="text-sm font-semibold truncate" :class="{ 'opacity-40 line-through font-normal': !active }">{{ $link->title }}</p>
+                            @if($link->starts_at || $link->expires_at)
+                                <i class="fas fa-calendar-alt text-[10px] text-primary" title="{{ __('Planlı') }}"></i>
+                            @endif
+                        </div>
+                        <p class="text-xs text-[hsl(var(--muted-foreground))] truncate mt-0.5">{{ str_replace(['https://','http://'], '', $link->url) }}</p>
+                    </div>
+
+                    <div x-show="!editing" class="flex items-center gap-3">
+                        <div class="text-[10px] font-medium text-[hsl(var(--muted-foreground))] px-2 py-0.5 bg-[hsl(var(--muted))] rounded shadow-inner">
+                            {{ $link->clicks }} {{ __('click') }}
                         </div>
 
-                        <div class="flex items-center gap-4">
-                            <!-- Toggle Switch -->
-                            <button @click="toggleLink({{ $link->id }}, active); active = !active" 
-                                    :class="active ? 'bg-black dark:bg-white' : 'bg-gray-100 dark:bg-gray-800'" 
-                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out">
-                                <span aria-hidden="true" :class="active ? 'translate-x-5 bg-white dark:bg-black' : 'translate-x-0 bg-white'" class="pointer-events-none inline-block h-5 w-5 transform rounded-full shadow-lg transition duration-300"></span>
+                        <!-- Toggle Switch -->
+                        <button @click="toggleLink({{ $link->id }}, active); active = !active" 
+                                :class="active ? 'bg-primary' : 'bg-[hsl(var(--muted))]'" 
+                                class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-ring">
+                            <span aria-hidden="true" :class="active ? 'translate-x-4' : 'translate-x-0'" class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-lg ring-0 transition duration-200"></span>
+                        </button>
+                        
+                        <!-- Actions -->
+                        <div class="flex items-center border-l border-[hsl(var(--border))] pl-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button @click="editing = true" class="p-1.5 text-[hsl(var(--muted-foreground))] hover:text-foreground transition-colors">
+                                <i class="fas fa-pencil-alt text-[10px]"></i>
                             </button>
-                            
-                            <!-- Actions Overlay -->
-                            <div class="flex items-center bg-gray-50 dark:bg-black p-1 rounded-2xl border border-gray-100 dark:border-gray-800 opacity-0 group-hover:opacity-100 transition-all">
-                                <button @click="editing = true" class="p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-                                    <i class="fas fa-pen text-xs"></i>
+                            <form method="post" action="{{ route('links.destroy', $link) }}" onsubmit="return confirm('{{ __('Emin misiniz?') }}');">
+                                @csrf @method('delete')
+                                <button type="submit" class="p-1.5 text-[hsl(var(--muted-foreground))] hover:text-destructive transition-colors">
+                                    <i class="fas fa-trash-alt text-[10px]"></i>
                                 </button>
-                                <form method="post" action="{{ route('links.destroy', $link) }}" onsubmit="return confirm('{{ __('Emin misiniz?') }}');" class="flex items-center">
-                                    @csrf
-                                    @method('delete')
-                                    <button type="submit" class="p-2 text-gray-400 hover:text-black dark:hover:text-white transition-colors">
-                                        <i class="fas fa-trash text-xs"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            </form>
                         </div>
                     </div>
 
-                    <!-- Edit Mode -->
-                    <form @submit="editing = false" x-show="editing" method="post" action="{{ route('links.update', $link) }}" class="flex flex-col gap-4 w-full bg-gray-50 dark:bg-gray-900 p-6 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 mt-2" x-cloak>
-                        @csrf
-                        @method('put')
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" x-data="{ currentIcon: '{{ $link->icon_class }}', showIconsEdit: false }">
-                            <div>
-                                <x-input-label :value="__('Başlık')" class="text-[10px] font-black text-gray-400" />
-                                <x-text-input name="title" value="{{ $link->title }}" class="w-full text-xs rounded-xl" required />
-                            </div>
-                            <div>
-                                <x-input-label :value="__('URL')" class="text-[10px] font-black text-gray-400" />
-                                <x-text-input name="url" value="{{ $link->url }}" type="url" class="w-full text-xs rounded-xl" required />
-                            </div>
-                            <div>
-                                <x-input-label :value="__('İkon')" class="text-[10px] font-black text-gray-400" />
-                                <div class="relative mt-1">
-                                    <button type="button" @click="showIconsEdit = !showIconsEdit" class="w-full h-10 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-black flex items-center justify-center text-gray-500 hover:text-black dark:hover:text-white transition-colors">
-                                        <i :class="currentIcon" class="text-lg"></i>
-                                    </button>
-                                    <input type="hidden" name="icon" x-model="currentIcon">
-                                    
-                                    <div x-show="showIconsEdit" @click.away="showIconsEdit = false" class="absolute z-50 mt-2 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-800 grid grid-cols-4 gap-2 w-48 max-h-48 overflow-y-auto custom-scrollbar" x-cloak>
-                                        <template x-for="iconItem in iconOptions">
-                                            <button type="button" @click="currentIcon = iconItem; showIconsEdit = false" class="p-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black rounded-lg text-gray-500 transition-colors text-center">
-                                                <i :class="iconItem"></i>
-                                            </button>
-                                        </template>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex justify-end gap-3 pt-2">
-                             <button type="button" @click="editing = false" class="text-[10px] font-black uppercase text-gray-400 hover:text-black transition-colors">{{ __('İptal') }}</button>
-                             <x-primary-button class="py-2 px-6 text-[10px] font-black rounded-xl bg-black dark:bg-white text-white dark:text-black">{{ __('Güncelle') }}</x-primary-button>
+                    <!-- Edit Mode (Simplified for compact feel) -->
+                    <form @submit="editing = false" x-show="editing" method="post" action="{{ route('links.update', $link) }}" class="flex-1 flex flex-col md:flex-row gap-2" x-cloak>
+                        @csrf @method('put')
+                        <x-text-input name="title" value="{{ $link->title }}" required class="h-8 text-xs" />
+                        <x-text-input name="url" value="{{ $link->url }}" type="url" required class="h-8 text-xs" />
+                        <div class="flex gap-1">
+                            <button type="submit" class="p-1.5 bg-primary text-primary-foreground rounded hover:opacity-90"><i class="fas fa-check text-[10px]"></i></button>
+                            <button type="button" @click="editing = false" class="p-1.5 bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] rounded hover:text-foreground"><i class="fas fa-times text-[10px]"></i></button>
                         </div>
                     </form>
                 </div>
             </div>
         @empty
-            <div class="text-center py-16 bg-white dark:bg-black rounded-3xl border border-gray-100 dark:border-gray-800">
-                <div class="w-16 h-16 bg-gray-50 dark:bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-link text-gray-300"></i>
-                </div>
-                <h3 class="text-xs font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ __('Henüz link bulunmuyor') }}</h3>
-                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 px-8">{{ __('Yukarıdan ilk linkinizi ekleyerek başlayın.') }}</p>
+            <div class="rounded-lg border border-dashed border-[hsl(var(--border))] p-12 text-center bg-[hsl(var(--muted))] /10">
+                <i class="fas fa-link text-3xl text-[hsl(var(--muted-foreground))] mb-4 opacity-20"></i>
+                <h3 class="text-sm font-semibold">{{ __('Henüz bağlantı bulunmuyor') }}</h3>
+                <p class="text-xs text-[hsl(var(--muted-foreground))] mt-1">{{ __('İlk bağlantınızı eklemek için yukarıdaki formu kullanın.') }}</p>
             </div>
         @endforelse
     </div>
+</div>
 </div>
 
 @once

@@ -1,38 +1,53 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+    <div class="px-4 md:px-8 py-8">
+        <x-section-header 
+            :title="__('Ayarlar')" 
+            :subtitle="__('Hesap bilgilerinizi, güvenlik ayarlarınızı ve sayfa temanızı buradan yönetin.')" 
+            class="mb-8"
+        />
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+        <div class="space-y-8 max-w-4xl">
+            <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-[hsl(var(--border))]">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Profil Bilgileri') }}</h3>
+                </div>
+                <div class="p-6">
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-[hsl(var(--border))]">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Görünüm Ayarları') }}</h3>
+                </div>
+                <div class="p-6">
                     @include('profile.partials.update-theme-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-[hsl(var(--border))]">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Özel Alan Adı') }}</h3>
+                </div>
+                <div class="p-6">
                     @include('profile.partials.update-custom-domain-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-[hsl(var(--border))]">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Şifreyi Güncelle') }}</h3>
+                </div>
+                <div class="p-6">
                     @include('profile.partials.update-password-form')
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
+            <div class="rounded-lg border border-destructive/20 bg-[hsl(var(--card))] shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-destructive/10 bg-destructive/5 text-destructive">
+                    <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Hesabı Sil') }}</h3>
+                </div>
+                <div class="p-6">
                     @include('profile.partials.delete-user-form')
                 </div>
             </div>

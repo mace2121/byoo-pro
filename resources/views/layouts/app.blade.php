@@ -17,15 +17,6 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-        <style>
-            /* Minimalist Scrollbar */
-            ::-webkit-scrollbar { width: 6px; height: 6px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-            ::-webkit-scrollbar-thumb:hover { background: #d1d5db; }
-            .dark ::-webkit-scrollbar-thumb { background: #374151; }
-            .dark ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
-        </style>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
