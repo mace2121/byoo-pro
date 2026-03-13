@@ -6,13 +6,14 @@
     />
 
     <!-- Link Ekle Formu -->
-    <div class="mb-8 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm border-t-4 border-t-indigo-500">
-        <header class="mb-6 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                <i class="fas fa-plus text-xs"></i>
+    <div class="mb-10 p-2 sm:p-0">
+        <header class="mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-plus-circle text-indigo-600"></i>
+                <h2 class="text-xs font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ __('Yeni Link Ekle') }}</h2>
             </div>
-            <h2 class="text-sm font-black text-gray-900 dark:text-gray-100 uppercase tracking-widest">{{ __('Yeni Link Ekle') }}</h2>
         </header>
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
         <form method="post" action="{{ route('links.store') }}" class="space-y-4">
             @csrf
             <div class="flex flex-col md:flex-row gap-5 items-end">
@@ -76,7 +77,7 @@
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
         <x-input-error class="mt-2" :messages="$errors->get('title')" />
         <x-input-error class="mt-2" :messages="$errors->get('url')" />
     </div>
@@ -87,8 +88,8 @@
             <div class="flex items-center gap-4 bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm link-item relative group hover:shadow-md hover:border-indigo-100 dark:hover:border-indigo-900/50 transition-all" data-id="{{ $link->id }}">
                 
                 <!-- Drag Handle -->
-                <div class="cursor-grab sort-handle text-gray-300 hover:text-indigo-500 active:cursor-grabbing transition-colors">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 9h2v2H8V9zm4 0h2v2h-2V9zm4 0h2v2h-2V9zm-8 4h2v2H8v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z" /></svg>
+                <div class="cursor-grab sort-handle text-gray-200 hover:text-indigo-500 active:cursor-grabbing transition-colors p-1">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 9h2v2H8V9zm4 0h2v2h-2V9zm4 0h2v2h-2V9zm-8 4h2v2H8v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z" /></svg>
                 </div>
 
                 <!-- Link Bilgileri -->

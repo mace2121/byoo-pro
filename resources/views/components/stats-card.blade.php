@@ -11,9 +11,9 @@
     $colorClass = $colors[$color] ?? $colors['indigo'];
 @endphp
 
-<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100 dark:border-gray-700 p-6 flex items-center gap-5 transition-all hover:shadow-md group">
+<div class="bg-white dark:bg-gray-800 overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-800 p-6 flex items-center gap-5 transition-all hover:bg-gray-50/50 dark:hover:bg-gray-700/30 group">
     @if($icon)
-        <div class="flex-shrink-0 w-12 h-12 rounded-xl {{ explode(' ', $colorClass)[0] ?? 'bg-indigo-500' }} flex items-center justify-center text-white shadow-lg shadow-{{ $color }}-500/20 group-hover:scale-110 transition-transform">
+        <div class="flex-shrink-0 w-12 h-12 rounded-xl {{ explode(' ', $colorClass)[0] ?? 'bg-indigo-500' }} flex items-center justify-center text-white group-hover:scale-105 transition-transform">
             <i class="{{ $icon }} text-lg"></i>
         </div>
     @endif
