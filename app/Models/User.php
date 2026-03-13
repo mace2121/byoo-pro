@@ -19,9 +19,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
+        'is_admin',
+        'is_active',
     ];
 
     /**
@@ -44,6 +47,41 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function links()
+    {
+        return $this->hasMany(Link::class);
+    }
+
+    // Subscription relationship
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    // Convenience accessor for current plan via subscription
+    public function plan()
+    {
+        return $this->subscription ? $this->subscription->plan : null;
+    }
+
+    // Helper to check if user reached their link limit based on plan
+    public function hasReachedLinkLimit(): bool
+    {
+        $plan = $this->plan();
+        if (!$plan) {
+            // Fallback to a default limit if no plan (should not happen)
+            return $this->links()->count() >= 5;
+        }
+        return $this->links()->count() >= $plan->link_limit;
     }
 }

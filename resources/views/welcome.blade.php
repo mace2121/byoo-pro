@@ -3,8 +3,26 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="byoo.pro - Tüm linklerini tek bir sayfada topla, paylaş ve takip et. Ücretsiz kayıt ol!">
+        <link rel="canonical" href="{{ url('/') }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>byoo.pro - Linklerini Tek Sayfada Topla</title>
+
+        <!-- Favicon -->
+        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="byoo.pro - Linklerini Tek Sayfada Topla">
+        <meta property="og:description" content="Tüm linklerini tek bir sayfada topla, paylaş ve takip et.">
+        <meta property="og:url" content="{{ url('/') }}">
+        <meta property="og:site_name" content="byoo.pro">
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="byoo.pro - Linklerini Tek Sayfada Topla">
+        <meta name="twitter:description" content="Tüm linklerini tek bir sayfada topla, paylaş ve takip et.">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
