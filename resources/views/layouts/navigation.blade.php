@@ -15,8 +15,9 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('links.index')" :active="request()->routeIs('links.*')">
-                        {{ __('My Links') }}
+                    <x-nav-link :href="route('public.profile', Auth::user()->username)" target="_blank">
+                        {{ __('View My Page') }}
+                        <svg class="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                     </x-nav-link>
                 </div>
             </div>
@@ -73,8 +74,8 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('links.index')" :active="request()->routeIs('links.*')">
-                {{ __('My Links') }}
+            <x-responsive-nav-link :href="route('public.profile', Auth::user()->username)" target="_blank">
+                {{ __('View My Page') }}
             </x-responsive-nav-link>
         </div>
 
