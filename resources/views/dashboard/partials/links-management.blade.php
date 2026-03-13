@@ -4,18 +4,43 @@
         <header class="mb-4">
             <h2 class="text-md font-semibold text-gray-900 dark:text-gray-100">{{ __('Add New Link') }}</h2>
         </header>
-        <form method="post" action="{{ route('links.store') }}" class="flex flex-col md:flex-row gap-4 items-end">
+        <form method="post" action="{{ route('links.store') }}" class="space-y-4">
             @csrf
-            <div class="w-full md:flex-1">
-                <x-input-label for="title" :value="__('Title')" />
-                <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" placeholder="e.g. My Website" required />
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="w-full md:flex-1">
+                    <x-input-label for="title" :value="__('Title')" />
+                    <x-text-input id="title" name="title" type="text" class="mt-1 block w-full" placeholder="e.g. My Website" required />
+                </div>
+                <div class="w-full md:flex-1">
+                    <x-input-label for="url" :value="__('URL')" />
+                    <x-text-input id="url" name="url" type="url" class="mt-1 block w-full" placeholder="https://example.com" required />
+                </div>
+                <div class="w-full md:w-auto">
+                    <x-primary-button class="w-full justify-center">{{ __('Add') }}</x-primary-button>
+                </div>
             </div>
-            <div class="w-full md:flex-1">
-                <x-input-label for="url" :value="__('URL')" />
-                <x-text-input id="url" name="url" type="url" class="mt-1 block w-full" placeholder="https://example.com" required />
-            </div>
-            <div class="w-full md:w-auto">
-                <x-primary-button class="w-full justify-center">{{ __('Add') }}</x-primary-button>
+
+            <!-- Advanced Settings Toggle -->
+            <div x-data="{ open: false }">
+                <button type="button" @click="open = !open" class="text-xs text-indigo-500 hover:text-indigo-600 font-medium flex items-center gap-1">
+                    <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    Advanced Options (Scheduling, Password)
+                </button>
+                
+                <div x-show="open" x-cloak class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                    <div>
+                        <x-input-label for="starts_at" :value="__('Starts At')" />
+                        <x-text-input id="starts_at" name="starts_at" type="datetime-local" class="mt-1 block w-full text-xs" />
+                    </div>
+                    <div>
+                        <x-input-label for="expires_at" :value="__('Expires At')" />
+                        <x-text-input id="expires_at" name="expires_at" type="datetime-local" class="mt-1 block w-full text-xs" />
+                    </div>
+                    <div>
+                        <x-input-label for="password" :value="__('Password Protection')" />
+                        <x-text-input id="password" name="password" type="text" class="mt-1 block w-full text-xs" placeholder="Optional" />
+                    </div>
+                </div>
             </div>
         </form>
         <x-input-error class="mt-2" :messages="$errors->get('title')" />
@@ -56,13 +81,35 @@
                     </div>
 
                     <!-- Edit Modu -->
-                    <form x-show="editing" method="post" action="{{ route('links.update', $link) }}" class="flex flex-col gap-3 w-full">
+                    <form x-show="editing" method="post" action="{{ route('links.update', $link) }}" class="flex flex-col gap-4 w-full">
                         @csrf
                         @method('put')
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <x-text-input name="title" value="{{ $link->title }}" class="w-full text-sm" required />
                             <x-text-input name="url" value="{{ $link->url }}" type="url" class="w-full text-sm" required />
                         </div>
+                        
+                        <div x-data="{ open: false }">
+                            <button type="button" @click="open = !open" class="text-[10px] text-gray-500 hover:text-indigo-500 flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform" :class="open ? 'rotate-90' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                Advanced Settings
+                            </button>
+                            <div x-show="open" x-cloak class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                <div>
+                                    <label class="text-[10px] text-gray-400">Starts At</label>
+                                    <x-text-input name="starts_at" value="{{ $link->starts_at?->format('Y-m-d\TH:i') }}" type="datetime-local" class="w-full text-[10px] p-1" />
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-400">Expires At</label>
+                                    <x-text-input name="expires_at" value="{{ $link->expires_at?->format('Y-m-d\TH:i') }}" type="datetime-local" class="w-full text-[10px] p-1" />
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-400">Password</label>
+                                    <x-text-input name="password" value="{{ $link->password }}" class="w-full text-[10px] p-1" />
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end gap-2">
                             <x-secondary-button @click="editing = false" class="py-1 px-3 text-xs">Cancel</x-secondary-button>
                             <x-primary-button class="py-1 px-3 text-xs font-bold">Save</x-primary-button>

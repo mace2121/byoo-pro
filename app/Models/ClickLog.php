@@ -11,6 +11,9 @@ class ClickLog extends Model
         'ip',
         'device',
         'country',
+        'browser',
+        'os',
+        'referer',
     ];
 
     public function link()

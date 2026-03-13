@@ -19,13 +19,39 @@ class DashboardController extends Controller
         $total_clicks = $user->links->sum('clicks');
         $profile_views = $user->profile->views ?? 0;
 
+        // Analytics data
+        $linkIds = $user->links->pluck('id');
+        $top_browsers = \App\Models\ClickLog::whereIn('link_id', $linkIds)
+            ->selectRaw('browser, count(*) as count')
+            ->groupBy('browser')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
+        $top_os = \App\Models\ClickLog::whereIn('link_id', $linkIds)
+            ->selectRaw('os, count(*) as count')
+            ->groupBy('os')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
+        $top_countries = \App\Models\ClickLog::whereIn('link_id', $linkIds)
+            ->selectRaw('country, count(*) as count')
+            ->groupBy('country')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
         return view('dashboard', [
             'user' => $user,
             'profile' => $user->profile,
             'links' => $user->links,
             'total_links' => $total_links,
             'total_clicks' => $total_clicks,
-            'profile_views' => $profile_views
+            'profile_views' => $profile_views,
+            'top_browsers' => $top_browsers,
+            'top_os' => $top_os,
+            'top_countries' => $top_countries,
         ]);
     }
 }

@@ -6,6 +6,7 @@
     <title>{{ $profile->username ?? $user->name }} - byoo.pro</title>
     <meta name="description" content="{{ $profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' adlı kullanıcının byoo.pro profili.' }}">
     <link rel="canonical" href="{{ url('/' . $user->username) }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
@@ -179,8 +180,38 @@
             <div class="mt-8 space-y-4">
                 @forelse($links as $link)
                     <a href="{{ route('public.redirect', $link->id) }}" target="_blank" rel="noopener noreferrer" 
-                       class="block w-full text-center font-medium py-4 px-6 rounded-xl theme-card">
-                        {{ $link->title }}
+                       class="flex items-center p-3 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg theme-card group relative">
+                        <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800/50 text-indigo-500 group-hover:scale-110 transition-transform">
+                            @if($link->platform === 'instagram')
+                                <i class="fab fa-instagram text-xl"></i>
+                            @elseif($link->platform === 'twitter')
+                                <i class="fab fa-twitter text-xl"></i>
+                            @elseif($link->platform === 'facebook')
+                                <i class="fab fa-facebook text-xl"></i>
+                            @elseif($link->platform === 'linkedin')
+                                <i class="fab fa-linkedin text-xl"></i>
+                            @elseif($link->platform === 'youtube')
+                                <i class="fab fa-youtube text-xl"></i>
+                            @elseif($link->platform === 'tiktok')
+                                <i class="fab fa-tiktok text-xl"></i>
+                            @elseif($link->platform === 'whatsapp')
+                                <i class="fab fa-whatsapp text-xl"></i>
+                            @elseif($link->platform === 'github')
+                                <i class="fab fa-github text-xl"></i>
+                            @elseif($link->platform === 'telegram')
+                                <i class="fab fa-telegram text-xl"></i>
+                            @else
+                                <i class="fas fa-link text-xl"></i>
+                            @endif
+                        </div>
+                        <div class="flex-1 text-center font-bold pr-10">
+                            {{ $link->title }}
+                        </div>
+                        @if($link->password)
+                            <div class="absolute right-4 text-gray-400">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            </div>
+                        @endif
                     </a>
                 @empty
                     <div class="text-center p-6 rounded-xl border border-dashed theme-empty">

@@ -49,4 +49,5 @@ use App\Http\Controllers\PublicProfileController;
 
 // Public Profile & Link Redirection
 Route::get('/l/{link}', [PublicProfileController::class, 'redirect'])->name('public.redirect');
+Route::post('/l/{link}/verify', [PublicProfileController::class, 'verifyPassword'])->name('public.verify-password');
 Route::get('/{username}', [PublicProfileController::class, 'show'])->name('public.profile');

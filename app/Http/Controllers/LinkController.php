@@ -24,6 +24,9 @@ class LinkController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'url' => 'required|url',
+            'starts_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after:starts_at',
+            'password' => 'nullable|string|max:255',
         ]);
 
         $maxOrder = Auth::user()->links()->max('order') ?? 0;
@@ -31,6 +34,9 @@ class LinkController extends Controller
         Auth::user()->links()->create([
             'title' => $validated['title'],
             'url' => $validated['url'],
+            'starts_at' => $validated['starts_at'],
+            'expires_at' => $validated['expires_at'],
+            'password' => $validated['password'],
             'order' => $maxOrder + 1,
             'is_active' => true,
         ]);
@@ -46,6 +52,9 @@ class LinkController extends Controller
             'title' => 'required|string|max:255',
             'url' => 'required|url',
             'is_active' => 'boolean',
+            'starts_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after:starts_at',
+            'password' => 'nullable|string|max:255',
         ]);
 
         if (isset($validated['is_active'])) {
