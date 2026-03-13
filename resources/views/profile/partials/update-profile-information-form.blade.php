@@ -20,7 +20,7 @@
         <div class="flex items-center space-x-6">
             <div class="shrink-0">
                 <img id="avatar-preview" class="h-16 w-16 object-cover rounded-full" 
-                     src="{{ $user->profile && $user->profile->avatar ? asset('storage/' . $user->profile->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name) }}" 
+                     src="{{ $user->profile?->avatar_url }}" 
                      alt="Current profile photo" />
             </div>
             <label class="block">

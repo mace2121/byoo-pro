@@ -1,210 +1,127 @@
-# byoo.pro - Agent Context
+# BYOO.PRO AI Development Agents
 
-## Proje Tanımı
-
-byoo.pro, Linktree mantığında çalışan bir SaaS platformudur.
-
-Kullanıcılar:
-
-- kayıt olur
-- profil oluşturur
-- link ekler
-- tek bir sayfa üzerinden linklerini paylaşır
-
-Örnek profil:
-
-byoo.pro/kullaniciadi
+This document defines the AI agents responsible for different
+development areas of the project.
 
 ---
 
-# Sunucu Ortamı
+# Backend Agent
 
-Provider: Hostinger VDS  
-OS: Ubuntu
+Responsible for:
 
-Domain:
-byoo.pro  
-www.byoo.pro
+- Laravel architecture
+- Database models
+- Controllers
+- API endpoints
+- Authentication
+- Authorization
+- Media upload system
+- Analytics system
 
-Sunucu mimarisi:
+Tasks:
 
-Internet
-→ Traefik (Docker SSL reverse proxy)
-→ byoo-proxy container
-→ Laravel Application (port 8081)
-
----
-
-# Container Yapısı
-
-Traefik:
-- SSL termination
-- Let's Encrypt
-- entrypoints: 80 / 443
-
-byoo-proxy:
-- nginx container
-- Traefik tarafından yönlendiriliyor
-
-Laravel:
-- Host üzerinde
-- port: 8081
+- Implement role system
+- Implement media storage
+- Implement analytics
+- Optimize queries
 
 ---
 
-# Laravel Ortamı
+# Frontend Agent
 
-Laravel Version:
-12.x
+Responsible for:
 
-Laravel Path:
-/var/www/byoo/app
+- Blade templates
+- TailwindCSS UI
+- Responsive layout
+- Dashboard UX
+- Theme editor UI
+- Landing page UI
 
-Laravel Serve Port:
-8081
+Tasks:
 
----
-
-# Git Repository
-
-GitHub repo:
-
-https://github.com/mace2121/byoo-pro
-
-Git deploy mantığı:
-
-Local development
-→ git commit
-→ git push
-
-Server:
-
-cd /var/www/byoo/app
-git pull origin main
-
-composer install --no-dev
-php artisan optimize
+- Redesign dashboard
+- Create theme editor
+- Build SaaS landing page
+- Improve forms UX
 
 ---
 
-# Antigravity Kullanımı
+# Theme System Agent
 
-Antigravity yalnızca development ortamında kullanılacaktır.
+Responsible for:
 
-Production server üzerinde AI agent çalıştırılmtayacaktır.
+- Theme customization
+- Background editor
+- Color system
+- CSS overrides
 
-Workspace root:
-Laravel project root
+Tasks:
 
----
-
-# İlk Hedef (MVP)
-
-Minimum çalışan sistem:
-
-1. Auth sistemi
-2. Kullanıcı profili
-3. Link ekleme
-4. Public profil sayfası
-5. Click tracking
-6. Basit dashboard
+- Implement background settings
+- Implement blur and overlay
+- Implement custom CSS
 
 ---
 
-# Route Yapısı
+# Smart Link Agent
 
-Public profil route:
+Responsible for:
 
-/{username}
+- URL parsing
+- Icon detection
+- Icon library
+- Link behavior
 
-Dashboard route:
+Tasks:
 
-/dashboard
-
-Admin route:
-
-/admin
-
----
-
-# Database Temel Yapı
-
-users
-profiles
-links
-profile_views
-click_logs
-plans
-subscriptions
+- Detect platform from URL
+- Map icons automatically
+- Allow manual icon selection
 
 ---
 
-# Temel Modüller
+# Admin System Agent
 
-Auth
-Profile management
-Link management
-Public profile page
-Analytics
-Admin
-Plans / Subscriptions
+Responsible for:
 
----
+- Super admin panel
+- User management
+- System statistics
 
-# Kodlama Kuralları
+Tasks:
 
-- Kod sade ve modüler olacak
-- Gereksiz package kullanılmayacak
-- Migration ile ilerle
-- Büyük değişiklikten önce plan üret
-- Commit öncesi review yapılmalı
-- .env commit edilmez
+- Build admin dashboard
+- Build user list
+- Build statistics system
 
 ---
 
-# UI Kuralları
+# Localization Agent
 
-Frontend:
+Responsible for:
 
-Blade + Tailwind
+- Translating all UI
+- Managing language files
 
-Tasarım:
+Tasks:
 
-minimal
-mobile-first
-fast loading
-
----
-
-# Performans Kuralları
-
-- N+1 query önlenmeli
-- index kullanılmalı
-- cache stratejisi uygulanmalı
-- click loglar optimize edilmeli
+- Translate auth
+- Translate dashboard
+- Translate notifications
 
 ---
 
-# Güvenlik
+# Analytics Agent
 
-CSRF
-XSS
-SQL Injection
-Rate limit
-Auth middleware
+Responsible for:
 
----
+- Tracking profile views
+- Tracking link clicks
+- Generating statistics
 
-# Fazlar
+Tasks:
 
-Faz 1
-Auth + Profiles + Links
-
-Faz 2
-Analytics
-
-Faz 3
-SaaS Plans
-
-Faz 4
-Custom domains
+- Implement tracking
+- Build analytics dashboard
+- Build charts

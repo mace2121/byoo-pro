@@ -55,10 +55,31 @@ class ProfileController extends Controller
             }
 
             if ($request->hasFile('avatar')) {
+                // Delete old avatar
                 if ($user->profile->avatar) {
                     Storage::disk('public')->delete($user->profile->avatar);
                 }
-                $profileData['avatar'] = $request->file('avatar')->store('avatars', 'public');
+
+                $file = $request->file('avatar');
+                $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
+
+                // Image processing (Resize and Optimize)
+                $manager = new \Intervention\Image\ImageManager(
+                    new \Intervention\Image\Drivers\Gd\Driver()
+                );
+                
+                $image = $manager->read($file);
+                
+                // Scale to 512x512 max while maintaining aspect ratio
+                $image->scale(512, 512);
+
+                // Encode as webp for better compression if possible, otherwise keep original extension
+                $encoded = $image->toWebp(80);
+                $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.webp';
+
+                Storage::disk('public')->put($filename, (string) $encoded);
+                
+                $profileData['avatar'] = $filename;
             }
 
             $user->profile->update($profileData);

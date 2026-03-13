@@ -158,11 +158,7 @@
             
             <!-- Profil Kartı -->
             <div class="text-center">
-                @if($profile->avatar)
-                    <img class="mx-auto h-24 w-24 rounded-full object-cover theme-avatar-ring" src="{{ asset('storage/' . $profile->avatar) }}" alt="{{ $user->name }}">
-                @else
-                    <img class="mx-auto h-24 w-24 rounded-full object-cover theme-avatar-ring" src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&size=128" alt="{{ $user->name }}">
-                @endif
+                <img class="mx-auto h-24 w-24 rounded-full object-cover theme-avatar-ring" src="{{ $profile->avatar_url }}" alt="{{ $user->name }}">
                 
                 <h2 class="mt-4 text-3xl font-extrabold tracking-tight theme-name">
                     {{ $user->name }}

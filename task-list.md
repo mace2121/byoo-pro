@@ -1,153 +1,105 @@
-# byoo.pro Task List
-
-## Faz 0 - Altyapı
-
-✔ Hostinger VDS kuruldu  
-✔ Laravel kuruldu  
-✔ Domain yayında  
-✔ Traefik SSL aktif  
-✔ Docker proxy yapılandırıldı  
-✔ Git deploy sistemi kuruldu  
+# BYOO.PRO Task List
 
 ---
 
-# Faz 1 - Authentication
+# Critical Fixes
 
-- kullanıcı kayıt
-- kullanıcı giriş
-- şifre reset
-- email doğrulama
-- username validation
-
----
-
-# Faz 2 - Profil Sistemi
-
-profiles migration
-
-alanlar:
-
-id
-user_id
-username
-avatar
-bio
-theme
-is_active
-
-profil düzenleme ekranı
+- Fix profile image broken links
+- Fix Laravel storage path
+- Add default profile image
+- Validate uploaded files
 
 ---
 
-# Faz 3 - Link Sistemi
+# Dashboard Improvements
 
-links tablosu
-
-id
-user_id
-title
-url
-icon
-order
-is_active
-clicks
-
-işlevler:
-
-link ekle
-link düzenle
-link sil
-drag-drop sıralama
+- Redesign dashboard layout
+- Create separate sections
+- Add onboarding hints
+- Improve mobile layout
+- Improve forms
 
 ---
 
-# Faz 4 - Public Profil
+# Smart Link System
 
-route:
-
-/{username}
-
-gösterilecek:
-
-avatar
-bio
-link listesi
-
-responsive layout
+- Detect icon from URL
+- Map domain to icon
+- Add manual icon selector
+- Add icon library
+- Add drag and drop sorting
+- Add link toggle
 
 ---
 
-# Faz 5 - Click Tracking
+# Theme Builder
 
-click_logs tablosu
-
-alanlar:
-
-link_id
-ip
-device
-country
-created_at
-
-redirect sistemi
+- Add background uploader
+- Add background blur
+- Add overlay slider
+- Add color picker
+- Add gradient presets
+- Add live preview
 
 ---
 
-# Faz 6 - Dashboard
+# Theme Customization
 
-dashboard
-
-gösterilecek:
-
-toplam click
-toplam link
-profil görüntülenme
-
----
-
-# Faz 7 - Admin
-
-admin middleware
-
-admin panel:
-
-kullanıcı listesi
-kullanıcı pasif et
-istatistik
+- Add color palette
+- Add font selector
+- Add button style selector
+- Add card opacity
+- Add layout options
+- Add custom CSS field
 
 ---
 
-# Faz 8 - SaaS Plan
+# Super Admin Panel
 
-plans tablosu
-
-free
-pro
-business
-
-subscriptions tablosu
-
-limit sistemi
+- Add role system
+- Create super admin dashboard
+- Create user list
+- Create user details
+- Add user stats
+- Add user disable feature
 
 ---
 
-# Faz 9 - SEO
+# Localization
 
-meta tags
-og tags
-favicon
+- Translate login page
+- Translate register page
+- Translate dashboard
+- Translate validation messages
+- Translate notifications
 
 ---
 
-# Faz 10 - Tema Sistemi
+# SaaS Landing Page
 
-minimal
-dark
-neon
-Glass
-Midnight
-Sunset
-Aurora
-Forest
-Cyber
-Obsidian
+- Remove Laravel welcome screen
+- Create SaaS homepage
+- Add hero section
+- Add features
+- Add use cases
+- Add preview profiles
+- Add FAQ
+- Add CTA
+
+---
+
+# Analytics
+
+- Add profile view tracking
+- Add link click tracking
+- Add analytics dashboard
+- Add charts
+
+---
+
+# Optimization
+
+- Refactor code
+- Optimize queries
+- Add caching
+- Add logging

@@ -1,145 +1,282 @@
-# byoo.pro Implementation Plan
+# BYOO.PRO Implementation Plan
 
-## MVP Architecture
+BYOO.PRO kullanıcıların kendi profil sayfalarını oluşturabildiği,
+linklerini paylaşabildiği ve temalarını özelleştirebildiği bir SaaS
+profil platformudur.
 
-Laravel Monolith
-
-Modules:
-
-Auth
-Profiles
-Links
-Public Page
-Analytics
+Teknik altyapı Laravel tabanlıdır ve sistem modüler şekilde
+geliştirilmektedir.
 
 ---
 
-# Migration Sırası
+# Current Status (MVP)
 
-1 users (default)
+Şu özellikler şu anda çalışır durumda:
 
-2 profiles
+- Laravel authentication sistemi
+- Kullanıcı kayıt olma
+- Kullanıcı giriş yapma
+- Dashboard paneli
+- Profil sayfası oluşturma
+- Link ekleme sistemi
+- Tema seçimi
+- Public profil sayfası
 
-3 links
-
-4 profile_views
-
-5 click_logs
-
-6 plans
-
-7 subscriptions
-
----
-
-# Auth
-
-Laravel Breeze veya custom auth
-
-username zorunlu olacak.
-
-email unique olacak.
+Ancak panel UX ve bazı sistem fonksiyonları henüz tamamlanmamıştır.
 
 ---
 
-# Profil
+# Project Architecture
 
-User → Profile relation
+Backend:
+- Laravel
 
-1 user
-1 profile
+Frontend:
+- Blade
+- TailwindCSS
+- AlpineJS (gerektiği yerde)
 
-username unique olacak.
+Database:
+- MySQL
 
----
+Media Storage:
+- Laravel Storage
 
-# Link Yönetimi
-
-User → Links relation
-
-1 user
-N links
-
-Link order column kullanılacak.
-
----
-
-# Public Profil
-
-Route:
-
-/{username}
-
-Controller:
-
-ProfileController@show
-
-Query:
-
-profile by username
+Icons:
+- FontAwesome
 
 ---
 
-# Click Tracking
-
-Route:
-
-/l/{link_id}
-
-Logic:
-
-click log oluştur
-redirect
+# Development Phases
 
 ---
 
-# Dashboard
+# Phase 1 — Media System Fixes
 
-Controller:
+Amaç: medya yükleme ve kırık link sorunlarını çözmek.
 
-DashboardController
+Tasks:
 
-Stats:
-
-links count
-click count
-profile views
-
----
-
-# Admin
-
-middleware:
-
-is_admin
-
-Admin routes:
-
-/admin/users
-/admin/stats
+- Fix profile image upload path
+- Fix broken image links
+- Configure Laravel storage public link
+- Add default profile image fallback
+- Validate image uploads
+- Limit image size
+- Resize uploaded images
+- Optimize images automatically
 
 ---
 
-# SaaS Plan
+# Phase 2 — Dashboard UX Redesign
 
-plans table
+Amaç: kullanıcı panelini modern ve anlaşılır hale getirmek.
 
-id
-name
-max_links
-max_views
-features
+Tasks:
 
-subscriptions
-
-user_id
-plan_id
-status
+- Redesign dashboard layout
+- Create clear sections
+  - Profile
+  - Links
+  - Theme
+  - Settings
+- Add onboarding hints
+- Improve mobile dashboard
+- Improve forms UX
+- Add preview system
+- Add success/error feedback
 
 ---
 
-# Performance
+# Phase 3 — Smart Link System
 
-cache public profiles
+Amaç: link ekleme deneyimini akıllı hale getirmek.
 
-optimize queries
+Features:
+
+Automatic icon detection based on URL.
+
+Examples:
+
+instagram.com → Instagram icon  
+youtube.com → YouTube icon  
+tiktok.com → TikTok icon  
+wa.me → WhatsApp icon  
+t.me → Telegram icon  
+x.com → X icon  
+spotify.com → Spotify icon  
+linkedin.com → LinkedIn icon  
+
+Tasks:
+
+- Detect domain from URL
+- Map domain to icon
+- Add manual icon selector
+- Add icon library
+- Add drag and drop link sorting
+- Add link active/inactive toggle
+- Add open in new tab option
+
+---
+
+# Phase 4 — Theme Builder
+
+Amaç: kullanıcıların temalarını görsel olarak düzenleyebilmesi.
+
+Features:
+
+- Background image upload
+- Background position
+- Background blur
+- Overlay darkness
+- Custom colors
+- Gradient presets
+- Live preview
+
+Tasks:
+
+- Create theme editor page
+- Add background image upload
+- Add blur slider
+- Add overlay slider
+- Add color picker
+- Add gradient presets
+- Implement live preview
+
+---
+
+# Phase 5 — Advanced Theme Customization
+
+Amaç: kullanıcının sayfasını tamamen özelleştirebilmesi.
+
+Features:
+
+- Custom colors
+- Font selection
+- Button style selection
+- Card transparency
+- Layout options
+- Custom CSS field
+
+Tasks:
+
+- Add color palette
+- Add font selector
+- Add button styles
+- Add card opacity
+- Add layout alignment
+- Add custom CSS field
+- Sanitize CSS input
+
+---
+
+# Phase 6 — Super Admin System
+
+Amaç: sistem yönetimi.
+
+Roles:
+
+user  
+admin  
+super_admin  
+
+Super Admin Features:
+
+- View all users
+- View profiles
+- User statistics
+- Disable users
+- Impersonate user (optional)
+
+Tasks:
+
+- Role system
+- Middleware authorization
+- Admin dashboard
+- User list
+- User details
+- System statistics
+
+---
+
+# Phase 7 — Turkish Localization
+
+Amaç: tüm sistemin Türkçe olması.
+
+Tasks:
+
+- Translate login page
+- Translate register page
+- Translate dashboard
+- Translate validation messages
+- Translate system messages
+- Translate buttons
+- Set locale to Turkish
+
+---
+
+# Phase 8 — SaaS Landing Page
+
+Amaç: byoo.pro ana sayfasını SaaS tanıtım sayfasına çevirmek.
+
+Sections:
+
+Hero  
+Features  
+How it works  
+Use cases  
+Preview profiles  
+FAQ  
+Pricing (placeholder)  
+CTA  
+
+Tasks:
+
+- Replace Laravel welcome screen
+- Build landing page
+- Add hero section
+- Add features section
+- Add preview section
+- Add FAQ
+- Add footer
+- Add SEO meta
+
+---
+
+# Phase 9 — Analytics
+
+Amaç: kullanıcı ve sistem analitikleri.
+
+Features:
+
+- Profile views
+- Link clicks
+- Daily analytics
+- Weekly analytics
+- Top links
+- Admin analytics
+
+Tasks:
+
+- Track profile views
+- Track link clicks
+- Build analytics dashboard
+- Add charts
+
+---
+
+# Phase 10 — Stability & Optimization
+
+Amaç: sistemi production için stabilize etmek.
+
+Tasks:
+
+- Refactor code structure
+- Add service classes
+- Improve authorization
+- Add caching
+- Add logging
+- Optimize queries
+- Add backup strategy
+
+---
