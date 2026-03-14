@@ -61,12 +61,40 @@
         @endforeach
     </div>
 
-    <!-- Custom Theme Notice -->
-    <div x-show="draftDesign.theme.custom_theme" x-cloak x-transition class="flex flex-col items-center justify-center p-12 text-center bg-muted/20 border border-dashed border-border rounded-xl">
-        <div class="w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
-            <i class="fas fa-paint-brush"></i>
+    <!-- Custom Theme Mode Settings -->
+    <div x-show="draftDesign.theme.custom_theme" x-cloak x-transition class="space-y-6">
+        <!-- Font Selection -->
+        <div class="bg-muted/10 p-4 rounded-xl border border-border space-y-4">
+            <div class="flex items-center gap-2 mb-2">
+                <i class="fas fa-font text-primary text-xs"></i>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Yazı Tipi (Font)') }}</h4>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <template x-for="font in [
+                    {id: 'inter', label: 'Inter', family: 'Inter'},
+                    {id: 'outfit', label: 'Outfit', family: 'Outfit'},
+                    {id: 'roboto', label: 'Roboto', family: 'Roboto'},
+                    {id: 'montserrat', label: 'Montserrat', family: 'Montserrat'},
+                    {id: 'playfair', label: 'Playfair', family: 'Playfair Display'},
+                    {id: 'mono', label: 'Mono', family: 'JetBrains Mono'}
+                ]">
+                    <label class="cursor-pointer group">
+                        <input type="radio" x-model="draftDesign.theme.font_family" :value="font.id" class="sr-only peer">
+                        <div class="border border-input peer-checked:border-primary peer-checked:ring-2 peer-checked:ring-primary/20 rounded-lg p-3 bg-background hover:bg-muted/50 transition-all text-center">
+                            <span class="block text-sm font-semibold truncate" :style="`font-family: ${font.family}, sans-serif`" x-text="font.label"></span>
+                        </div>
+                    </label>
+                </template>
+            </div>
         </div>
-        <h4 class="text-sm font-semibold mb-2">{{ __('Özel Tasarım Modu Aktif') }}</h4>
-        <p class="text-xs text-muted-foreground max-w-sm">{{ __('Hazır temalar devre dışı bırakıldı. Profilinizi tamamen kişiselleştirmek için Arka Plan, Butonlar ve Renkler sekmelerini kullanabilirsiniz.') }}</p>
+
+        <div class="flex flex-col items-center justify-center p-8 text-center bg-primary/5 border border-dashed border-primary/20 rounded-xl">
+            <div class="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-3">
+                <i class="fas fa-paint-brush text-sm"></i>
+            </div>
+            <h4 class="text-sm font-semibold mb-1">{{ __('Özel Tasarım Modu Aktif') }}</h4>
+            <p class="text-[10px] text-muted-foreground max-w-sm">{{ __('Profilinizi tamamen kişiselleştirmek için Arka Plan, Butonlar ve Renkler sekmelerini kullanabilirsiniz.') }}</p>
+        </div>
     </div>
 </div>

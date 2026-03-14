@@ -309,11 +309,19 @@
             z-index: -10; /* Fixed Behind Content */
             pointer-events: none;
             background-color: var(--bg-color, #f9fafb);
+        }
+
+        .bg-image-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: none;
             @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
                 background-image: url('{{ $design['background']['image_url'] ?? $profile->bg_image_url ?? '' }}');
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
+                display: block;
             @endif
         }
 
@@ -338,7 +346,7 @@
             background: rgba(0,0,0, {{ ($design['background']['overlay'] ?? 0) / 100 }});
             backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
             -webkit-backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
-            z-index: 5;
+            z-index: 10; /* Above images/video/anim but below content */
             pointer-events: none;
         }
 
@@ -425,13 +433,24 @@
         </div>
     @endif
 
-    <div class="bg-layer-wrapper" style="background-color: var(--bg-color); background-image: var(--bg-image, none);">
+    <div class="bg-layer-wrapper">
+        <div class="bg-image-layer"></div>
+        <div class="bg-video-container" style="display: {{ ($design['background']['type'] ?? '') === 'video' ? 'block' : 'none' }}">
+            @if(($design['background']['type'] ?? '') === 'video' && isset($design['background']['video_url']))
+                <video autoplay muted loop playsinline src="{{ $design['background']['video_url'] }}"></video>
+            @endif
+        </div>
+        @if(($design['background']['type'] ?? '') === 'animation')
+            <div class="bg-anim-container bg-{{ $design['background']['animation'] ?? 'none' }}"></div>
+        @endif
+        <div class="bg-overlay"></div>
+    </div>
 
             <!-- Profil Kartı -->
-            <div class="{{ $layoutWrapperClass }} relative z-10 p-2 anim-{{ $design['background']['animation'] ?? 'none' }}">
+            <div class="{{ $layoutWrapperClass }} relative z-10 p-2 anim-target bg-{{ $design['background']['animation'] ?? 'none' }}">
                 <div class="{{ $layoutFlexClass }}">
                     <!-- Avatar -->
-                    <img class="{{ $avatarClasses }} {{ $frameClasses }} object-cover theme-avatar-ring flex-shrink-0 {{ $headerLayout === 'hero-cover' ? 'w-32 h-32 -mt-24 border-4 border-background bg-background shadow-2xl scale-110' : '' }} {{ $headerLayout === 'left-aligned' ? 'w-20 h-20' : '' }}" 
+                    <img class="{{ $avatarClasses }} {{ $frameClasses }} avatar-preview-img object-cover theme-avatar-ring flex-shrink-0 {{ $headerLayout === 'hero-cover' ? 'w-32 h-32 -mt-24 border-4 border-background bg-background shadow-2xl scale-110' : '' }} {{ $headerLayout === 'left-aligned' ? 'w-20 h-20' : '' }}" 
                          src="{{ $profile->avatar_url }}" alt="{{ $user->name }}">
                     
                     <!-- Text Info -->
@@ -570,59 +589,54 @@
                     // 3. Background Sync
                     if (design.background) {
                         const bg = design.background;
-                        const themePage = document.querySelector('.theme-page');
+                        const bgWrapper = document.querySelector('.bg-layer-wrapper');
+                        const bgImageLayer = document.querySelector('.bg-image-layer');
                         const overlayEl = document.querySelector('.bg-overlay');
                         let videoContainer = document.querySelector('.bg-video-container');
+                        let animContainer = document.querySelector('.bg-anim-container');
 
-                        if (themePage) {
-                            const bgWrapper = document.querySelector('.bg-layer-wrapper');
-                            bgWrapper.style.backgroundImage = '';
-                            bgWrapper.style.backgroundColor = '';
+                        if (bgWrapper) {
+                            // Reset layers
+                            if (bgImageLayer) bgImageLayer.style.display = 'none';
                             if (videoContainer) videoContainer.style.display = 'none';
-
+                            if (animContainer) animContainer.style.display = 'none';
+                            root.style.setProperty('--bg-color', bg.color || '#f9fafb');
+                            
                             if (bg.type === 'color') {
-                                root.style.setProperty('--bg-color', bg.color || '#f9fafb');
-                                bgWrapper.style.backgroundColor = 'var(--bg-color)';
+                                // Just background color
                             } else if (bg.type === 'gradient') {
                                 root.style.setProperty('--bg-image', bg.gradient || '');
                                 bgWrapper.style.backgroundImage = 'var(--bg-image)';
                             } else if (bg.type === 'image') {
-                                bgWrapper.style.backgroundImage = `url('${bg.image_url}')`;
-                                bgWrapper.style.backgroundSize = 'cover';
-                                bgWrapper.style.backgroundPosition = 'center';
+                                if (bgImageLayer) {
+                                    bgImageLayer.style.display = 'block';
+                                    bgImageLayer.style.backgroundImage = `url('${bg.image_url}')`;
+                                }
                             } else if (bg.type === 'video') {
                                 if (!videoContainer) {
                                     videoContainer = document.createElement('div');
                                     videoContainer.className = 'bg-video-container';
                                     videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
-                                    const bgWrapper = document.querySelector('.bg-layer-wrapper');
-                                    bgWrapper.insertBefore(videoContainer, bgWrapper.firstChild);
+                                    bgWrapper.appendChild(videoContainer);
                                 }
                                 videoContainer.style.display = 'block';
                                 const video = videoContainer.querySelector('video');
-                                if (video.src !== bg.video_url) {
+                                if (video && bg.video_url && video.src !== bg.video_url) {
                                     video.src = bg.video_url;
                                     video.load();
                                 }
-                            }
-
-                            // Background Animation Pattern
-                            let animContainer = document.querySelector('.bg-anim-container');
-                            if (bg.type === 'animation' && bg.animation !== 'none') {
+                            } else if (bg.type === 'animation') {
                                 if (!animContainer) {
                                     animContainer = document.createElement('div');
                                     animContainer.className = 'bg-anim-container';
                                     bgWrapper.appendChild(animContainer);
                                 }
+                                animContainer.style.display = 'block';
                                 animContainer.className = 'bg-anim-container bg-' + bg.animation;
-                                themePage.style.background = 'transparent';
                                 if (bg.animation_colors) {
                                     root.style.setProperty('--anim-color-1', bg.animation_colors[0]);
                                     root.style.setProperty('--anim-color-2', bg.animation_colors[1]);
                                 }
-                            } else if (animContainer) {
-                                animContainer.remove();
-                                themePage.style.background = '';
                             }
 
                             if (overlayEl) {
@@ -635,22 +649,19 @@
                     // 4. Header & Layout Sync
                     if (design.header) {
                         const header = design.header;
-                        const avatarImg = document.querySelector('img[alt="{{ $user->name }}"]');
+                        const avatarImg = document.querySelector('.avatar-preview-img');
                         const nameEl = document.querySelector('.theme-name');
                         const usernameEl = document.querySelector('.theme-username');
                         const bioEl = document.querySelector('.theme-bio');
-                        const maxWContainer = document.querySelector('.max-w-md');
-                        const cardWrapper = avatarImg?.closest('.z-10');
-                        const flexContainer = avatarImg?.parentElement;
+                        const cardWrapper = document.querySelector('.anim-target');
+                        const flexContainer = avatarImg ? avatarImg.parentElement : null;
                         
                         if (avatarImg) {
-                            avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40', 'w-20', 'h-20');
-                            avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
-                            const sizeMap = { sm: 'w-16', md: 'w-24', lg: 'w-32', xl: 'w-40' };
-                            const heightMap = { sm: 'h-16', md: 'h-24', lg: 'h-32', xl: 'h-40' };
-                            avatarImg.classList.add(sizeMap[header.avatar_size] || 'w-24');
-                            avatarImg.classList.add(heightMap[header.avatar_size] || 'h-24');
+                            avatarImg.className = 'avatar-preview-img object-cover theme-avatar-ring flex-shrink-0'; // Base classes
+                            const sizeMap = { sm: 'w-16 h-16', md: 'w-24 h-24', lg: 'w-32 h-32', xl: 'w-40 h-40' };
                             const frameMap = { 'rounded-xl': 'rounded-xl', 'square': 'rounded-none', 'polygon': 'avatar-polygon', 'circle': 'rounded-full' };
+                            
+                            (sizeMap[header.avatar_size] || 'w-24 h-24').split(' ').forEach(c => avatarImg.classList.add(c));
                             avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
                         }
 
@@ -658,21 +669,19 @@
                         if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
                         if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
 
-                        if (cardWrapper && flexContainer && maxWContainer) {
+                        if (cardWrapper && flexContainer) {
                             let heroCover = document.querySelector('.hero-cover-container');
-                            cardWrapper.classList.remove('text-left', 'text-center', 'relative', 'pt-12', 'mt-16');
-                            flexContainer.classList.remove('flex-row', 'items-center', 'gap-6', 'flex-col');
-                            avatarImg?.classList.remove('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
-                            maxWContainer.classList.remove('pt-16', 'pt-32');
-
+                            cardWrapper.className = 'relative z-10 p-2 anim-target'; // Reset
+                            flexContainer.className = ''; // Reset
+                            
                             if (header.layout === 'left-aligned') {
                                 cardWrapper.classList.add('text-left');
-                                flexContainer.classList.add('flex', 'flex-row', 'items-center', 'gap-6');
+                                flexContainer.className = 'flex flex-row items-center gap-6';
                                 if (heroCover) heroCover.style.display = 'none';
+                                avatarImg?.classList.add('w-20', 'h-20');
                             } else if (header.layout === 'hero-cover') {
                                 cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
-                                flexContainer.classList.add('flex', 'flex-col', 'items-center');
-                                maxWContainer.classList.add('pt-32');
+                                flexContainer.className = 'flex flex-col items-center';
                                 if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
                                 
                                 if (heroCover) {
@@ -682,7 +691,7 @@
                                 }
                             } else {
                                 cardWrapper.classList.add('text-center');
-                                flexContainer.classList.add('flex', 'flex-col', 'items-center');
+                                flexContainer.className = 'flex flex-col items-center';
                                 if (heroCover) heroCover.style.display = 'none';
                             }
                         }
@@ -695,7 +704,6 @@
 
                     // 5. Special Fix for Colors & Custom Theme Logic
                     if (design.theme?.custom_theme) {
-                         // Ensure custom colors are applied if in custom theme mode
                          if (design.colors) {
                              root.style.setProperty('--text-title', design.colors.title || '#111827');
                              root.style.setProperty('--text-page', design.colors.page_text || '#111827');
