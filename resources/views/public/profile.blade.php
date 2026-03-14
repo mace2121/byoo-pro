@@ -300,7 +300,8 @@
             justify-content: center;
             padding: 3rem 1rem;
             position: relative;
-            background: var(--bg);
+            position: relative;
+            background: {{ (($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none') ? 'transparent' : 'var(--bg)' }};
             overflow-x: hidden;
             @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
                 background-image: url('{{ $design['background']['image_url'] ?? $profile->bg_image_url ?? '' }}');
@@ -587,6 +588,7 @@
                                     themePage.parentElement.insertBefore(animContainer, themePage);
                                 }
                                 animContainer.className = 'bg-anim-container bg-' + bg.animation;
+                                themePage.style.background = 'transparent';
                                 if (bg.animation_colors) {
                                     root.style.setProperty('--anim-color-1', bg.animation_colors[0]);
                                     root.style.setProperty('--anim-color-2', bg.animation_colors[1]);
