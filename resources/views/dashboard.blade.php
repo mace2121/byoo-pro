@@ -138,8 +138,7 @@
             </nav>
 
             <!-- Content + Preview Row -->
-            <div style="display: grid; height: calc(100% - 56px); overflow: hidden;"
-                 :style="previewOpen ? 'grid-template-columns: 1fr 340px' : 'grid-template-columns: 1fr 0px'">
+            <div :style="'display: grid; height: calc(100% - 56px); overflow: hidden; grid-template-columns: ' + (previewOpen ? '1fr 340px' : '1fr 0px')">
                 <!-- MAIN CONTENT AREA (always first column) -->
                 <div style="overflow-y: auto; min-width: 0;">
                     <div class="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
