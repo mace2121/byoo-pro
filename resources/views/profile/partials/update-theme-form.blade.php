@@ -130,6 +130,26 @@
                                 </div>
                             @endif
                         </div>
+
+                        <!-- Opacity & Blur Controls -->
+                        @if($user->profile?->bg_image)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+                            <div class="space-y-2">
+                                <x-input-label value="Karartma (Overlay)" class="text-xs font-medium" />
+                                <div class="flex items-center gap-3">
+                                    <input type="range" name="bg_overlay" min="0" max="100" step="5" value="{{ $user->profile?->bg_overlay ?? 0 }}" class="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-foreground" />
+                                    <span class="text-xs font-mono text-muted-foreground w-10 text-right">{{ $user->profile?->bg_overlay ?? 0 }}%</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <x-input-label value="Bulanıklık (Blur)" class="text-xs font-medium" />
+                                <div class="flex items-center gap-3">
+                                    <input type="range" name="bg_blur" min="0" max="20" step="1" value="{{ $user->profile?->bg_blur ?? 0 }}" class="w-full h-1.5 bg-muted rounded-full appearance-none cursor-pointer accent-foreground" />
+                                    <span class="text-xs font-mono text-muted-foreground w-10 text-right">{{ $user->profile?->bg_blur ?? 0 }}px</span>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

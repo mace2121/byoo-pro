@@ -136,7 +136,7 @@ class ProfileController extends Controller
             $this->profileService->clearProfileCache($user);
         }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('dashboard', ['tab' => 'design'])->with('status', 'profile-updated');
     }
 
     /**

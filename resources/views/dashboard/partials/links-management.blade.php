@@ -6,7 +6,7 @@
     />
 
     <!-- Link Ekle Formu (Card) -->
-    <div class="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-sm mb-10 overflow-hidden">
+    <div class="rounded-lg border border-border bg-card shadow-sm mb-10">
         <div class="p-6 border-b border-[hsl(var(--border))]">
             <h3 class="text-lg font-semibold leading-none tracking-tight">{{ __('Yeni Link Ekle') }}</h3>
             <p class="text-sm text-[hsl(var(--muted-foreground))] mt-1.5">{{ __('Bağlantı başlığını ve linkini girerek anında yayına alın.') }}</p>
