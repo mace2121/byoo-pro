@@ -423,6 +423,8 @@
 @php
     $design = $profile->design_settings ?? [];
 @endphp
+<body class="h-full theme-{{ $theme }} {{ ($design['theme']['custom_theme'] ?? false) ? 'theme-custom' : '' }}">
+    <div class="theme-page">
     @if(($design['header']['layout'] ?? '') === 'hero-cover')
         <div class="hero-cover-container" style="display: block;">
             <div class="hero-image-bg" style="background-image: url('{{ $design['header']['hero_image_url'] ?? $profile->hero_image_url ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')"></div>
@@ -446,6 +448,7 @@
         <div class="bg-overlay"></div>
     </div>
 
+        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
             <!-- Profil Kartı -->
             <div class="{{ $layoutWrapperClass }} relative z-10 p-2 anim-target bg-{{ $design['background']['animation'] ?? 'none' }}">
                 <div class="{{ $layoutFlexClass }}">
@@ -523,201 +526,231 @@
     </div>
 
     <script>
-        if (window.self !== window.top) {
-            window.addEventListener('message', (event) => {
-                if (event.data?.type === 'DESIGN_UPDATE') {
-                    const design = event.data.payload;
-                    if (!design) return;
+        (() => {
+            const initialDesign = @js($design);
+            const defaultUsername = @js($profile->username ?? $user->username);
 
-                    const root = document.documentElement;
-                    const body = document.body;
+            const applyDesign = (design) => {
+                if (!design || typeof design !== 'object') return;
 
-                    // 0. Profile Data Sync (MOVED TO TOP FOR ROBUSTNESS)
-                    if (design.profile) {
-                        const nameEl = document.querySelector('.theme-name');
-                        const usernameEl = document.querySelector('.theme-username');
-                        const bioEl = document.querySelector('.theme-bio');
-                        
-                        if (nameEl) nameEl.textContent = design.profile.name || '';
-                        if (usernameEl) usernameEl.textContent = design.profile.username ? ('@' + design.profile.username) : '';
-                        if (bioEl) bioEl.textContent = design.profile.bio || '';
+                const root = document.documentElement;
+                const body = document.body;
+                const nameEl = document.querySelector('.theme-name');
+                const usernameEl = document.querySelector('.theme-username');
+                const bioEl = document.querySelector('.theme-bio');
+
+                if (design.profile) {
+                    if (typeof design.profile.name === 'string' && nameEl) {
+                        nameEl.textContent = design.profile.name;
                     }
 
-                    // 1. Theme Mode
-                    if (design.theme) {
-                        body.classList.remove('theme-custom');
-                        const classes = Array.from(body.classList);
-                        classes.forEach(c => { if(c.startsWith('theme-') && c !== 'theme-page') body.classList.remove(c); });
-                        
-                        if (design.theme.custom_theme) {
-                            body.classList.add('theme-custom');
-                        } else {
-                            body.classList.add('theme-' + (design.theme.preset || 'minimal'));
-                        }
+                    if (typeof design.profile.bio === 'string' && bioEl) {
+                        bioEl.textContent = design.profile.bio;
                     }
 
-                    // 2. Colors & Buttons Sync
-                    if (design.colors) {
-                        root.style.setProperty('--text-title', design.colors.title || design.colors.text || '#111827');
-                        root.style.setProperty('--text-page', design.colors.page_text || design.colors.text || '#111827');
-                    }
-
-                    if (design.buttons) {
-                        const btns = design.buttons;
-                        root.style.setProperty('--card-bg', btns.variant === 'outline' ? 'transparent' : (btns.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (btns.bg_color || '#ffffff')));
-                        root.style.setProperty('--card-border', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : 'transparent');
-                        root.style.setProperty('--link-color', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : (btns.text_color || '#111827'));
-                        root.style.setProperty('--card-shadow', btns.shadow && btns.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
-                        
-                        // Icon Color Sync
-                        root.style.setProperty('--icon-color', btns.text_color || (btns.variant === 'outline' ? btns.bg_color : '#111827'));
-                        
-                        const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
-                        root.style.setProperty('--btn-align', alignMap[btns.align] || 'center');
-                        root.style.setProperty('--btn-text-align', btns.align || 'center');
-
-                        const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
-                        root.style.setProperty('--btn-radius', radiusMap[btns.style] || '0.75rem');
-
-                        document.querySelectorAll('.theme-card').forEach(card => {
-                            card.classList.remove('variant-offset', 'backdrop-blur-md');
-                            if (btns.variant === 'offset') card.classList.add('variant-offset');
-                            else if (btns.variant === 'glass') card.classList.add('backdrop-blur-md');
-                        });
-                    }
-
-                    // 3. Background Sync
-                    if (design.background) {
-                        const bg = design.background;
-                        const bgWrapper = document.querySelector('.bg-layer-wrapper');
-                        const bgImageLayer = document.querySelector('.bg-image-layer');
-                        const overlayEl = document.querySelector('.bg-overlay');
-                        let videoContainer = document.querySelector('.bg-video-container');
-                        let animContainer = document.querySelector('.bg-anim-container');
-
-                        if (bgWrapper) {
-                            // Reset layers
-                            if (bgImageLayer) bgImageLayer.style.display = 'none';
-                            if (videoContainer) videoContainer.style.display = 'none';
-                            if (animContainer) animContainer.style.display = 'none';
-                            root.style.setProperty('--bg-color', bg.color || '#f9fafb');
-                            
-                            if (bg.type === 'color') {
-                                // Just background color
-                            } else if (bg.type === 'gradient') {
-                                root.style.setProperty('--bg-image', bg.gradient || '');
-                                bgWrapper.style.backgroundImage = 'var(--bg-image)';
-                            } else if (bg.type === 'image') {
-                                if (bgImageLayer) {
-                                    bgImageLayer.style.display = 'block';
-                                    bgImageLayer.style.backgroundImage = `url('${bg.image_url}')`;
-                                }
-                            } else if (bg.type === 'video') {
-                                if (!videoContainer) {
-                                    videoContainer = document.createElement('div');
-                                    videoContainer.className = 'bg-video-container';
-                                    videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
-                                    bgWrapper.appendChild(videoContainer);
-                                }
-                                videoContainer.style.display = 'block';
-                                const video = videoContainer.querySelector('video');
-                                if (video && bg.video_url && video.src !== bg.video_url) {
-                                    video.src = bg.video_url;
-                                    video.load();
-                                }
-                            } else if (bg.type === 'animation') {
-                                if (!animContainer) {
-                                    animContainer = document.createElement('div');
-                                    animContainer.className = 'bg-anim-container';
-                                    bgWrapper.appendChild(animContainer);
-                                }
-                                animContainer.style.display = 'block';
-                                animContainer.className = 'bg-anim-container bg-' + bg.animation;
-                                if (bg.animation_colors) {
-                                    root.style.setProperty('--anim-color-1', bg.animation_colors[0]);
-                                    root.style.setProperty('--anim-color-2', bg.animation_colors[1]);
-                                }
-                            }
-
-                            if (overlayEl) {
-                                overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(bg.overlay || 0) / 100})`;
-                                overlayEl.style.backdropFilter = overlayEl.style.webkitBackdropFilter = `blur(${bg.blur || 0}px)`;
-                            }
-                        }
-                    }
-
-                    // 4. Header & Layout Sync
-                    if (design.header) {
-                        const header = design.header;
-                        const avatarImg = document.querySelector('.avatar-preview-img');
-                        const nameEl = document.querySelector('.theme-name');
-                        const usernameEl = document.querySelector('.theme-username');
-                        const bioEl = document.querySelector('.theme-bio');
-                        const cardWrapper = document.querySelector('.anim-target');
-                        const flexContainer = avatarImg ? avatarImg.parentElement : null;
-                        
-                        if (avatarImg) {
-                            avatarImg.className = 'avatar-preview-img object-cover theme-avatar-ring flex-shrink-0'; // Base classes
-                            const sizeMap = { sm: 'w-16 h-16', md: 'w-24 h-24', lg: 'w-32 h-32', xl: 'w-40 h-40' };
-                            const frameMap = { 'rounded-xl': 'rounded-xl', 'square': 'rounded-none', 'polygon': 'avatar-polygon', 'circle': 'rounded-full' };
-                            
-                            (sizeMap[header.avatar_size] || 'w-24 h-24').split(' ').forEach(c => avatarImg.classList.add(c));
-                            avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
-                        }
-
-                        if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
-                        if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
-                        if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
-
-                        if (cardWrapper && flexContainer) {
-                            let heroCover = document.querySelector('.hero-cover-container');
-                            cardWrapper.className = 'relative z-10 p-2 anim-target'; // Reset
-                            flexContainer.className = ''; // Reset
-                            
-                            if (header.layout === 'left-aligned') {
-                                cardWrapper.classList.add('text-left');
-                                flexContainer.className = 'flex flex-row items-center gap-6';
-                                if (heroCover) heroCover.style.display = 'none';
-                                avatarImg?.classList.add('w-20', 'h-20');
-                            } else if (header.layout === 'hero-cover') {
-                                cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
-                                flexContainer.className = 'flex flex-col items-center';
-                                if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
-                                
-                                if (heroCover) {
-                                    heroCover.style.display = 'block';
-                                    const heroImg = heroCover.querySelector('.hero-image-bg');
-                                    if (heroImg) heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
-                                }
-                            } else {
-                                cardWrapper.classList.add('text-center');
-                                flexContainer.className = 'flex flex-col items-center';
-                                if (heroCover) heroCover.style.display = 'none';
-                            }
-                        }
-                    }
-
-                    if (design.theme && design.theme.font_family) {
-                        const fontMap = { outfit: "'Outfit'", inter: "'Inter'", roboto: "'Roboto'", montserrat: "'Montserrat'", playfair: "'Playfair Display'", mono: "'JetBrains Mono'" };
-                        root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ", sans-serif");
-                    }
-
-                    // 5. Special Fix for Colors & Custom Theme Logic
-                    if (design.theme?.custom_theme) {
-                         if (design.colors) {
-                             root.style.setProperty('--text-title', design.colors.title || '#111827');
-                             root.style.setProperty('--text-page', design.colors.page_text || '#111827');
-                         }
-                         if (design.buttons) {
-                             const b = design.buttons;
-                             root.style.setProperty('--card-bg', b.variant === 'outline' ? 'transparent' : (b.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (b.bg_color || '#ffffff')));
-                             root.style.setProperty('--card-border', b.variant === 'outline' ? (b.bg_color || '#ffffff') : 'transparent');
-                             root.style.setProperty('--link-color', b.variant === 'outline' ? (b.bg_color || '#ffffff') : (b.text_color || '#111827'));
-                         }
+                    if (usernameEl && typeof design.profile.username === 'string') {
+                        const username = design.profile.username.replace(/^@/, '');
+                        usernameEl.textContent = username ? '@' + username : '';
                     }
                 }
+
+                if (design.theme) {
+                    Array.from(body.classList).forEach((className) => {
+                        if (className.startsWith('theme-') && className !== 'theme-page') {
+                            body.classList.remove(className);
+                        }
+                    });
+
+                    if (design.theme.custom_theme) {
+                        body.classList.add('theme-custom');
+                    } else {
+                        body.classList.add('theme-' + (design.theme.preset || 'minimal'));
+                    }
+                }
+
+                if (design.colors) {
+                    root.style.setProperty('--text-title', design.colors.title || design.colors.text || '#111827');
+                    root.style.setProperty('--text-page', design.colors.page_text || design.colors.text || '#111827');
+                }
+
+                if (design.buttons) {
+                    const buttons = design.buttons;
+                    root.style.setProperty('--card-bg', buttons.variant === 'outline' ? 'transparent' : (buttons.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (buttons.bg_color || '#ffffff')));
+                    root.style.setProperty('--card-border', buttons.variant === 'outline' ? (buttons.bg_color || '#ffffff') : 'transparent');
+                    root.style.setProperty('--link-color', buttons.variant === 'outline' ? (buttons.bg_color || '#ffffff') : (buttons.text_color || '#111827'));
+                    root.style.setProperty('--card-shadow', buttons.shadow && buttons.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
+                    root.style.setProperty('--icon-color', buttons.text_color || (buttons.variant === 'outline' ? buttons.bg_color : '#111827'));
+
+                    const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+                    root.style.setProperty('--btn-align', alignMap[buttons.align] || 'center');
+                    root.style.setProperty('--btn-text-align', buttons.align || 'center');
+
+                    const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
+                    root.style.setProperty('--btn-radius', radiusMap[buttons.style] || '0.75rem');
+
+                    document.querySelectorAll('.theme-card').forEach((card) => {
+                        card.classList.remove('variant-offset', 'backdrop-blur-md');
+                        if (buttons.variant === 'offset') card.classList.add('variant-offset');
+                        if (buttons.variant === 'glass') card.classList.add('backdrop-blur-md');
+                    });
+                }
+
+                if (design.background) {
+                    const background = design.background;
+                    const bgWrapper = document.querySelector('.bg-layer-wrapper');
+                    const bgImageLayer = document.querySelector('.bg-image-layer');
+                    const overlayEl = document.querySelector('.bg-overlay');
+                    let videoContainer = document.querySelector('.bg-video-container');
+                    let animContainer = document.querySelector('.bg-anim-container');
+
+                    if (bgWrapper) {
+                        bgWrapper.style.backgroundImage = 'none';
+
+                        if (bgImageLayer) {
+                            bgImageLayer.style.display = 'none';
+                            bgImageLayer.style.backgroundImage = 'none';
+                        }
+
+                        if (videoContainer) {
+                            videoContainer.style.display = 'none';
+                        }
+
+                        if (animContainer) {
+                            animContainer.style.display = 'none';
+                        }
+
+                        root.style.setProperty('--bg-color', background.color || '#f9fafb');
+
+                        if (background.type === 'gradient') {
+                            bgWrapper.style.backgroundImage = background.gradient || 'none';
+                        }
+
+                        if (background.type === 'image' && bgImageLayer) {
+                            bgImageLayer.style.display = 'block';
+                            bgImageLayer.style.backgroundImage = background.image_url ? `url('${background.image_url}')` : 'none';
+                        }
+
+                        if (background.type === 'video') {
+                            if (!videoContainer) {
+                                videoContainer = document.createElement('div');
+                                videoContainer.className = 'bg-video-container';
+                                videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
+                                bgWrapper.appendChild(videoContainer);
+                            }
+
+                            videoContainer.style.display = 'block';
+                            const videoEl = videoContainer.querySelector('video');
+                            if (videoEl && background.video_url && videoEl.src !== background.video_url) {
+                                videoEl.src = background.video_url;
+                                videoEl.load();
+                            }
+                        }
+
+                        if (background.type === 'animation') {
+                            if (!animContainer) {
+                                animContainer = document.createElement('div');
+                                animContainer.className = 'bg-anim-container';
+                                bgWrapper.appendChild(animContainer);
+                            }
+
+                            animContainer.style.display = 'block';
+                            animContainer.className = 'bg-anim-container bg-' + (background.animation || 'none');
+
+                            if (Array.isArray(background.animation_colors)) {
+                                root.style.setProperty('--anim-color-1', background.animation_colors[0] || '#6366f1');
+                                root.style.setProperty('--anim-color-2', background.animation_colors[1] || '#a855f7');
+                            }
+                        }
+
+                        if (overlayEl) {
+                            overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(background.overlay || 0) / 100})`;
+                            const blurValue = `${background.blur || 0}px`;
+                            overlayEl.style.backdropFilter = `blur(${blurValue})`;
+                            overlayEl.style.webkitBackdropFilter = `blur(${blurValue})`;
+                        }
+                    }
+                }
+
+                if (design.header) {
+                    const header = design.header;
+                    const avatarImg = document.querySelector('.avatar-preview-img');
+                    const cardWrapper = document.querySelector('.anim-target');
+                    const flexContainer = avatarImg ? avatarImg.parentElement : null;
+
+                    if (avatarImg) {
+                        avatarImg.className = 'avatar-preview-img object-cover theme-avatar-ring flex-shrink-0';
+
+                        const sizeMap = { sm: 'w-16 h-16', md: 'w-24 h-24', lg: 'w-32 h-32', xl: 'w-40 h-40' };
+                        const frameMap = { 'rounded-xl': 'rounded-xl', square: 'rounded-none', polygon: 'avatar-polygon', circle: 'rounded-full' };
+
+                        (sizeMap[header.avatar_size] || 'w-24 h-24').split(' ').forEach((className) => avatarImg.classList.add(className));
+                        avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
+                    }
+
+                    if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
+                    if (usernameEl) {
+                        usernameEl.style.display = header.show_username ? 'block' : 'none';
+                        if (!usernameEl.textContent.trim()) usernameEl.textContent = '@' + defaultUsername;
+                    }
+                    if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
+
+                    if (cardWrapper && flexContainer) {
+                        const heroCover = document.querySelector('.hero-cover-container');
+
+                        cardWrapper.className = 'relative z-10 p-2 anim-target';
+
+                        if (header.layout === 'left-aligned') {
+                            cardWrapper.classList.add('text-left');
+                            flexContainer.className = 'flex flex-row items-center gap-6';
+                            if (heroCover) heroCover.style.display = 'none';
+                            if (avatarImg) avatarImg.classList.add('w-20', 'h-20');
+                        } else if (header.layout === 'hero-cover') {
+                            cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
+                            flexContainer.className = 'flex flex-col items-center';
+
+                            if (avatarImg) {
+                                avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
+                            }
+
+                            if (heroCover) {
+                                heroCover.style.display = 'block';
+                                const heroImg = heroCover.querySelector('.hero-image-bg');
+                                if (heroImg) {
+                                    heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
+                                }
+                            }
+                        } else {
+                            cardWrapper.classList.add('text-center');
+                            flexContainer.className = 'flex flex-col items-center';
+                            if (heroCover) heroCover.style.display = 'none';
+                        }
+                    }
+                }
+
+                if (design.theme && design.theme.font_family) {
+                    const fontMap = {
+                        outfit: "'Outfit'",
+                        inter: "'Inter'",
+                        roboto: "'Roboto'",
+                        montserrat: "'Montserrat'",
+                        playfair: "'Playfair Display'",
+                        mono: "'JetBrains Mono'",
+                    };
+
+                    root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ', sans-serif');
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                applyDesign(initialDesign);
             });
-        }
+
+            window.addEventListener('message', (event) => {
+                if (event.data?.type === 'DESIGN_UPDATE') {
+                    applyDesign(event.data.payload);
+                }
+            });
+        })();
     </script>
 </body>
 </html>

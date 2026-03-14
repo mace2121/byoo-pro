@@ -318,6 +318,7 @@
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 previewSyncTimer: null,
+                isSaving: false,
                 
                 // Track files for upload
                 files: {
@@ -330,6 +331,7 @@
                 draftDesign: {
                     profile: {
                         name: {!! json_encode(auth()->user()->name) !!},
+                        username: {!! json_encode(auth()->user()->username) !!},
                         bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
                     },
                     header: {
@@ -465,36 +467,83 @@
                 },
 
                 saveDesign() {
+                    if (this.isSaving) return;
+                    this.isSaving = true;
                     this.sanitizeAllColors(this.draftDesign);
-                    const formData = new FormData();
-                    formData.append('_method', 'PATCH');
-                    formData.append('design_settings', JSON.stringify(this.draftDesign));
-                    
-                    if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
-                    if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
-                    if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
 
-                    fetch("{{ route('profile.design.update') }}", {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'Accept': 'application/json'
-                        },
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            if (data.design_settings) {
-                                this.draftDesign = data.design_settings;
-                                this.files = { hero_image: null, bg_image: null, bg_video: null };
-                            }
-                            window.dispatchEvent(new CustomEvent('notify', { detail: 'Tasarım kaydedildi!' }));
+                    const hasFileUpload = !!(this.files.hero_image || this.files.bg_image || this.files.bg_video);
+                    const headers = {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    };
+
+                    let requestOptions = {
+                        credentials: 'same-origin',
+                    };
+
+                    if (hasFileUpload) {
+                        const formData = new FormData();
+                        formData.append('_method', 'PATCH');
+                        formData.append('design_settings', JSON.stringify(this.draftDesign));
+
+                        if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
+                        if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
+                        if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
+
+                        requestOptions = {
+                            ...requestOptions,
+                            method: 'POST',
+                            headers,
+                            body: formData,
+                        };
+                    } else {
+                        requestOptions = {
+                            ...requestOptions,
+                            method: 'PATCH',
+                            headers: {
+                                ...headers,
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                design_settings: this.draftDesign,
+                            }),
+                        };
+                    }
+
+                    fetch("{{ route('profile.design.update') }}", requestOptions)
+                    .then(async response => {
+                        let data = {};
+                        const contentType = response.headers.get('content-type') || '';
+
+                        if (contentType.includes('application/json')) {
+                            data = await response.json();
+                        } else {
+                            const text = await response.text();
+                            throw new Error(text || 'Unexpected response format');
                         }
+
+                        if (!response.ok || data.success === false) {
+                            throw new Error(data.message || ('HTTP ' + response.status));
+                        }
+
+                        return data;
+                    })
+                    .then(data => {
+                        if (data.design_settings) {
+                            this.draftDesign = data.design_settings;
+                        }
+
+                        this.files = { hero_image: null, bg_image: null, bg_video: null };
+                        this.updatePreview(this.draftDesign);
+                        window.dispatchEvent(new CustomEvent('notify', { detail: 'Tasarım kaydedildi!' }));
                     })
                     .catch(error => {
                         console.error('Save error:', error);
                         window.dispatchEvent(new CustomEvent('notify', { detail: 'Kaydedilirken hata oluştu!', type: 'error' }));
+                    })
+                    .finally(() => {
+                        this.isSaving = false;
                     });
                 }
             }));

@@ -146,28 +146,49 @@ class ProfileController extends Controller
     public function updateDesign(Request $request)
     {
         $user = $request->user();
+        $profile = $user->profile;
+
+        if (!$profile) {
+            $profile = $user->profile()->create([
+                'username' => $user->username,
+            ]);
+        }
         
         try {
             // If it's a standard JSON request (no files)
             if ($request->isJson()) {
                 $designSettings = $request->input('design_settings');
-                if ($user->profile) {
-                    if (isset($designSettings['profile'])) {
-                        $user->update(['name' => $designSettings['profile']['name']]);
-                        $user->profile->update(['bio' => $designSettings['profile']['bio']]);
-                    }
-                    
-                    $user->profile->update([
-                        'design_settings' => $designSettings,
-                    ]);
-                    $this->profileService->clearProfileCache($user);
+
+                if (!is_array($designSettings)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid design payload.',
+                    ], 422);
                 }
+
+                if (isset($designSettings['profile'])) {
+                    $user->update(['name' => $designSettings['profile']['name'] ?? $user->name]);
+                    $profile->update(['bio' => $designSettings['profile']['bio'] ?? $profile->bio]);
+                }
+                
+                $profile->update([
+                    'design_settings' => $designSettings,
+                ]);
+                $this->profileService->clearProfileCache($user);
+
                 return response()->json(['success' => true, 'design_settings' => $designSettings]);
             }
 
             // Handle multipart form-data (for file uploads)
             $designSettingsInput = $request->input('design_settings');
             $designSettings = is_string($designSettingsInput) ? json_decode($designSettingsInput, true) : $designSettingsInput;
+
+            if (!is_array($designSettings)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid design payload.',
+                ], 422);
+            }
             
             \Log::debug('Design Update Request:', [
                 'user_id' => $user->id,
@@ -176,61 +197,64 @@ class ProfileController extends Controller
                 'settings' => $designSettings
             ]);
 
-            if ($user->profile) {
-                // Update profile fields
-                if (isset($designSettings['profile'])) {
-                    $user->update(['name' => $designSettings['profile']['name']]);
-                    $user->profile->update(['bio' => $designSettings['profile']['bio']]);
-                }
-
-                // Hero Image
-                if ($request->hasFile('hero_image')) {
-                    $file = $request->file('hero_image');
-                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                    $image = $manager->read($file);
-                    $image->scale(1200, null);
-                    $encoded = $image->toWebp(80);
-                    $filename = 'hero/' . \Illuminate\Support\Str::random(40) . '.webp';
-                    
-                    if (!Storage::disk('public')->exists('hero')) {
-                        Storage::disk('public')->makeDirectory('hero');
-                    }
-                    
-                    Storage::disk('public')->put($filename, (string) $encoded);
-                    $designSettings['header']['hero_image_url'] = Storage::url($filename);
-                }
-
-                // Background Image
-                if ($request->hasFile('bg_image')) {
-                    $file = $request->file('bg_image');
-                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                    $image = $manager->read($file);
-                    $image->scale(1920, null);
-                    $encoded = $image->toWebp(70);
-                    $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
-                    
-                    if (!Storage::disk('public')->exists('backgrounds')) {
-                        Storage::disk('public')->makeDirectory('backgrounds');
-                    }
-                    
-                    Storage::disk('public')->put($filename, (string) $encoded);
-                    $designSettings['background']['image_url'] = Storage::url($filename);
-                }
-
-                // Background Video
-                if ($request->hasFile('bg_video')) {
-                    $file = $request->file('bg_video');
-                    if ($file->getSize() <= 10 * 1024 * 1024) { // Increased to 10MB
-                        $filename = $file->store('videos', 'public');
-                        $designSettings['background']['video_url'] = Storage::url($filename);
-                    }
-                }
-
-                $user->profile->update([
-                    'design_settings' => $designSettings,
-                ]);
-                $this->profileService->clearProfileCache($user);
+            // Update profile fields
+            if (isset($designSettings['profile'])) {
+                $user->update(['name' => $designSettings['profile']['name'] ?? $user->name]);
+                $profile->update(['bio' => $designSettings['profile']['bio'] ?? $profile->bio]);
             }
+
+            // Hero Image
+            if ($request->hasFile('hero_image')) {
+                $file = $request->file('hero_image');
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->read($file);
+                $image->scale(1200, null);
+                $encoded = $image->toWebp(80);
+                $filename = 'hero/' . \Illuminate\Support\Str::random(40) . '.webp';
+                
+                if (!Storage::disk('public')->exists('hero')) {
+                    Storage::disk('public')->makeDirectory('hero');
+                }
+                
+                Storage::disk('public')->put($filename, (string) $encoded);
+                $designSettings['header']['hero_image_url'] = Storage::url($filename);
+            }
+
+            // Background Image
+            if ($request->hasFile('bg_image')) {
+                $file = $request->file('bg_image');
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->read($file);
+                $image->scale(1920, null);
+                $encoded = $image->toWebp(70);
+                $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
+                
+                if (!Storage::disk('public')->exists('backgrounds')) {
+                    Storage::disk('public')->makeDirectory('backgrounds');
+                }
+                
+                Storage::disk('public')->put($filename, (string) $encoded);
+                $designSettings['background']['image_url'] = Storage::url($filename);
+            }
+
+            // Background Video
+            if ($request->hasFile('bg_video')) {
+                $file = $request->file('bg_video');
+                if ($file->getSize() <= 10 * 1024 * 1024) { // Increased to 10MB
+                    $filename = $file->store('videos', 'public');
+                    $designSettings['background']['video_url'] = Storage::url($filename);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Video boyutu 10MB limitini aşıyor.',
+                    ], 422);
+                }
+            }
+
+            $profile->update([
+                'design_settings' => $designSettings,
+            ]);
+            $this->profileService->clearProfileCache($user);
 
             return response()->json(['success' => true, 'design_settings' => $designSettings]);
         } catch (\Exception $e) {
