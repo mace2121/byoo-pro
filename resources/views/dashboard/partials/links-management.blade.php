@@ -147,7 +147,6 @@
         @endforelse
     </div>
 </div>
-</div>
 
 @once
     @push('scripts')
