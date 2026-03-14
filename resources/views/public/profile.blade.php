@@ -236,7 +236,7 @@
         .bg-anim-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
         }
 
@@ -300,9 +300,9 @@
             justify-content: center;
             padding: 3rem 1rem;
             position: relative;
-            position: relative;
             background: {{ (($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none') ? 'transparent' : 'var(--bg)' }};
             overflow-x: hidden;
+            z-index: 10;
             @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
                 background-image: url('{{ $design['background']['image_url'] ?? $profile->bg_image_url ?? '' }}');
                 background-size: cover;
@@ -332,7 +332,7 @@
             background: rgba(0,0,0, {{ ($design['background']['overlay'] ?? 0) / 100 }});
             backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
             -webkit-backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
-            z-index: 0;
+            z-index: 5;
             pointer-events: none;
         }
 
@@ -399,12 +399,11 @@
             </div>
         @endif
 
-        @if(($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none')
-            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}"></div>
-        @endif
+        <div class="bg-overlay" style="z-index: 5;"></div>
 
-        <!-- Background Overlay -->
-        <div class="bg-overlay"></div>
+        @if(($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none')
+            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}" style="z-index: 0;"></div>
+        @endif
 
         <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
             
