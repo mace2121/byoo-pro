@@ -282,8 +282,8 @@
                 // Design Draft State
                 draftDesign: {
                     profile: {
-                        name: "{{ auth()->user()->name }}",
-                        bio: "{{ auth()->user()->profile->bio ?? '' }}",
+                        name: @js(auth()->user()->name),
+                        bio: @js(auth()->user()->profile->bio ?? ''),
                     },
                     header: {
                         layout: initialSettings?.header?.layout || 'centered-classic',

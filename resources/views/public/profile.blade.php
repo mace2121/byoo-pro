@@ -1,3 +1,113 @@
+@php
+    $design = $profile->design_settings ?? [];
+    
+    // Theme Defaults & Overrides
+    $theme = $profile->theme ?? 'minimal';
+    if(isset($design['theme']) && !empty($design['theme'])) {
+        if(($design['theme']['custom_theme'] ?? false) == true) {
+            $theme = 'custom';
+            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
+        } else if(isset($design['theme']['preset'])) {
+            $theme = $design['theme']['preset'];
+            $profile->theme_type = 'preset';
+        }
+    }
+    $headerLayout = $design['header']['layout'] ?? 'centered-classic';
+    $avatarSize = $design['header']['avatar_size'] ?? 'md';
+    $avatarFrame = $design['header']['avatar_frame'] ?? 'circle';
+    $showName = $design['header']['show_name'] ?? true;
+    $showUsername = $design['header']['show_username'] ?? true;
+    $showBio = $design['header']['show_bio'] ?? true;
+
+    // Avatar Size Mapping
+    $avatarClasses = '';
+    switch($avatarSize) {
+        case 'sm': $avatarClasses = 'w-16 h-16'; break;
+        case 'lg': $avatarClasses = 'w-32 h-32'; break;
+        case 'xl': $avatarClasses = 'w-40 h-40'; break;
+        case 'md':
+        default: $avatarClasses = 'w-24 h-24'; break;
+    }
+
+    // Avatar Frame Mapping
+    $frameClasses = '';
+    switch($avatarFrame) {
+        case 'rounded-xl': $frameClasses = 'rounded-xl'; break;
+        case 'square': $frameClasses = 'rounded-none'; break;
+        case 'polygon': $frameClasses = 'avatar-polygon'; break;
+        case 'circle':
+        default: $frameClasses = 'rounded-full'; break;
+    }
+
+    // Layout Classes
+    $layoutWrapperClass = 'text-center';
+    $layoutFlexClass = 'flex flex-col items-center';
+    $heroCoverClass = '';
+    
+    if ($headerLayout === 'left-aligned') {
+        $layoutWrapperClass = 'text-left';
+        $layoutFlexClass = 'flex flex-row items-center gap-6';
+    } elseif ($headerLayout === 'hero-cover') {
+        $layoutWrapperClass = 'text-center relative pt-12 mt-16';
+        $layoutFlexClass = 'flex flex-col items-center';
+        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
+    }
+@endphp
+@php
+    $design = $profile->design_settings ?? [];
+    
+    // Theme Defaults & Overrides
+    $theme = $profile->theme ?? 'minimal';
+    if(isset($design['theme']) && !empty($design['theme'])) {
+        if(($design['theme']['custom_theme'] ?? false) == true) {
+            $theme = 'custom';
+            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
+        } else if(isset($design['theme']['preset'])) {
+            $theme = $design['theme']['preset'];
+            $profile->theme_type = 'preset';
+        }
+    }
+    $headerLayout = $design['header']['layout'] ?? 'centered-classic';
+    $avatarSize = $design['header']['avatar_size'] ?? 'md';
+    $avatarFrame = $design['header']['avatar_frame'] ?? 'circle';
+    $showName = $design['header']['show_name'] ?? true;
+    $showUsername = $design['header']['show_username'] ?? true;
+    $showBio = $design['header']['show_bio'] ?? true;
+
+    // Avatar Size Mapping
+    $avatarClasses = '';
+    switch($avatarSize) {
+        case 'sm': $avatarClasses = 'w-16 h-16'; break;
+        case 'lg': $avatarClasses = 'w-32 h-32'; break;
+        case 'xl': $avatarClasses = 'w-40 h-40'; break;
+        case 'md':
+        default: $avatarClasses = 'w-24 h-24'; break;
+    }
+
+    // Avatar Frame Mapping
+    $frameClasses = '';
+    switch($avatarFrame) {
+        case 'rounded-xl': $frameClasses = 'rounded-xl'; break;
+        case 'square': $frameClasses = 'rounded-none'; break;
+        case 'polygon': $frameClasses = 'avatar-polygon'; break;
+        case 'circle':
+        default: $frameClasses = 'rounded-full'; break;
+    }
+
+    // Layout Classes
+    $layoutWrapperClass = 'text-center';
+    $layoutFlexClass = 'flex flex-col items-center';
+    $heroCoverClass = '';
+    
+    if ($headerLayout === 'left-aligned') {
+        $layoutWrapperClass = 'text-left';
+        $layoutFlexClass = 'flex flex-row items-center gap-6';
+    } elseif ($headerLayout === 'hero-cover') {
+        $layoutWrapperClass = 'text-center relative pt-12 mt-16';
+        $layoutFlexClass = 'flex flex-col items-center';
+        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full antialiased">
 <head>
@@ -263,58 +373,6 @@
 </head>
 @php
     $design = $profile->design_settings ?? [];
-    
-    // Theme Defaults & Overrides
-    $theme = $profile->theme ?? 'minimal';
-    if(isset($design['theme']) && !empty($design['theme'])) {
-        if(($design['theme']['custom_theme'] ?? false) == true) {
-            $theme = 'custom';
-            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
-        } else if(isset($design['theme']['preset'])) {
-            $theme = $design['theme']['preset'];
-            $profile->theme_type = 'preset';
-        }
-    }
-    $headerLayout = $design['header']['layout'] ?? 'centered-classic';
-    $avatarSize = $design['header']['avatar_size'] ?? 'md';
-    $avatarFrame = $design['header']['avatar_frame'] ?? 'circle';
-    $showName = $design['header']['show_name'] ?? true;
-    $showUsername = $design['header']['show_username'] ?? true;
-    $showBio = $design['header']['show_bio'] ?? true;
-
-    // Avatar Size Mapping
-    $avatarClasses = '';
-    switch($avatarSize) {
-        case 'sm': $avatarClasses = 'w-16 h-16'; break;
-        case 'lg': $avatarClasses = 'w-32 h-32'; break;
-        case 'xl': $avatarClasses = 'w-40 h-40'; break;
-        case 'md':
-        default: $avatarClasses = 'w-24 h-24'; break;
-    }
-
-    // Avatar Frame Mapping
-    $frameClasses = '';
-    switch($avatarFrame) {
-        case 'rounded-xl': $frameClasses = 'rounded-xl'; break;
-        case 'square': $frameClasses = 'rounded-none'; break;
-        case 'polygon': $frameClasses = 'avatar-polygon'; break;
-        case 'circle':
-        default: $frameClasses = 'rounded-full'; break;
-    }
-
-    // Layout Classes
-    $layoutWrapperClass = 'text-center';
-    $layoutFlexClass = 'flex flex-col items-center';
-    $heroCoverClass = '';
-    
-    if ($headerLayout === 'left-aligned') {
-        $layoutWrapperClass = 'text-left';
-        $layoutFlexClass = 'flex flex-row items-center gap-6';
-    } elseif ($headerLayout === 'hero-cover') {
-        $layoutWrapperClass = 'text-center relative pt-12 mt-16';
-        $layoutFlexClass = 'flex flex-col items-center';
-        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
-    }
 @endphp
 <body class="h-full theme-{{ $theme }} {{ $profile->theme_type === 'custom' ? 'theme-custom' : '' }}">
     <div class="theme-page">
