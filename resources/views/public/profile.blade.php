@@ -107,43 +107,58 @@
         .theme-obsidian { --bg: #121212; --text: #e0e0e0; --text-secondary: #888888; --card-bg: #1e1e1e; --card-border: #333333; --card-hover: #2a2a2a; --avatar-ring: #555555; --link-color: #cccccc; --footer-color: #555555; }
 
         /* Custom Theme Overrides */
-        @if($profile->theme_type === 'custom')
+        @if(($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom')
         .theme-custom {
-            @if($profile->bg_type === 'color')
-                --bg: {{ $profile->bg_color ?? '#f9fafb' }};
-            @elseif($profile->bg_type === 'gradient')
-                --bg: {{ $profile->bg_gradient ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }};
-            @endif
-            --text: {{ $profile->text_color ?? '#111827' }};
-            --text-secondary: {{ ($profile->text_color ?? '#111827') . 'cc' }}; /* 80% opacity */
-            --card-bg: {{ $profile->button_color ?? '#ffffff' }};
-            --card-border: transparent;
-            --card-hover: {{ ($profile->button_color ?? '#ffffff') . 'ee' }};
-            --link-color: {{ $profile->button_text_color ?? '#111827' }};
-            --footer-color: {{ ($profile->text_color ?? '#111827') . '88' }};
-            --card-shadow: {{ $profile->button_shadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none' }};
+            @php
+                $bgType = $design['background']['type'] ?? $profile->bg_type ?? 'color';
+                $bgColor = $design['background']['color'] ?? $profile->bg_color ?? '#f9fafb';
+                $bgGradient = $design['background']['gradient'] ?? $profile->bg_gradient ?? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                
+                $textColor = $design['colors']['text'] ?? $profile->text_color ?? '#111827';
+                
+                $btnColor = $design['buttons']['bg_color'] ?? $profile->button_color ?? '#ffffff';
+                $btnTextColor = $design['buttons']['text_color'] ?? $profile->button_text_color ?? '#111827';
+                $btnShadow = $design['buttons']['shadow'] ?? $profile->button_shadow ?? true;
+                $btnStyle = $design['buttons']['style'] ?? $profile->button_style ?? 'pill';
+                
+                $fontFamily = $design['theme']['font_family'] ?? $profile->font_family ?? 'inter';
+            @endphp
             
-            @if($profile->font_family === 'outfit')
+            @if($bgType === 'color')
+                --bg: {{ $bgColor }};
+            @elseif($bgType === 'gradient')
+                --bg: {{ $bgGradient }};
+            @endif
+            --text: {{ $textColor }};
+            --text-secondary: {{ $textColor . 'cc' }}; /* 80% opacity */
+            --card-bg: {{ $btnColor }};
+            --card-border: transparent;
+            --card-hover: {{ $btnColor . 'ee' }};
+            --link-color: {{ $btnTextColor }};
+            --footer-color: {{ $textColor . '88' }};
+            --card-shadow: {{ $btnShadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none' }};
+            
+            @if($fontFamily === 'outfit')
                 --font-family: 'Outfit', sans-serif;
-            @elseif($profile->font_family === 'inter')
+            @elseif($fontFamily === 'inter')
                 --font-family: 'Inter', sans-serif;
-            @elseif($profile->font_family === 'roboto')
+            @elseif($fontFamily === 'roboto')
                 --font-family: 'Roboto', sans-serif;
-            @elseif($profile->font_family === 'montserrat')
+            @elseif($fontFamily === 'montserrat')
                 --font-family: 'Montserrat', sans-serif;
-            @elseif($profile->font_family === 'playfair')
+            @elseif($fontFamily === 'playfair')
                 --font-family: 'Playfair Display', serif;
-            @elseif($profile->font_family === 'serif')
+            @elseif($fontFamily === 'serif')
                 --font-family: Georgia, serif;
-            @elseif($profile->font_family === 'mono')
+            @elseif($fontFamily === 'mono')
                 --font-family: 'JetBrains Mono', SFMono-Regular, Consolas, monospace;
             @endif
 
-            @if($profile->button_style === 'pill')
+            @if($btnStyle === 'pill')
                 --btn-radius: 9999px;
-            @elseif($profile->button_style === 'square')
+            @elseif($btnStyle === 'square')
                 --btn-radius: 0px;
-            @elseif($profile->button_style === 'soft')
+            @elseif($btnStyle === 'soft')
                 --btn-radius: 2rem;
             @endif
         }
@@ -159,21 +174,22 @@
             padding: 3rem 1rem;
             position: relative;
             background: var(--bg);
-            @if($profile->theme_type === 'custom' && $profile->bg_type === 'image')
-                background-image: url('{{ $profile->bg_image_url }}');
+            @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
+                background-image: url('{{ $design['background']['image_url'] ?? $profile->bg_image_url ?? '' }}');
                 background-size: cover;
                 background-position: center;
                 background-attachment: fixed;
             @endif
         }
 
-        @if($profile->theme_type === 'custom' && $profile->bg_type === 'image')
+        @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
         .theme-page::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0, {{ ($profile->bg_overlay ?? 0) / 100 }});
-            backdrop-filter: blur({{ $profile->bg_blur ?? 0 }}px);
+            background: rgba(0,0,0, {{ ($design['background']['overlay'] ?? 0) / 100 }});
+            backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
+            -webkit-backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
             z-index: 0;
         }
         .theme-page > div { position: relative; z-index: 10; }
@@ -235,34 +251,102 @@
         }
 
         .theme-avatar-ring { box-shadow: 0 0 0 3px var(--avatar-ring); }
+        .avatar-polygon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
         .theme-footer { color: var(--footer-color); }
         .theme-empty { color: var(--text-secondary); background: var(--card-bg); border-color: var(--card-border); }
     </style>
 </head>
 @php
+    $design = $profile->design_settings ?? [];
+    
+    // Theme Defaults & Overrides
     $theme = $profile->theme ?? 'minimal';
+    if(isset($design['theme']) && !empty($design['theme'])) {
+        if(($design['theme']['custom_theme'] ?? false) == true) {
+            $theme = 'custom';
+            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
+        } else if(isset($design['theme']['preset'])) {
+            $theme = $design['theme']['preset'];
+            $profile->theme_type = 'preset';
+        }
+    }
+    $headerLayout = $design['header']['layout'] ?? 'centered-classic';
+    $avatarSize = $design['header']['avatar_size'] ?? 'md';
+    $avatarFrame = $design['header']['avatar_frame'] ?? 'circle';
+    $showName = $design['header']['show_name'] ?? true;
+    $showUsername = $design['header']['show_username'] ?? true;
+    $showBio = $design['header']['show_bio'] ?? true;
+
+    // Avatar Size Mapping
+    $avatarClasses = '';
+    switch($avatarSize) {
+        case 'sm': $avatarClasses = 'w-16 h-16'; break;
+        case 'lg': $avatarClasses = 'w-32 h-32'; break;
+        case 'xl': $avatarClasses = 'w-40 h-40'; break;
+        case 'md':
+        default: $avatarClasses = 'w-24 h-24'; break;
+    }
+
+    // Avatar Frame Mapping
+    $frameClasses = '';
+    switch($avatarFrame) {
+        case 'rounded-xl': $frameClasses = 'rounded-xl'; break;
+        case 'square': $frameClasses = 'rounded-none'; break;
+        case 'polygon': $frameClasses = 'avatar-polygon'; break;
+        case 'circle':
+        default: $frameClasses = 'rounded-full'; break;
+    }
+
+    // Layout Classes
+    $layoutWrapperClass = 'text-center';
+    $layoutFlexClass = 'flex flex-col items-center';
+    $heroCoverClass = '';
+    
+    if ($headerLayout === 'left-aligned') {
+        $layoutWrapperClass = 'text-left';
+        $layoutFlexClass = 'flex flex-row items-center gap-6';
+    } elseif ($headerLayout === 'hero-cover') {
+        $layoutWrapperClass = 'text-center relative pt-12 mt-16';
+        $layoutFlexClass = 'flex flex-col items-center';
+        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
+    }
 @endphp
 <body class="h-full theme-{{ $theme }} {{ $profile->theme_type === 'custom' ? 'theme-custom' : '' }}">
     <div class="theme-page">
-        <div class="max-w-md w-full space-y-8">
+        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
             
-            <!-- Profil Kartı -->
-            <div class="text-center">
-                <img class="mx-auto h-24 w-24 rounded-full object-cover theme-avatar-ring" src="{{ $profile->avatar_url }}" alt="{{ $user->name }}">
-                
-                <h2 class="mt-4 text-3xl font-extrabold tracking-tight theme-name">
-                    {{ $user->name }}
-                </h2>
-                
-                <p class="mt-1 text-sm font-medium theme-username">
-                    {{ '@' . ($profile->username ?? $user->username) }}
-                </p>
+            @if($headerLayout === 'hero-cover')
+                <div class="absolute top-0 left-[-2rem] right-[-2rem] h-40 bg-card/30 backdrop-blur-md rounded-b-[3rem] border-b border-card-border pointer-events-none z-0"></div>
+            @endif
 
-                @if($profile->bio)
-                    <p class="mt-4 text-base leading-relaxed theme-bio">
-                        {{ $profile->bio }}
-                    </p>
-                @endif
+            <!-- Profil Kartı -->
+            <div class="{{ $layoutWrapperClass }} relative z-10 p-2">
+                <div class="{{ $layoutFlexClass }}">
+                    <!-- Avatar -->
+                    <img class="{{ $avatarClasses }} {{ $frameClasses }} object-cover theme-avatar-ring flex-shrink-0 {{ $headerLayout === 'hero-cover' ? 'w-32 h-32 -mt-20 border-4 border-background bg-background shadow-xl' : '' }} {{ $headerLayout === 'left-aligned' ? 'w-20 h-20' : '' }}" 
+                         src="{{ $profile->avatar_url }}" alt="{{ $user->name }}">
+                    
+                    <!-- Text Info -->
+                    <div class="{{ $headerLayout === 'left-aligned' ? 'flex-1 pt-1' : 'w-full' }}">
+                        @if($showName)
+                            <h2 class="{{ $headerLayout === 'hero-cover' ? 'mt-6 text-4xl' : 'mt-4 text-3xl' }} font-extrabold tracking-tight theme-name break-words">
+                                {{ $user->name }}
+                            </h2>
+                        @endif
+                        
+                        @if($showUsername)
+                            <p class="{{ $headerLayout === 'left-aligned' ? 'mt-0.5' : 'mt-1' }} text-sm font-medium theme-username opacity-80">
+                                {{ '@' . ($profile->username ?? $user->username) }}
+                            </p>
+                        @endif
+
+                        @if($showBio && $profile->bio)
+                            <p class="{{ $headerLayout === 'hero-cover' ? 'mt-6 px-4' : 'mt-4' }} {{ $headerLayout === 'left-aligned' ? 'text-sm' : 'text-base' }} leading-relaxed theme-bio text-center md:{{ $headerLayout === 'left-aligned' ? 'text-left' : 'text-center' }}">
+                                {{ $profile->bio }}
+                            </p>
+                        @endif
+                    </div>
+                </div>
             </div>
 
             <!-- Linkler -->
@@ -298,5 +382,215 @@
             
         </div>
     </div>
+
+    @if(request()->headers->has('referer') && str_contains(request()->headers->get('referer'), '/dashboard'))
+    <script>
+        // Sadece iframe içindeyken (dashboard'dan geliyorsa) çalışır
+        window.addEventListener('message', (event) => {
+            if (event.data?.type === 'DESIGN_UPDATE') {
+                const design = event.data.payload;
+                if (!design || !design.header) return;
+
+                const header = design.header;
+                const avatarImg = document.querySelector('img[alt="{{ $user->name }}"]');
+                const nameEl = document.querySelector('.theme-name');
+                const usernameEl = document.querySelector('.theme-username');
+                const bioEl = document.querySelector('.theme-bio');
+                const cardWrapper = avatarImg?.closest('.relative.z-10');
+                const flexContainer = avatarImg?.parentElement;
+                const heroCover = document.querySelector('.bg-card\\/30.backdrop-blur-md');
+                const maxWContainer = document.querySelector('.max-w-md');
+                const textWrapper = nameEl?.parentElement;
+
+                // 1. Avatar Size
+                if (avatarImg) {
+                    avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40');
+                    if (header.layout === 'hero-cover') {
+                        avatarImg.classList.add('w-32', 'h-32'); 
+                    } else if (header.layout === 'left-aligned') {
+                        avatarImg.classList.add('w-20', 'h-20');
+                    } else {
+                        switch(header.avatar_size) {
+                            case 'sm': avatarImg.classList.add('w-16', 'h-16'); break;
+                            case 'lg': avatarImg.classList.add('w-32', 'h-32'); break;
+                            case 'xl': avatarImg.classList.add('w-40', 'h-40'); break;
+                            case 'md':
+                            default: avatarImg.classList.add('w-24', 'h-24'); break;
+                        }
+                    }
+                }
+
+                // 2. Avatar Frame
+                if (avatarImg) {
+                    avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
+                    switch(header.avatar_frame) {
+                        case 'rounded-xl': avatarImg.classList.add('rounded-xl'); break;
+                        case 'square': avatarImg.classList.add('rounded-none'); break;
+                        case 'polygon': avatarImg.classList.add('avatar-polygon'); break;
+                        case 'circle':
+                        default: avatarImg.classList.add('rounded-full'); break;
+                    }
+                }
+
+                // 3. Visibility
+                if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
+                if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
+                if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
+
+                // 4. Layout
+                if (cardWrapper && flexContainer && maxWContainer && textWrapper && avatarImg) {
+                    // Reset all specific layout classes
+                    cardWrapper.className = 'relative z-10 p-2';
+                    flexContainer.className = '';
+                    avatarImg.classList.remove('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
+                    maxWContainer.classList.remove('pt-16');
+                    textWrapper.className = '';
+                    if (nameEl) nameEl.className = 'font-extrabold tracking-tight theme-name break-words';
+                    if (usernameEl) usernameEl.className = 'font-medium theme-username opacity-80';
+                    if (bioEl) bioEl.className = 'leading-relaxed theme-bio';
+
+                    if (heroCover) heroCover.style.display = 'none';
+
+                    if (header.layout === 'left-aligned') {
+                        cardWrapper.classList.add('text-left');
+                        flexContainer.classList.add('flex', 'flex-row', 'items-center', 'gap-6');
+                        textWrapper.classList.add('flex-1', 'pt-1');
+                        if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
+                        if (usernameEl) usernameEl.classList.add('mt-0.5', 'text-sm');
+                        if (bioEl) bioEl.classList.add('mt-4', 'text-sm', 'text-left', 'md:text-left');
+                    } else if (header.layout === 'hero-cover') {
+                        cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
+                        flexContainer.classList.add('flex', 'flex-col', 'items-center');
+                        maxWContainer.classList.add('pt-16');
+                        avatarImg.classList.add('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
+                        textWrapper.classList.add('w-full');
+                        if (nameEl) nameEl.classList.add('mt-6', 'text-4xl');
+                        if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
+                        if (bioEl) bioEl.classList.add('mt-6', 'px-4', 'text-base', 'text-center', 'md:text-center');
+                        
+                        if (heroCover) {
+                            heroCover.style.display = 'block';
+                        } else {
+                            // Dinamik olarak hero cover ekle
+                            const newHeroCover = document.createElement('div');
+                            newHeroCover.className = 'absolute top-0 left-[-2rem] right-[-2rem] h-40 bg-card/30 backdrop-blur-md rounded-b-[3rem] border-b border-card-border pointer-events-none z-0';
+                            maxWContainer.insertBefore(newHeroCover, cardWrapper);
+                        }
+                    } else { // centered-classic
+                        cardWrapper.classList.add('text-center');
+                        flexContainer.classList.add('flex', 'flex-col', 'items-center');
+                        textWrapper.classList.add('w-full');
+                        if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
+                        if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
+                        if (bioEl) bioEl.classList.add('mt-4', 'text-base', 'text-center', 'md:text-center');
+                    }
+                }
+
+                // 5. Theme Updates
+                if (design.theme) {
+                    const bodyEl = document.body;
+                    
+                    if (!design.theme.custom_theme && design.theme.preset) {
+                        bodyEl.classList.remove('theme-custom');
+                        // Mevcut preset temasını bul ve kaldır (theme-X formatında)
+                        const classes = Array.from(bodyEl.classList);
+                        classes.forEach(c => {
+                            if(c.startsWith('theme-') && c !== 'theme-page') {
+                                bodyEl.classList.remove(c);
+                            }
+                        });
+                        
+                        // Yeni temayı ekle
+                        bodyEl.classList.add(`theme-${design.theme.preset}`);
+                    } else if (design.theme.custom_theme) {
+                        bodyEl.classList.add('theme-custom');
+                        
+                        // Set CSS variables for Live Preview based on design draft
+                        const bgType = design.background?.type || 'color';
+                        const bgColor = design.background?.color || '#f9fafb';
+                        const bgGradient = design.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        const bgImage = design.background?.image_url || '';
+                        const bgOverlay = design.background?.overlay || 0;
+                        const bgBlur = design.background?.blur || 0;
+                        
+                        const textColor = design.colors?.text || '#111827';
+                        
+                        const btnColor = design.buttons?.bg_color || '#ffffff';
+                        const btnTextColor = design.buttons?.text_color || '#111827';
+                        const btnShadow = design.buttons?.shadow ?? true;
+                        const btnStyle = design.buttons?.style || 'pill';
+                        
+                        const fontFamily = design.theme?.font_family || 'inter';
+
+                        // Background
+                        const themePage = document.querySelector('.theme-page');
+                        if (bgType === 'color') {
+                            document.documentElement.style.setProperty('--bg', bgColor);
+                            if(themePage) {
+                                themePage.style.backgroundImage = 'none';
+                                themePage.style.backgroundColor = 'var(--bg)';
+                            }
+                        } else if (bgType === 'gradient') {
+                            document.documentElement.style.setProperty('--bg', bgGradient);
+                            if(themePage) {
+                                themePage.style.backgroundImage = 'none';
+                                themePage.style.background = 'var(--bg)';
+                            }
+                        } else if (bgType === 'image') {
+                            if(themePage) {
+                                themePage.style.background = 'none';
+                                themePage.style.backgroundImage = `url('${bgImage}')`;
+                                themePage.style.backgroundSize = 'cover';
+                                themePage.style.backgroundPosition = 'center';
+                                themePage.style.backgroundAttachment = 'fixed';
+                            }
+                        }
+
+                        // Background Overlay/Blur (Requires pseudo-element handling or wrapper div)
+                        // Note: Inline styles can't edit ::before directly. So we find/create the pseudo-overlay instead.
+                        if (themePage) {
+                            let overlayEl = themePage.querySelector('.bg-dynamic-overlay');
+                            if (bgType === 'image') {
+                                if (!overlayEl) {
+                                    overlayEl = document.createElement('div');
+                                    overlayEl.className = 'bg-dynamic-overlay absolute inset-0 z-0 pointer-events-none';
+                                    themePage.insertBefore(overlayEl, themePage.firstChild);
+                                }
+                                overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${bgOverlay / 100})`;
+                                overlayEl.style.backdropFilter = `blur(${bgBlur}px)`;
+                                overlayEl.style.webkitBackdropFilter = `blur(${bgBlur}px)`;
+                            } else {
+                                if (overlayEl) overlayEl.remove();
+                            }
+                        }
+
+                        // Text & Cards
+                        document.documentElement.style.setProperty('--text', textColor);
+                        document.documentElement.style.setProperty('--text-secondary', textColor + 'cc');
+                        document.documentElement.style.setProperty('--card-bg', btnColor);
+                        document.documentElement.style.setProperty('--card-hover', btnColor + 'ee');
+                        document.documentElement.style.setProperty('--link-color', btnTextColor);
+                        document.documentElement.style.setProperty('--footer-color', textColor + '88');
+                        document.documentElement.style.setProperty('--card-shadow', btnShadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none');
+
+                        // Buttons Border Radius
+                        if (btnStyle === 'pill') document.documentElement.style.setProperty('--btn-radius', '9999px');
+                        else if (btnStyle === 'square') document.documentElement.style.setProperty('--btn-radius', '0px');
+                        else if (btnStyle === 'soft') document.documentElement.style.setProperty('--btn-radius', '2rem');
+
+                        // Font
+                        if (fontFamily === 'outfit') document.documentElement.style.setProperty('--font-family', "'Outfit', sans-serif");
+                        else if (fontFamily === 'inter') document.documentElement.style.setProperty('--font-family', "'Inter', sans-serif");
+                        else if (fontFamily === 'roboto') document.documentElement.style.setProperty('--font-family', "'Roboto', sans-serif");
+                        else if (fontFamily === 'montserrat') document.documentElement.style.setProperty('--font-family', "'Montserrat', sans-serif");
+                        else if (fontFamily === 'playfair') document.documentElement.style.setProperty('--font-family', "'Playfair Display', serif");
+                        else if (fontFamily === 'serif') document.documentElement.style.setProperty('--font-family', "Georgia, serif");
+                        else if (fontFamily === 'mono') document.documentElement.style.setProperty('--font-family', "'JetBrains Mono', monospace");
+                    }
+                }
+            }
+        });
+    </script>
+    @endif
 </body>
 </html>

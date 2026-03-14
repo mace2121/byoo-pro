@@ -272,24 +272,24 @@
                     theme: {
                         preset: initialSettings?.theme?.preset || 'minimal',
                         custom_theme: initialSettings?.theme?.custom_theme || false,
+                        font_family: initialSettings?.theme?.font_family || 'inter',
                     },
                     background: {
                         type: initialSettings?.background?.type || 'color',
-                        color: initialSettings?.background?.color || '#ffffff',
-                        gradient: initialSettings?.background?.gradient || '',
-                        image: initialSettings?.background?.image || '',
+                        color: initialSettings?.background?.color || '#f9fafb',
+                        gradient: initialSettings?.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        image_url: initialSettings?.background?.image_url || '',
                         overlay: initialSettings?.background?.overlay || 0,
                         blur: initialSettings?.background?.blur || 0,
                     },
                     buttons: {
                         style: initialSettings?.buttons?.style || 'pill',
-                        radius: initialSettings?.buttons?.radius || 16,
+                        shadow: initialSettings?.buttons?.shadow ?? true,
+                        bg_color: initialSettings?.buttons?.bg_color || '#ffffff',
+                        text_color: initialSettings?.buttons?.text_color || '#111827',
                     },
                     colors: {
-                        primary: initialSettings?.colors?.primary || '#111111',
-                        text: initialSettings?.colors?.text || '#111111',
-                        button_bg: initialSettings?.colors?.button_bg || '#111111',
-                        button_text: initialSettings?.colors?.button_text || '#ffffff',
+                        text: initialSettings?.colors?.text || '#111827',
                     }
                 },
                 
