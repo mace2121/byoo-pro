@@ -36,8 +36,14 @@ class Profile extends Model
         'meta_description',
         'custom_domain',
         'custom_domain_verified',
+        'design_settings',
         'is_active',
         'views',
+    ];
+
+    protected $casts = [
+        'design_settings' => 'array',
+        'is_active' => 'boolean',
     ];
 
     /**

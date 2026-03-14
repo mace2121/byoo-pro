@@ -1,5 +1,8 @@
 <x-app-layout>
-    <div class="h-full flex" x-data="{ tab: '{{ request()->query('tab', 'links') }}', previewOpen: window.innerWidth >= 1280 }">
+    @php 
+        $initialSettings = auth()->user()->profile?->design_settings ?? []; 
+    @endphp
+    <div class="h-full flex" x-data="dashboardManager('{{ request()->query('tab', 'links') }}', {{ json_encode($initialSettings) }})">
         <!-- LEFT SIDEBAR (Navigation) -->
         <aside class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" 
                :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'">
@@ -152,9 +155,44 @@
                             </div>
                         </div>
 
-                        <div x-show="tab === 'design'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
-                            <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
-                                @include('profile.partials.update-theme-form')
+                        <div x-show="tab === 'design'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" class="h-full">
+                            <div class="bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col h-[calc(100vh-8rem)]">
+                                <!-- Sub Navigation -->
+                                <div class="border-b border-border bg-muted/30 px-4 flex gap-6 overflow-x-auto whitespace-nowrap">
+                                    <button @click="designTab = 'header'" :class="designTab === 'header' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Header') }}</button>
+                                    <button @click="designTab = 'theme'" :class="designTab === 'theme' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Tema') }}</button>
+                                    <button @click="designTab = 'background'" :class="designTab === 'background' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Arka Plan') }}</button>
+                                    <button @click="designTab = 'buttons'" :class="designTab === 'buttons' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Butonlar') }}</button>
+                                    <button @click="designTab = 'colors'" :class="designTab === 'colors' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Renkler') }}</button>
+                                </div>
+
+                                <!-- Content Area -->
+                                <div class="p-6 md:p-8 flex-1 overflow-y-auto">
+                                    <div x-show="designTab === 'header'" x-cloak>
+                                        @include('dashboard.partials.design.header')
+                                    </div>
+                                    <div x-show="designTab === 'theme'" x-cloak>
+                                        @include('dashboard.partials.design.theme')
+                                    </div>
+                                    <div x-show="designTab === 'background'" x-cloak>
+                                        @include('dashboard.partials.design.background')
+                                    </div>
+                                    <div x-show="designTab === 'buttons'" x-cloak>
+                                        @include('dashboard.partials.design.buttons')
+                                    </div>
+                                    <div x-show="designTab === 'colors'" x-cloak>
+                                        @include('dashboard.partials.design.colors')
+                                    </div>
+                                </div>
+
+                                <!-- Action Bar -->
+                                <div class="border-t border-border bg-muted/10 p-4 flex items-center justify-between">
+                                    <p class="text-[10px] text-muted-foreground uppercase tracking-wider">{{ __('Değişikliklerinizi sağdan önizleyebilirsiniz') }}</p>
+                                    <button @click="saveDesign" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors hover:opacity-90 bg-primary text-primary-foreground h-9 px-6 gap-2 shadow-sm">
+                                        <i class="fas fa-save"></i>
+                                        {{ __('Kaydet') }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -212,4 +250,91 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
+                tab: initialTab,
+                designTab: 'header',
+                previewOpen: window.innerWidth >= 1280,
+                
+                // Design Draft State
+                draftDesign: {
+                    header: {
+                        layout: initialSettings?.header?.layout || 'centered-classic',
+                        avatar_size: initialSettings?.header?.avatar_size || 'md',
+                        avatar_frame: initialSettings?.header?.avatar_frame || 'circle',
+                        show_name: initialSettings?.header?.show_name ?? true,
+                        show_username: initialSettings?.header?.show_username ?? true,
+                        show_bio: initialSettings?.header?.show_bio ?? true,
+                    },
+                    theme: {
+                        preset: initialSettings?.theme?.preset || 'minimal',
+                        custom_theme: initialSettings?.theme?.custom_theme || false,
+                    },
+                    background: {
+                        type: initialSettings?.background?.type || 'color',
+                        color: initialSettings?.background?.color || '#ffffff',
+                        gradient: initialSettings?.background?.gradient || '',
+                        image: initialSettings?.background?.image || '',
+                        overlay: initialSettings?.background?.overlay || 0,
+                        blur: initialSettings?.background?.blur || 0,
+                    },
+                    buttons: {
+                        style: initialSettings?.buttons?.style || 'pill',
+                        radius: initialSettings?.buttons?.radius || 16,
+                    },
+                    colors: {
+                        primary: initialSettings?.colors?.primary || '#111111',
+                        text: initialSettings?.colors?.text || '#111111',
+                        button_bg: initialSettings?.colors?.button_bg || '#111111',
+                        button_text: initialSettings?.colors?.button_text || '#ffffff',
+                    }
+                },
+                
+                init() {
+                    // Watch for changes to update preview immediately
+                    this.$watch('draftDesign', value => {
+                        this.updatePreview(value);
+                    }, { deep: true });
+                },
+
+                updatePreview(settings) {
+                    // We will pass this data to the iframe via postMessage
+                    const iframe = this.$refs.previewIframe;
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'DESIGN_UPDATE',
+                            payload: settings
+                        }, '*');
+                    }
+                },
+
+                saveDesign() {
+                    // Function to submit the draftDesign payload
+                    fetch("{{ route('profile.design.update') }}", {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ design_settings: this.draftDesign })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show toast or success indicator
+                            window.dispatchEvent(new CustomEvent('notify', { detail: 'Tasarım kaydedildi!' }));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving design:', error);
+                    });
+                }
+            }));
+        });
+    </script>
+    @endpush
 </x-app-layout>

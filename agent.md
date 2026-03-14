@@ -1,217 +1,217 @@
+
+---
+
+# `AGENT.md`
+
+```md
 # AGENT.md
 
-## Proje Kimliği
-Bu proje, BYOO.PRO isimli Laravel tabanlı bio link / mini profil / bağlantı yönetim platformudur.
+## Proje Bağlamı
+Bu görev, BYOO.PRO projesinde yalnızca **Tasarım sekmesini** geliştirmek içindir. Amaç, mevcut Laravel admin panel düzenini bozmadan; kullanıcıya daha güçlü bir tasarım editörü deneyimi sunmaktır.
 
-Agent’ın görevi, mevcut çalışan Laravel sistemini sıfırdan dağıtmadan; hataları gidererek, arayüzü profesyonelleştirerek, Türkçeleştirerek ve yeni yönetim özellikleri ekleyerek ürünü üretim seviyesine yaklaştırmaktır.
-
----
-
-# 1. TEMEL ÇALIŞMA KURALLARI
-
-## 1.1 Sıfırdan Başlama Yok
-Bu projede yaklaşım:
-- var olan sistemi koru
-- çalışan parçaları bozma
-- sadece gerekli alanları iyileştir
-- mevcut deploy ve repo yapısını yeniden kurmaya çalışma
-
-## 1.2 Önce Var Olanı Kontrol Et
-Her geliştirmeden önce:
-- ilgili dosya zaten var mı?
-- aynı iş daha önce yapıldı mı?
-- mevcut kod iyileştirilebilir mi?
-- yeni dosya açmadan mevcut yapı genişletilebilir mi?
-
-## 1.3 Tekrar Eden İş Yapma
-Aşağıdaki işler önceki aşamalarda yapıldı ve yeniden yapılmayacak:
-- sunucu temel kurulumları
-- domain / SSL ayarları
-- Traefik temel kurulumu
-- Docker tabanlı servis ayağa kaldırma
-- GitHub repo oluşturma
-- temel deploy mantığı
-- Laravel uygulamasını ayağa kaldırma
-
-Agent bu alanlarda yeniden kurulum önermemeli; yalnızca ihtiyaç varsa bakım veya iyileştirme önermelidir.
+Bu görev, tüm panel redesign görevi değildir.
 
 ---
 
-# 2. ÖNCELİK STRATEJİSİ
+# 1. ANA GÖREV
 
-Agent aşağıdaki sırayı izlemeli:
-
-1. Kırık / hata veren modülleri düzelt
-2. İngilizce kalan alanları temizle
-3. Dashboard ve panel deneyimini iyileştir
-4. Canlı önizleme ve tema editörünü geliştir
-5. Link ikon sistemini geliştir
-6. Süper admin ve raporlama alanlarını ekle
-
----
-
-# 3. TASARIM YAKLAŞIMI
-
-## 3.1 Hedef Görünüm
-Panel görünümü:
-- Laravel starter kit gibi görünmemeli
-- modern SaaS panel hissi vermeli
-- temiz, profesyonel, düzenli olmalı
-- aşırı renkli değil kontrollü güçlü görünmeli
-
-## 3.2 UI İlkeleri
-- boş alan kullanımı dengeli olmalı
-- kartlar tutarlı olmalı
-- tüm butonlar aynı tasarım diline sahip olmalı
-- istatistik kartları sade ama güçlü görünmeli
-- form alanları okunaklı ve modern olmalı
-- canlı önizleme admin panelin doğal parçası gibi durmalı
-
-## 3.3 Önizleme Yaklaşımı
-Telefon mockup kullanılmayacak.
-Onun yerine:
-- admin arayüzüne uyumlu preview container
-- masaüstü panel içinde doğal duran canlı görünüm
-- gerçek link kartlarını gösteren alan
-kullanılacak.
+Agent’ın görevi:
+- mevcut Tasarım sekmesini incelemek
+- mevcut panel iskeletini korumak
+- tasarım alanını alt sekmeli hale getirmek
+- canlı önizleme + sonradan kaydetme akışını kurmak
+- header/hero alanını varyasyonlu hale getirmek
+- yalnızca hedef modülde iyileştirme yapmaktır
 
 ---
 
-# 4. DİL KURALI
+# 2. EN KRİTİK KURAL
 
-Bu projenin kullanıcıya dönük tüm alanları Türkçe olmalıdır.
-
+## Mevcut panel yapısı korunacak
 Agent:
-- İngilizce metin bırakmamalı
-- yeni eklediği metinleri Türkçe yazmalı
-- teknik kavramları kullanıcıya sade Türkçe ile sunmalı
-- terminolojiyi tutarlı kullanmalı
+- sidebar yapısını bozmayacak
+- sayfa iskeletini tamamen değiştirmeyecek
+- tüm yönetim panelini yeniden tasarlamayacak
+- sadece Tasarım sekmesini geliştirecek
 
-Örnek tercih:
-- Dashboard yerine “Panel” veya “Genel Bakış”
-- Settings yerine “Ayarlar”
-- Save yerine “Kaydet”
-- Update yerine “Güncelle”
+Buradaki amaç:
+- başka bir ürünü birebir kopyalamak değil
+- gelişmiş tasarım düzenleme davranışlarını mevcut sisteme uyarlamaktır
 
 ---
 
-# 5. KOD YAZIM KURALI
+# 3. TEMEL DAVRANIŞ HEDEFLERİ
 
-## 5.1 Mevcut Yapıya Saygı
-- mevcut klasör düzenine uygun çalış
-- gereksiz yeni mimari kurma
-- controller’ları aşırı şişirme
-- tekrar eden mantığı service katmanına al
+Agent aşağıdaki davranışları sisteme kazandırmalıdır:
 
-## 5.2 Temiz Kod
-- sade isimlendirme
-- açıklayıcı method adları
-- tek sorumluluk prensibi
-- bileşen bazlı arayüz mantığı
+1. Tasarım alanı alt sekmelere ayrılmalı
+   - Header
+   - Tema
+   - Arka Plan
+   - Butonlar
+   - Renkler
 
-## 5.3 Güvenlik
-- upload path kontrol edilmeli
-- custom css alanı sanitize edilmeli
-- rol kontrolü net yapılmalı
-- kullanıcılar birbirinin verisine erişememeli
+2. Kullanıcı yaptığı değişiklikleri anlık görmeli
+
+3. Bu değişiklikler veritabanına anında yazılmamalı
+
+4. Kullanıcı son görünümü beğenince Kaydet ile kalıcı hale getirmeli
+
+5. Header alanı sabit tek tip olmamalı; farklı layout/hero varyasyonları desteklenmeli
 
 ---
 
-# 6. HATA YÖNETİMİ YAKLAŞIMI
+# 4. HEADER / HERO YAKLAŞIMI
 
-Agent hata çözümünde şu sırayı izlemeli:
-1. log dosyasını oku
-2. gerçek sebebi bul
-3. geçici bastırma yerine kök nedeni çöz
-4. boş veri durumunu ayrıca ele al
-5. kullanıcıya temiz hata / boş durum deneyimi sun
+Agent şu noktayı temel kabul etmelidir:
 
-Özellikle:
-- Analizler sayfasındaki 500 error öncelikli konudur
-- Profil resmi kırık link sorunu ikinci kritik konudur
+Header alanı yalnızca “profil fotoğrafı + isim” alanı değildir. Bu modül, profil sayfasının üst bölümünün bütün görsel yerleşimini yönetir.
+
+## Agent’ın desteklemesi gereken yapılar:
+- avatar yükleme / değiştirme
+- avatar boyutu
+- avatar frame tipi
+- avatar konumu
+- isim görünürlüğü
+- kullanıcı adı görünürlüğü
+- bio görünürlüğü
+- başlık renk/font/boyut
+- header layout presetleri
+- hero benzeri geniş üst alan yapıları
+
+## Minimum header layout presetleri:
+- centered-classic
+- minimal-stack
+- hero-cover
+- card-header
+- left-aligned-profile
+- compact-header
+
+Agent bu modülü basit bir form alanı gibi değil, ayrı bir üst alan yerleşim sistemi olarak ele almalıdır.
+
+---
+
+# 5. KORUNMASI GEREKENLER
+
+Agent aşağıdakileri mümkün olduğunca korumalıdır:
+- mevcut tasarım sekmesinin sayfa içindeki konumu
+- mevcut admin layout yapısı
+- mevcut tema preset mantığı
+- mevcut bileşenlerden yararlanılabiliyorsa onları kullanma yaklaşımı
+- mevcut veri yapısına uyumluluk
+
+---
+
+# 6. ÖNERİLEN TEKNİK YAKLAŞIM
+
+## Öncelikli çözüm
+Eğer mevcut yapı Blade tabanlıysa:
+- Alpine.js ile draft state
+- save sırasında backend submit
+en uygun çözümdür.
+
+## Agent şunu yapmamalı:
+- küçük modül için tüm frontend stack’i değiştirmek
+- React/Vue geçişi önermek
+- mevcut çalışan blade yapısını gereksiz yere kırmak
 
 ---
 
 # 7. MODÜL BAZLI SORUMLULUKLAR
 
-## 7.1 Dashboard
+## 7.1 Header
 Agent:
-- placeholder alanları kaldırmalı
-- gerçek veriyle çalışan kart sistemi kurmalı
-- kullanıcı ve admin için farklı dashboard deneyimi tasarlamalı
+- üst alan varyasyonlarını eklemeli
+- header preview’ını anlık güncellemeli
+- toggle ve preset mantığını net kurmalı
 
-## 7.2 Tema Editörü
+## 7.2 Tema
 Agent:
-- canlı önizlemeyi güçlendirmeli
-- arka plan, blur, renk ve kart stilini desteklemeli
-- telefon mockup kullanmamalı
+- mevcut presetleri korumalı
+- seçim davranışını iyileştirmeli
+- custom override mantığını desteklemeli
 
-## 7.3 Link Yönetimi
+## 7.3 Arka Plan
 Agent:
-- URL’ye göre otomatik ikon önermeli
-- kullanıcıya manuel ikon değiştirme imkanı sunmalı
-- link formunu daha kullanışlı hale getirmeli
+- solid / gradient / pattern / image tiplerini desteklemeli
+- overlay / blur mantığını kurmalı
 
-## 7.4 Marka
+## 7.4 Butonlar
 Agent:
-- sistem logosunu panelde görünür kılmalı
-- favicon’u sistem logosuyla eşleştirmeli
-- auth ve panel alanlarında marka bütünlüğü sağlamalı
+- preset button stilleri sunmalı
+- radius, border, align ve renk ayarlarını canlı önizlemeli
 
-## 7.5 Süper Admin
+## 7.5 Renkler
 Agent:
-- süper admin rolünü net ayırmalı
-- kullanıcı listesi, istatistik ve sistem özeti ekranlarını planlamalı
-- yönetim ekranlarını sonradan büyüyebilecek şekilde kurgulamalı
+- genel renk kontrolünü merkezi hale getirmeli
+- seçilen renkleri ilgili preview alanlarına bağlamalı
 
 ---
 
-# 8. YAPILMAMASI GEREKENLER
+# 8. CANLI ÖNİZLEME YAKLAŞIMI
+
+Agent preview sisteminde şu kurala uymalı:
+- preview önce draft state’i okur
+- persisted state yalnızca başlangıç referansı olur
+- save yapılmadan DB güncellenmez
+
+Bu görevde autosave istenmiyor.
+
+---
+
+# 9. UI İLKELERİ
+
+Agent şu tasarım ilkelerine uymalı:
+- seçili seçenekler belirgin olmalı
+- ayar grupları birbirinden net ayrılmalı
+- preview alanı sade ama etkili olmalı
+- kullanıcı hangi değişikliğin neyi etkilediğini anlamalı
+- Tasarım sekmesi kalabalık değil, modüler görünmeli
+
+---
+
+# 10. YAPILMAMASI GEREKENLER
 
 Agent aşağıdakileri yapmamalıdır:
-
-- her sorunda “projeyi baştan yazalım” yaklaşımı
-- daha önce kurulan deploy yapısını yeniden kurmak
-- sadece görsel iyileştirme yapıp mantık hatalarını bırakmak
-- hardcoded İngilizce metin eklemek
-- mockup uğruna kullanım kolaylığını düşürmek
-- rol yapısını belirsiz bırakmak
-- kullanıcı paneli ile admin panelini aynılaştırmak
+- tüm paneli baştan tasarlamak
+- sadece referans ürüne benzetmek için mevcut UI’ı bozmak
+- tüm değişiklikleri otomatik kaydetmek
+- header modülünü sadece avatar değiştirme alanına indirgemek
+- mevcut sistemin tema mantığını tamamen çöpe atmak
 
 ---
 
-# 9. ÇALIŞMA BİÇİMİ
+# 11. ÇALIŞMA SIRASI
 
-Her iş kalemi için şu format izlenmeli:
+Agent aşağıdaki sıraya göre ilerlemelidir:
 
-1. Mevcut durumu incele
-2. Aynı iş daha önce yapıldı mı kontrol et
-3. En küçük etkili değişiklikle iyileştir
-4. UI ve backend birlikte düşün
-5. Türkçeleştirmeyi unutma
-6. Test et
-7. Sonra bir sonraki adıma geç
-
----
-
-# 10. BAŞARI KRİTERİ
-
-Agent başarılı kabul edilir eğer:
-
-- sistem daha stabil hale gelirse
-- 500 hata ortadan kalkarsa
-- tüm panel Türkçeleşirse
-- kullanıcı dashboard anlamlı hale gelirse
-- admin dashboard gerçek yönetim paneli gibi olursa
-- canlı önizleme doğal ve kullanışlı çalışırsa
-- link ikon sistemi kullanıcı dostu hale gelirse
-- sistem logosu ve favicon tutarlı şekilde görünürse
-- daha önce yapılan kurulum işleri tekrar edilmeden ilerlenirse
+1. mevcut Tasarım sekmesini incele
+2. state ayrımını planla
+3. alt sekmeli yapı kur
+4. preview panelini draft state’e bağla
+5. Header/Hero modülünü ekle
+6. Tema modülünü geliştir
+7. Arka plan modülünü ekle
+8. Butonlar modülünü ekle
+9. Renkler modülünü ekle
+10. save akışını tamamla
 
 ---
 
-# 11. KISA YÖNERGE
+# 12. BAŞARI TANIMI
 
-Bu proje için ana motto:
+Agent başarılı sayılırsa:
+- Tasarım sekmesi belirgin biçimde güçlenmiş olur
+- Header alanı varyasyonlu hale gelir
+- Kullanıcı anlık sonucu görür
+- değişiklikler sadece Kaydet sonrası kalıcı olur
+- mevcut panel düzeni korunur
+- sistem gelecekte daha da büyütülebilecek modüler bir yapıya kavuşur
 
-**“Çalışanı bozmadan geliştir, tekrar yapma, tamamen Türkçeleştir, starter kit hissini sil, ürünü gerçek SaaS paneline dönüştür.”**
+---
+
+# 13. KISA YÖNERGE
+
+Bu görev için ana motto:
+
+**“Mevcut paneli bozmadan, Tasarım sekmesini canlı önizlemeli ve varyasyonlu bir görsel editöre dönüştür.”**

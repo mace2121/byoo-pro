@@ -140,6 +140,26 @@ class ProfileController extends Controller
     }
 
     /**
+     * Update the user's design settings via AJAX.
+     */
+    public function updateDesign(Request $request)
+    {
+        $request->validate([
+            'design_settings' => 'required|array',
+        ]);
+
+        $user = $request->user();
+        if ($user->profile) {
+            $user->profile->update([
+                'design_settings' => $request->design_settings,
+            ]);
+            $this->profileService->clearProfileCache($user);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

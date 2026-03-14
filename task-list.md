@@ -1,304 +1,277 @@
 # TASK.md
 
 ## Proje
-BYOO.PRO – Laravel tabanlı bio link / mini profil platformu
+BYOO.PRO – Tasarım Sekmesi Geliştirme Görevi
 
-## Amaç
-Mevcut sistemi, üretime uygun, tamamen Türkçeleştirilmiş, görsel olarak güçlü, kullanıcı ve süper admin rolleri net ayrılmış, canlı önizleme destekli modern bir SaaS platformuna dönüştürmek.
+## Görev Özeti
+Mevcut Laravel tabanlı panel yapısı korunarak, yalnızca **Tasarım sekmesi** daha gelişmiş bir görsel düzenleme alanına dönüştürülecektir. Amaç, kullanıcıların profil sayfasının görünümünü daha detaylı şekilde yönetebilmesi, yaptığı değişiklikleri **anlık canlı önizleme** ile görebilmesi ve son hali onayladıktan sonra **Kaydet** ile kalıcı hale getirebilmesidir.
 
----
-
-# 1. DAHA ÖNCE TAMAMLANAN / TEKRAR YAPILMAYACAK İŞLER
-
-Bu maddeler yeniden yapılmayacak, sadece korunacak ve gerekiyorsa iyileştirilecektir:
-
-- Sunucu temel kurulumu yapıldı
-- Domain yönlendirmesi çalışıyor
-- Traefik / HTTPS yapısı kuruldu
-- Docker tabanlı servis altyapısı çalışır durumda
-- GitHub reposu oluşturuldu:
-  - https://github.com/mace2121/byoo-pro
-- Git deploy akışı kuruldu
-- Proje sunucuda ayağa kaldırıldı
-- Laravel tabanlı sistem temel olarak çalışıyor
-- Kullanıcı kayıt / giriş altyapısı mevcut
-- Temel panel yapısı mevcut
-- Tema mantığı için ilk altyapı düşünülmüş durumda
-- Sistem şu anda “çalışıyor”, ancak arayüz, akış ve bazı modüller revize edilecek
-
-> Not: Bu aşamada hedef sıfırdan kurulum değil, mevcut sistemi yeniden yapılandırmak ve profesyonel hale getirmektir.
+Bu görev, mevcut paneli baştan tasarlama görevi değildir. Sadece mevcut yapı içinde Tasarım sekmesi genişletilecek ve güçlendirilecektir.
 
 ---
 
-# 2. KRİTİK HATALAR
+# 1. KAPSAM
 
-## 2.1 Analizler Sayfası 500 Hatası
-- Analizler sayfasındaki 500 error tespit edilecek
-- Log kayıtları incelenecek
-- Route / controller / query / view kaynaklı hata netleştirilecek
-- Hata giderilecek
-- Boş veri durumunda sayfa kırılmayacak
-- Hatalı veri olduğunda kullanıcı dostu fallback gösterilecek
+Bu görev yalnızca aşağıdaki alanları kapsar:
+- Tasarım sekmesi içeriği
+- canlı önizleme davranışı
+- header / hero alanı varyasyonları
+- tema seçimi
+- arka plan ayarları
+- buton stilleri
+- renk yönetimi
+- draft state + kaydet akışı
 
-## 2.2 Profil Görseli / Kırık Link Problemleri
-- Kullanıcı profil fotoğrafı yükleyince oluşan kırık görsel linkleri düzeltilecek
-- Storage link, disk config, asset path ve upload mantığı kontrol edilecek
-- Varsayılan profil görseli fallback olarak eklenecek
-
----
-
-# 3. PANEL YAPISI – YENİDEN TASARIM
-
-## 3.1 Kullanıcı Dashboard
-Mevcut starter kit görünümü kaldırılacak veya büyük ölçüde özelleştirilecek.
-
-### Yeni kullanıcı dashboard alanları:
-- Genel bakış kartları
-  - Toplam link sayısı
-  - Toplam görüntülenme
-  - Toplam tıklanma
-  - Aktif tema
-- Son eklenen linkler
-- En çok tıklanan linkler
-- Profil durumu
-- Tema özeti
-- Hızlı işlemler
-  - Yeni link ekle
-  - Tema düzenle
-  - Profil bilgilerini güncelle
-  - Analizleri görüntüle
-
-## 3.2 Yönetici / Süper Admin Dashboard
-Süper admin alanı oluşturulacak.
-
-### Görebileceği veriler:
-- Toplam kullanıcı sayısı
-- Aktif / pasif kullanıcılar
-- Bugün oluşturulan hesaplar
-- Toplam link sayısı
-- En çok kullanılan temalar
-- En çok trafik alan kullanıcılar
-- Sistem genel istatistikleri
-- Son kayıt olan kullanıcılar
-- Hızlı yönetim bağlantıları
+Bu görev aşağıdakileri kapsamaz:
+- tüm panelin yeniden tasarlanması
+- dashboard redesign
+- analizler sayfasının yeniden ele alınması
+- sidebar yapısının değiştirilmesi
+- mevcut genel admin layout’un kırılması
+- tüm ürün mimarisinin yeniden kurulması
 
 ---
 
-# 4. TEMA DÜZENLEME DENEYİMİ
+# 2. DAHA ÖNCE YAPILANLAR / TEKRAR YAPILMAYACAKLAR
 
-## 4.1 Canlı Önizleme
-- Kullanıcının tema değişiklikleri panel içinde canlı önizlenebilmeli
-- Telefon mockup kaldırılacak
-- Önizleme alanı, Laravel admin panele uyumlu modern bir “preview panel” olarak tasarlanacak
-- Sağ veya sol tarafta masaüstü benzeri canlı görünüm olacak
-- Değişiklikler anlık yansıyacak
+Aşağıdaki işler mevcut sistemde zaten vardır veya temel olarak kurulmuştur; bu görev kapsamında bunlar sıfırdan yapılmayacaktır:
 
-## 4.2 Özelleştirme Alanları
-Kullanıcı aşağıdaki ayarları düzenleyebilmeli:
-- Tema seçimi
-- Ana renk
-- Yardımcı renk
-- Arka plan rengi
-- Arka plan görseli
-- Arka plan bulanıklığı
-- Kart köşe yuvarlaklığı
-- Yazı rengi
-- Buton stili
-- Link kartı stili
-- Font seçimi (ileri faz)
-- Özel CSS alanı
+- Laravel tabanlı admin panel altyapısı
+- kullanıcı giriş / kayıt sistemi
+- temel kullanıcı paneli
+- Tasarım sekmesinin ilk versiyonu
+- hazır tema kartlarının temel mantığı
+- sağ tarafta önizleme alanı mantığı
+- deploy ve repo altyapısı
+- sunucu ve domain kurulumları
 
-## 4.3 Arka Plan Yönetimi
-- Görsel yükleme
-- Görsel konumlandırma
-- Opaklık / blur ayarı
-- Overlay desteği
+Bu nedenle hedef:
+- sistemi yeniden kurmak değil
+- mevcut Tasarım sekmesini ürün seviyesinde iyileştirmektir
 
 ---
 
-# 5. LİNK YÖNETİMİ GELİŞTİRMELERİ
+# 3. ANA HEDEF
 
-## 5.1 Otomatik İkon Algılama
-Bağlantı tipine göre sistem otomatik ikon önermeli:
-- Instagram → Instagram ikonu
-- WhatsApp → WhatsApp ikonu
-- YouTube → YouTube ikonu
-- TikTok → TikTok ikonu
-- X / Twitter → X ikonu
-- Telegram → Telegram ikonu
-- Facebook → Facebook ikonu
-- LinkedIn → LinkedIn ikonu
-- Website / generic → zincir / globe ikonu
+Kullanıcı, Tasarım sekmesinde yaptığı değişiklikleri anında görebilmeli; ancak bu değişiklikler veritabanına hemen yazılmamalıdır.
 
-## 5.2 Manuel İkon Seçimi
-- Kullanıcı isterse otomatik ikonu değiştirebilmeli
-- Panelde ikon seçici olmalı
-- İkon kütüphanesi düzenli şekilde gösterilmeli
-- Seçilen ikon link kartında görünmeli
-
-## 5.3 Link Alanı Geliştirmeleri
-- Başlık
-- URL
-- Açıklama (opsiyonel)
-- İkon
-- Buton stili
-- Sıralama
-- Aktif / pasif durumu
+Beklenen akış:
+1. Kullanıcı tasarım ayarlarını değiştirir
+2. Sağdaki önizleme alanı anlık güncellenir
+3. Değişiklikler geçici taslak state içinde tutulur
+4. Kullanıcı son hali beğenirse “Kaydet” butonuna basar
+5. Ancak bu aşamada kalıcı kayıt yapılır
 
 ---
 
-# 6. TAM TÜRKÇELEŞTİRME
+# 4. TASARIM SEKME YAPISI
 
-## 6.1 Laravel Starter Kit İngilizce Alanların Temizlenmesi
-Sistemde İngilizce kalan hiçbir alan bırakılmayacak.
+Tasarım sekmesi kendi içinde alt sekmelere ayrılacaktır.
 
-### Türkçeleştirilecek alanlar:
-- Giriş / kayıt / şifre sıfırlama ekranları
-- Dashboard alanları
-- Validation mesajları
-- Buton metinleri
-- Menü alanları
-- Boş durum metinleri
-- Bildirimler
-- Profil ayarları
-- Auth ekranları
-- Tablo başlıkları
-- Form placeholder’ları
+## Alt sekmeler:
+- Header
+- Tema
+- Arka Plan
+- Butonlar
+- Renkler
 
-## 6.2 Dil Standardı
-- Resmi ama anlaşılır Türkçe
-- Tutarlı terimler kullanılacak
-- İngilizce teknik alanlar kullanıcıya gösterilmeyecek
+Bu sekmeler mevcut Tasarım ekranı içinde çalışacak, yeni bir bağımsız modül gibi davranmayacak.
 
 ---
 
-# 7. MARKA UYGULAMASI
+# 5. HEADER MODÜLÜ – DİNAMİK ÜST ALAN
 
-## 7.1 Sistem Logosu
-- Laravel panel üst alanında sistem logosu gösterilecek
-- Sol menü / auth ekranları / üst bar ile tutarlı kullanılacak
+Header alanı sadece profil fotoğrafı değiştirilen basit bir bölüm değildir. Kullanıcının profil sayfasındaki üst alanın genel görünümünü ve yerleşimini belirleyen modül olacaktır.
 
-## 7.2 Favicon
-- Favicon, sistem logosundan üretilecek
-- Tarayıcı sekmesinde görünecek
-- Light / dark uyumu kontrol edilecek
+## Header modülünde desteklenecek ana özellikler:
+- profil görseli yükleme/değiştirme
+- avatar boyutu
+- avatar çerçeve tipi
+- avatar konumu
+- isim göster/gizle
+- kullanıcı adı göster/gizle
+- açıklama / bio göster-gizle
+- başlık hizası
+- başlık fontu
+- başlık rengi
+- başlık boyutu
+- header layout seçimi
+- hero benzeri üst alan varyasyonları
 
-## 7.3 SaaS Marka Bütünlüğü
-- Panel, giriş ekranı ve public landing page aynı marka dilini taşımalı
+## Header / Hero layout varyasyonları
+İlk sürümde en az aşağıdaki preset yapılar desteklenecek:
+- klasik merkez hizalı avatar + isim
+- minimal header
+- geniş hero alanı + avatar
+- kartlı üst alan
+- sol hizalı profil düzeni
+- sade metin ağırlıklı üst alan
 
----
-
-# 8. UI / UX İYİLEŞTİRMELERİ
-
-## 8.1 Starter Kit Görünümünden Çıkış
-- Varsayılan Laravel starter kit hissi azaltılacak
-- Kutular, spacing, renk sistemi ve tipografi yeniden ele alınacak
-
-## 8.2 Panel Tasarım Hedefi
-- Modern SaaS görünüm
-- Daha güçlü kart sistemi
-- Daha iyi boşluk kullanımı
-- Daha net görsel hiyerarşi
-- Kullanıcı dostu form deneyimi
-- Hover / active / empty state tasarımı
-- Responsive ama öncelik desktop admin deneyimi
-
-## 8.3 Ortak Bileşenler
-- Kartlar
-- İstatistik widget’ları
-- Tablo bileşenleri
-- İkon butonları
-- Form alanları
-- Sekmeli ayar ekranları
-- Toast / bildirim sistemi
+## Davranış
+Kullanıcı header tipi değiştirdiğinde:
+- önizleme alanı anında güncellenmeli
+- profil bloğunun yerleşimi değişmeli
+- isim / kullanıcı adı / açıklama alanları seçilen layout’a göre yeniden hizalanmalı
 
 ---
 
-# 9. SÜPER ADMIN MODÜLÜ
+# 6. TEMA SEKME ÖZELLİKLERİ
 
-## 9.1 Roller
-- Kullanıcı
-- Admin / Süper Admin
+Tema sekmesi mevcut tema sistemini koruyarak genişletilecektir.
 
-## 9.2 Süper Admin Yetkileri
-- Tüm kullanıcıları görüntüleme
-- Kullanıcı profillerini inceleme
-- Kullanıcı istatistiklerini görüntüleme
-- Kullanıcıları aktif / pasif yapma
-- Tema kullanım istatistiklerini görüntüleme
-- Genel sistem istatistikleri
-- Gerekirse kullanıcıya müdahale araçları
+## Desteklenecek davranışlar:
+- hazır tema kartları
+- seçili tema vurgusu
+- özel tema mantığı
+- tema kartına tıklayınca anlık önizleme
+- tema ile birlikte bazı varsayılan renk ve buton presetlerinin gelmesi
 
----
-
-# 10. LANDING PAGE / ANA SAYFA
-
-Daha önce belirtilen şekilde:
-- byoo.pro açıldığında Laravel starter kit görünümü değil
-- Türkçe SaaS tanıtım sayfası açılmalı
-
-### Bu sayfada bulunacak:
-- Hero alanı
-- Kısa değer önerisi
-- Özellikler
-- Tema örnekleri
-- Kullanım adımları
-- SSS
-- Kayıt ol / giriş yap CTA alanları
-
-> Eğer landing page kısmen yapıldıysa tekrar baştan yazılmadan mevcut yapı gözden geçirilir.
+## Not
+Mevcut tema kartları silinmeyecek, gerekirse geliştirilerek korunacaktır.
 
 ---
 
-# 11. TEKNİK TEMİZLİK VE STANDARTLAR
+# 7. ARKA PLAN SEKME ÖZELLİKLERİ
 
-- Route düzeni gözden geçirilecek
-- Controller sorumlulukları sadeleştirilecek
-- Gereksiz starter bileşenleri temizlenecek
-- Blade / component mimarisi düzenlenecek
-- Asset yapısı sadeleştirilecek
-- Upload ve media path sistemi standartlaştırılacak
-- Hata loglama netleştirilecek
+Kullanıcı arka planı daha özgürce özelleştirebilmelidir.
 
----
+## İlk sürümde desteklenecek alanlar:
+- düz renk arka plan
+- gradient arka plan
+- pattern / yüzey seçimi
+- arka plan görseli yükleme
+- overlay yoğunluğu
+- blur / yumuşatma etkisi
 
-# 12. ÖNCELİK SIRASI
-
-## Faz 1 – Kritik Düzeltmeler
-1. Analizler sayfası 500 hatası
-2. Kırık profil görselleri
-3. Türkçeleştirme eksikleri
-4. Sistem logosu + favicon
-
-## Faz 2 – Panel Dönüşümü
-5. Kullanıcı dashboard redesign
-6. Yönetici / süper admin dashboard
-7. UI component iyileştirmeleri
-
-## Faz 3 – Tema ve Canlı Önizleme
-8. Telefon mockup kaldırılması
-9. Canlı önizleme alanı
-10. Tema ayarlarının genişletilmesi
-11. Özel CSS desteği
-
-## Faz 4 – Link Yönetimi
-12. Otomatik ikon algılama
-13. Manuel ikon seçici
-14. Link düzenleme deneyimi
-
-## Faz 5 – Yönetim ve Büyüme
-15. Süper admin modülü
-16. Sistem istatistik ekranları
-17. Landing page final düzenlemeleri
+## İleri düzey ama opsiyonel alanlar:
+- arka plan hizalama
+- cover / contain seçenekleri
+- ayrı masaüstü / mobil varyasyonları
 
 ---
 
-# 13. TAMAMLAMA KRİTERLERİ
+# 8. BUTONLAR SEKME ÖZELLİKLERİ
 
-Bir geliştirme tamamlanmış sayılması için:
-- Hata vermeden çalışmalı
-- Türkçe dil standardına uymalı
-- Mobil ve masaüstünde bozulmamalı
-- Mevcut çalışan modülleri kırmamalı
-- Panel görünümünü hissedilir şekilde iyileştirmeli
-- Kullanıcı açısından sezgisel olmalı
+Link kartları / butonları için gelişmiş stil yönetimi eklenecektir.
+
+## Stil presetleri:
+- Solid
+- Glass
+- Outline
+- Offset
+
+## Ayarlar:
+- köşe yuvarlaklığı
+- buton arka plan rengi
+- metin rengi
+- border rengi
+- border açık / kapalı
+- metin hizası
+- gölge yoğunluğu (opsiyonel)
+- ikon-metin aralığı (opsiyonel)
+
+## Beklenen davranış
+Kullanıcı bu ayarlarda değişiklik yaptığında link önizlemeleri anında değişmelidir.
+
+---
+
+# 9. RENKLER SEKME ÖZELLİKLERİ
+
+Genel renk sistemi ayrı bir kontrol alanı olarak yönetilecektir.
+
+## Alanlar:
+- ana renk
+- yardımcı renk
+- accent rengi
+- metin rengi
+- ikincil metin rengi
+- buton rengi
+- border rengi
+
+## Davranış
+Renk seçildiğinde:
+- önizleme anlık değişmeli
+- ilgili bileşenler otomatik uyumlu görünmeli
+
+---
+
+# 10. CANLI ÖNİZLEME
+
+## Temel kurallar
+- Önizleme alanı mevcut panel içinde kalmalı
+- Panel layout bozulmamalı
+- Önizleme admin panele uyumlu görünmeli
+- Telefon mockup zorunlu değildir
+- Önizleme gerçek ürün hissi veren bir “preview container” olarak kurgulanmalıdır
+
+## Önizlemede anlık değişecek alanlar:
+- header / hero görünümü
+- avatar yapısı
+- isim / kullanıcı adı / bio
+- arka plan tipi
+- tema seçimi
+- buton stili
+- renk sistemi
+- hizalama
+- radius
+- border / shadow yapısı
+
+---
+
+# 11. KAYDET AKIŞI
+
+## Zorunlu işleyiş
+- Kullanıcı ayar değiştirir
+- Değişiklikler geçici state’te tutulur
+- Veritabanına anında yazılmaz
+- Kullanıcı “Kaydet” dediğinde tek seferde kayıt yapılır
+
+## Geri bildirim
+- Kaydet sonrası başarı bildirimi gösterilmeli
+- Kaydedilmemiş değişiklik varsa buton aktif hale gelebilir
+- Hatalı alanlarda kullanıcı yönlendirilmeli
+
+---
+
+# 12. TEKNİK VERİ GRUPLARI
+
+Ayarlar mantıksal olarak şu başlıklarda ele alınmalıdır:
+- header_settings
+- theme_settings
+- background_settings
+- button_settings
+- color_settings
+
+Bunlar ister JSON ister ayrı kolonlarla saklansın, kod tarafında grup yapısı korunmalıdır.
+
+---
+
+# 13. ÖNCELİK SIRASI
+
+## Faz 1
+- Taslak state + canlı önizleme altyapısı
+- Header sekmesi
+- Tema sekmesi
+
+## Faz 2
+- Arka Plan sekmesi
+- Butonlar sekmesi
+- Renkler sekmesi
+
+## Faz 3
+- hero varyasyonlarının artırılması
+- görsel arka plan detayları
+- gelişmiş overlay / blur kontrolleri
+- kaydedilmemiş değişiklik uyarıları
+
+---
+
+# 14. TAMAMLAMA KRİTERLERİ
+
+Bu görev tamamlanmış sayılırsa:
+- Tasarım sekmesi alt sekmelere ayrılmış olur
+- Header alanı dinamik / varyasyonlu hale gelir
+- Kullanıcı değişiklikleri anlık görür
+- Değişiklikler Kaydet’e kadar kalıcı olmaz
+- Mevcut panel düzeni bozulmaz
+- Tasarım sekmesi belirgin şekilde daha profesyonel ve güçlü hale gelir
