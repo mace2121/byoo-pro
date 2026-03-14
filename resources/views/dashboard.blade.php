@@ -22,25 +22,25 @@
                             <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('Menu') }}</p>
                         </div>
                         <nav class="space-y-1 px-2">
-                            <button @click="tab = 'links'" 
+                            <button @click="tab = 'links'; if(window.innerWidth < 768) sidebarOpen = false" 
                                     :class="tab === 'links' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                     class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 <i class="fas fa-link w-4 text-center"></i>
                                 {{ __('Linklerim') }}
                             </button>
-                            <button @click="tab = 'stats'" 
+                            <button @click="tab = 'stats'; if(window.innerWidth < 768) sidebarOpen = false" 
                                     :class="tab === 'stats' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                     class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 <i class="fas fa-chart-pie w-4 text-center"></i>
                                 {{ __('Analizler') }}
                             </button>
-                            <button @click="tab = 'design'" 
+                            <button @click="tab = 'design'; if(window.innerWidth < 768) sidebarOpen = false" 
                                     :class="tab === 'design' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                     class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 <i class="fas fa-paint-brush w-4 text-center"></i>
                                 {{ __('Tasarım') }}
                             </button>
-                            <button @click="tab = 'settings'" 
+                            <button @click="tab = 'settings'; if(window.innerWidth < 768) sidebarOpen = false" 
                                     :class="tab === 'settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                     class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                                 <i class="fas fa-cog w-4 text-center"></i>

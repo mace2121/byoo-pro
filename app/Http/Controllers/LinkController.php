@@ -27,7 +27,7 @@ class LinkController extends Controller
     {
         // Enforce plan link limit
         if (Auth::user()->hasReachedLinkLimit()) {
-            return redirect()->route('links.index')->with('error', 'Link limitinize ulaştınız. Daha fazla link eklemek için planınızı yükseltin.');
+            return redirect()->route('dashboard')->with('error', 'Link limitinize ulaştınız. Daha fazla link eklemek için planınızı yükseltin.');
         }
 
         $validated = $request->validate([
@@ -52,7 +52,7 @@ class LinkController extends Controller
 
         $this->profileService->clearProfileCache(Auth::user());
 
-        return redirect()->route('links.index')->with('success', 'Link added successfully.');
+        return redirect()->route('dashboard')->with('success', 'Link eklendi.');
     }
 
     public function update(Request $request, Link $link)
@@ -76,7 +76,7 @@ class LinkController extends Controller
 
         $this->profileService->clearProfileCache(Auth::user());
 
-        return redirect()->route('links.index')->with('success', 'Link updated successfully.');
+        return redirect()->route('dashboard')->with('success', 'Link güncellendi.');
     }
 
     public function toggle(Request $request, Link $link)
@@ -97,7 +97,7 @@ class LinkController extends Controller
 
         $this->profileService->clearProfileCache(Auth::user());
 
-        return redirect()->route('links.index')->with('success', 'Link deleted successfully.');
+        return redirect()->route('dashboard')->with('success', 'Link silindi.');
     }
 
     public function reorder(Request $request)

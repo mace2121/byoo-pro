@@ -4,10 +4,6 @@
             <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-md hover:bg-accent transition-colors">
                 <i class="fas fa-bars-staggered text-muted-foreground"></i>
             </button>
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                <x-application-logo class="h-6 w-6 fill-current" />
-                <span class="hidden font-bold sm:inline-block tracking-tight italic">byoo<span class="text-muted-foreground/60">.pro</span></span>
-            </a>
         </div>
 
         <div class="flex flex-1 items-center justify-end space-x-4">
@@ -30,7 +26,7 @@
 
                     <x-slot name="content">
                         <div class="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest">{{ __('Account') }}</div>
-                        <x-dropdown-link :href="route('profile.edit')" class="flex items-center">
+                        <x-dropdown-link :href="route('dashboard', ['tab' => 'settings'])" class="flex items-center">
                             <i class="fas fa-cog mr-2 w-4 opacity-50"></i> {{ __('Ayarlar') }}
                         </x-dropdown-link>
 
@@ -50,3 +46,4 @@
         </div>
     </div>
 </nav>
+
