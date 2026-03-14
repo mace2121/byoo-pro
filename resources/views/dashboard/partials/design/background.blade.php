@@ -96,7 +96,7 @@
                             {{ __('Görsel Yükle') }}
                             <input type="file" class="hidden" accept="image/*" @change="handleFileChange($event, 'bg_image')">
                         </label>
-                        <button type="button" x-show="draftDesign.background.image_url" @click="draftDesign.background.image_url = ''" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
+                        <button type="button" x-show="draftDesign.background.image_url" @click="clearDesignMedia('bg_image', 'background.image_url')" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
                             <i class="fas fa-trash-alt mr-2"></i>
                             {{ __('Kaldır') }}
                         </button>
@@ -120,7 +120,7 @@
                             {{ __('Video Yükle') }}
                             <input type="file" class="hidden" accept="video/mp4,video/webm" @change="handleFileChange($event, 'bg_video')">
                         </label>
-                        <button type="button" x-show="draftDesign.background.video_url" @click="draftDesign.background.video_url = ''" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
+                        <button type="button" x-show="draftDesign.background.video_url" @click="clearDesignMedia('bg_video', 'background.video_url')" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
                             <i class="fas fa-trash-alt mr-2"></i>
                             {{ __('Kaldır') }}
                         </button>

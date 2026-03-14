@@ -160,74 +160,70 @@
                                 <!-- New Sticky Sub Navigation (Scroll Spy Style) -->
                                 <div class="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur px-4 flex items-center justify-between overflow-x-auto no-scrollbar py-2">
                                     <div class="flex gap-1">
-                                        <button @click="scrollToSection('design-header')" 
+                                        <button @click="setDesignTab('header')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'header' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="designTab === 'header' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-id-card text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Header') }}</span>
                                         </button>
-                                        <button @click="scrollToSection('design-theme')" 
+                                        <button @click="setDesignTab('theme')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="designTab === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-layer-group text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Tema') }}</span>
                                         </button>
-                                        <button @click="scrollToSection('design-background')" 
+                                        <button @click="setDesignTab('background')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'background' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="designTab === 'background' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-bahai text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Arka Plan') }}</span>
                                         </button>
-                                        <button @click="scrollToSection('design-buttons')" 
+                                        <button @click="setDesignTab('buttons')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="designTab === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-hand-pointer text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Butonlar') }}</span>
                                         </button>
-                                        <button @click="scrollToSection('design-colors')" 
+                                        <button @click="setDesignTab('colors')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="designTab === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-palette text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Renkler') }}</span>
                                         </button>
                                     </div>
                                     <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
                                         <i class="fas fa-save text-xs"></i>
-                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
+                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : (isDirty ? '{{ __('Kaydet') }} *' : '{{ __('Kaydedildi') }}')"></span>
                                     </button>
                                 </div>
 
                                 <!-- Content Area: Single Page Scrolling -->
-                                <div class="flex-1 overflow-y-auto scroll-smooth no-scrollbar p-6" x-ref="designScrollArea" @scroll="handleDesignScroll">
-                                    <div id="design-header" class="mb-12 scroll-mt-20">
+                                <div class="flex-1 overflow-y-auto no-scrollbar p-6">
+                                    <div x-show="designTab === 'header'" x-transition.opacity.duration.200ms>
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-id-card"></i> Header
                                         </h3>
                                         @include('dashboard.partials.design.header')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-theme" class="mb-12 scroll-mt-20">
+                                    <div x-show="designTab === 'theme'" x-cloak x-transition.opacity.duration.200ms>
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-layer-group"></i> Tema
                                         </h3>
                                         @include('dashboard.partials.design.theme')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-background" class="mb-12 scroll-mt-20">
+                                    <div x-show="designTab === 'background'" x-cloak x-transition.opacity.duration.200ms>
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-bahai"></i> Arka Plan
                                         </h3>
                                         @include('dashboard.partials.design.background')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-buttons" class="mb-12 scroll-mt-20">
+                                    <div x-show="designTab === 'buttons'" x-cloak x-transition.opacity.duration.200ms>
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-hand-pointer"></i> Butonlar
                                         </h3>
                                         @include('dashboard.partials.design.buttons')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-colors" class="mb-12 scroll-mt-20">
+                                    <div x-show="designTab === 'colors'" x-cloak x-transition.opacity.duration.200ms>
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-palette"></i> Renkler
                                         </h3>
@@ -294,7 +290,7 @@
                             
                             <div class="flex-1 relative overflow-hidden">
                                 <iframe x-ref="previewIframe" 
-                                        @load="updatePreview(draftDesign)"
+                                        @load="handlePreviewLoad"
                                         src="{{ route('public.profile', auth()->user()->username) }}" 
                                         class="w-full h-full border-none"></iframe>
                             </div>
@@ -314,11 +310,13 @@
             Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
                 tab: initialTab,
                 designTab: 'header',
-                activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 previewSyncTimer: null,
+                beforeUnloadHandler: null,
                 isSaving: false,
+                isDirty: false,
+                lastSavedSnapshot: '',
                 
                 // Track files for upload
                 files: {
@@ -383,17 +381,65 @@
                 },
                 
                 init() {
-                    this.draftDesign = this.normalizeDesignSettings(this.draftDesign);
+                    this.draftDesign = this.normalizeDesignSettings(initialSettings);
+                    this.lastSavedSnapshot = this.serializeDesign(this.draftDesign);
+                    this.isDirty = false;
 
-                    // Debounced watcher prevents rapid recursive preview updates.
-                    this.$watch('draftDesign', value => {
-                        clearTimeout(this.previewSyncTimer);
-                        this.previewSyncTimer = setTimeout(() => {
-                            this.updatePreview(this.normalizeDesignSettings(value));
-                        }, 120);
+                    this.beforeUnloadHandler = (event) => {
+                        if (!this.isDirty) return;
+                        event.preventDefault();
+                        event.returnValue = '';
+                    };
+                    window.addEventListener('beforeunload', this.beforeUnloadHandler);
+
+                    this.$watch('draftDesign', () => {
+                        this.isDirty = this.serializeDesign(this.draftDesign) !== this.lastSavedSnapshot;
+                        this.pushPreview(false);
                     }, { deep: true });
 
-                    this.updatePreview(this.draftDesign);
+                    this.$watch('tab', (nextTab) => {
+                        if (nextTab === 'design') {
+                            this.pushPreview(true);
+                        }
+                    });
+
+                    this.$nextTick(() => {
+                        this.pushPreview(true);
+                    });
+                },
+
+                destroy() {
+                    clearTimeout(this.previewSyncTimer);
+                    if (this.beforeUnloadHandler) {
+                        window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+                    }
+                    this.clearAllObjectUrls();
+                },
+
+                setDesignTab(tab) {
+                    this.designTab = tab;
+                },
+
+                handlePreviewLoad() {
+                    this.pushPreview(true);
+                },
+
+                pushPreview(force = false, settings = null) {
+                    clearTimeout(this.previewSyncTimer);
+                    const payload = this.preparePayload(settings || this.draftDesign);
+                    this.previewSyncTimer = setTimeout(() => {
+                        const iframe = this.$refs.previewIframe;
+                        if (!iframe || !iframe.contentWindow) return;
+
+                        iframe.contentWindow.postMessage({
+                            type: 'DESIGN_UPDATE',
+                            payload,
+                        }, '*');
+                    }, force ? 0 : 90);
+                },
+
+                serializeDesign(settings) {
+                    return JSON.stringify(this.preparePayload(settings));
                 },
 
                 normalizeDesignSettings(settings) {
@@ -462,179 +508,249 @@
                         normalized.background.animation_colors = [...defaults.background.animation_colors];
                     }
 
+                    const allowedLayouts = ['centered-classic', 'left-aligned', 'hero-cover'];
+                    const allowedPresets = ['minimal', 'dark', 'neon', 'glass', 'midnight', 'sunset', 'aurora', 'forest', 'cyber', 'obsidian'];
+                    const allowedFonts = ['inter', 'outfit', 'roboto', 'montserrat', 'playfair', 'mono'];
+                    const allowedBgTypes = ['color', 'gradient', 'image', 'video', 'animation'];
+                    const allowedAnimations = ['anim-1', 'anim-2', 'anim-3', 'anim-4', 'anim-5'];
+                    const allowedButtonStyles = ['pill', 'soft', 'square'];
+                    const allowedButtonVariants = ['solid', 'outline', 'glass', 'offset'];
+                    const allowedButtonAligns = ['left', 'center', 'right'];
+
+                    if (!allowedLayouts.includes(normalized.header.layout)) normalized.header.layout = defaults.header.layout;
+                    if (!allowedPresets.includes(normalized.theme.preset)) normalized.theme.preset = defaults.theme.preset;
+                    if (!allowedFonts.includes(normalized.theme.font_family)) normalized.theme.font_family = defaults.theme.font_family;
+                    if (!allowedBgTypes.includes(normalized.background.type)) normalized.background.type = defaults.background.type;
+                    if (!allowedAnimations.includes(normalized.background.animation)) normalized.background.animation = 'anim-1';
+                    if (!allowedButtonStyles.includes(normalized.buttons.style)) normalized.buttons.style = defaults.buttons.style;
+                    if (!allowedButtonVariants.includes(normalized.buttons.variant)) normalized.buttons.variant = defaults.buttons.variant;
+                    if (!allowedButtonAligns.includes(normalized.buttons.align)) normalized.buttons.align = defaults.buttons.align;
+
+                    normalized.profile.username = defaults.profile.username;
+                    normalized.theme.custom_theme = !!normalized.theme.custom_theme;
+                    normalized.header.show_name = !!normalized.header.show_name;
+                    normalized.header.show_username = !!normalized.header.show_username;
+                    normalized.header.show_bio = !!normalized.header.show_bio;
+                    normalized.buttons.shadow = !!normalized.buttons.shadow;
+
+                    normalized.profile.name = String(normalized.profile.name ?? defaults.profile.name);
+                    normalized.profile.bio = String(normalized.profile.bio ?? defaults.profile.bio);
+                    normalized.background.gradient = String(normalized.background.gradient || defaults.background.gradient);
+                    normalized.background.image_url = String(normalized.background.image_url || '');
+                    normalized.background.video_url = String(normalized.background.video_url || '');
+                    normalized.header.hero_image_url = String(normalized.header.hero_image_url || '');
+
+                    const overlay = Number(normalized.background.overlay);
+                    const blur = Number(normalized.background.blur);
+                    normalized.background.overlay = Number.isFinite(overlay) ? Math.max(0, Math.min(100, overlay)) : defaults.background.overlay;
+                    normalized.background.blur = Number.isFinite(blur) ? Math.max(0, Math.min(50, blur)) : defaults.background.blur;
+
+                    normalized.background.color = this.sanitizeHexColor(normalized.background.color, defaults.background.color);
+                    normalized.buttons.bg_color = this.sanitizeHexColor(normalized.buttons.bg_color ?? normalized.colors.btn_bg, defaults.buttons.bg_color);
+                    normalized.buttons.text_color = this.sanitizeHexColor(normalized.buttons.text_color ?? normalized.colors.btn_text, defaults.buttons.text_color);
+                    normalized.colors.text = this.sanitizeHexColor(normalized.colors.text, defaults.colors.text);
+                    normalized.colors.title = this.sanitizeHexColor(normalized.colors.title, defaults.colors.title);
+                    normalized.colors.page_text = this.sanitizeHexColor(normalized.colors.page_text, defaults.colors.page_text);
+                    normalized.colors.btn_bg = normalized.buttons.bg_color;
+                    normalized.colors.btn_text = normalized.buttons.text_color;
+                    normalized.background.animation_colors = normalized.background.animation_colors.slice(0, 2).map((color, index) => {
+                        return this.sanitizeHexColor(color, defaults.background.animation_colors[index] || defaults.background.animation_colors[0]);
+                    });
+
                     return normalized;
                 },
 
-                scrollToSection(id) {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        el.scrollIntoView({ behavior: 'smooth' });
-                        this.activeDesignSection = id.replace('design-', '');
-                    }
+                clearAllObjectUrls() {
+                    Object.keys(this.objectUrls).forEach((key) => {
+                        if (this.objectUrls[key]) {
+                            URL.revokeObjectURL(this.objectUrls[key]);
+                            this.objectUrls[key] = null;
+                        }
+                    });
                 },
 
-                handleDesignScroll() {
-                    const sections = ['header', 'theme', 'background', 'buttons', 'colors'];
-                    const area = this.$refs.designScrollArea;
-                    for (const section of sections) {
-                        const el = document.getElementById('design-' + section);
-                        if (el) {
-                            const rect = el.getBoundingClientRect();
-                            const areaRect = area.getBoundingClientRect();
-                            if (rect.top >= areaRect.top && rect.top <= areaRect.top + 100) {
-                                this.activeDesignSection = section;
-                                break;
-                            }
+                setDraftValue(path, value) {
+                    const keys = String(path).split('.');
+                    let current = this.draftDesign;
+
+                    for (let i = 0; i < keys.length - 1; i += 1) {
+                        const key = keys[i];
+                        if (!current[key] || typeof current[key] !== 'object') {
+                            current[key] = {};
                         }
+                        current = current[key];
                     }
+
+                    current[keys[keys.length - 1]] = value;
+                },
+
+                clearDesignMedia(type, targetPath) {
+                    if (this.objectUrls[type]) {
+                        URL.revokeObjectURL(this.objectUrls[type]);
+                        this.objectUrls[type] = null;
+                    }
+
+                    this.files[type] = null;
+                    this.setDraftValue(targetPath, '');
+                    this.pushPreview(true);
                 },
 
                 handleFileChange(event, type) {
-                    const file = event.target.files[0];
-                    if (file) {
-                        this.files[type] = file;
+                    const file = event?.target?.files?.[0];
+                    if (!file) return;
 
-                        if (this.objectUrls[type]) {
-                            URL.revokeObjectURL(this.objectUrls[type]);
-                            this.objectUrls[type] = null;
-                        }
+                    this.files[type] = file;
 
-                        const previewUrl = URL.createObjectURL(file);
-                        this.objectUrls[type] = previewUrl;
+                    if (this.objectUrls[type]) {
+                        URL.revokeObjectURL(this.objectUrls[type]);
+                        this.objectUrls[type] = null;
+                    }
 
-                        if (type === 'hero_image') this.draftDesign.header.hero_image_url = previewUrl;
-                        if (type === 'bg_image') this.draftDesign.background.image_url = previewUrl;
-                        if (type === 'bg_video') this.draftDesign.background.video_url = previewUrl;
+                    const previewUrl = URL.createObjectURL(file);
+                    this.objectUrls[type] = previewUrl;
+
+                    if (type === 'hero_image') {
+                        this.draftDesign.header.hero_image_url = previewUrl;
+                        this.designTab = 'header';
+                    }
+                    if (type === 'bg_image') {
+                        this.draftDesign.background.image_url = previewUrl;
+                        this.draftDesign.background.type = 'image';
+                        this.designTab = 'background';
+                    }
+                    if (type === 'bg_video') {
+                        this.draftDesign.background.video_url = previewUrl;
+                        this.draftDesign.background.type = 'video';
+                        this.designTab = 'background';
+                    }
+
+                    if (event?.target) {
+                        event.target.value = '';
                     }
                 },
 
-                sanitizeColor(c) {
-                    if (typeof c === 'string' && c.includes('#')) {
-                        let parts = c.split('#').filter(Boolean);
-                        let hex = parts.pop(); // Get the last hex part
-                        return hex ? '#' + hex.slice(-6) : c;
+                sanitizeHexColor(value, fallback) {
+                    if (typeof value !== 'string') return fallback;
+                    const raw = value.trim();
+
+                    if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw;
+                    if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
+                        return '#' + raw.slice(1).split('').map((part) => part + part).join('');
                     }
-                    return c;
+
+                    return fallback;
                 },
 
                 sanitizeAllColors(design) {
-                    const d = design;
-                    if (d.background) d.background.color = this.sanitizeColor(d.background.color);
-                    if (d.background?.animation_colors) {
-                        d.background.animation_colors = d.background.animation_colors.map(c => this.sanitizeColor(c));
-                    }
-                    if (d.buttons) {
-                        d.buttons.bg_color = this.sanitizeColor(d.buttons.bg_color);
-                        d.buttons.text_color = this.sanitizeColor(d.buttons.text_color);
-                    }
-                    if (d.colors) {
-                        Object.keys(d.colors).forEach(k => {
-                            d.colors[k] = this.sanitizeColor(d.colors[k]);
-                        });
-                    }
+                    design.background.color = this.sanitizeHexColor(design.background.color, '#f9fafb');
+                    design.buttons.bg_color = this.sanitizeHexColor(design.buttons.bg_color, '#ffffff');
+                    design.buttons.text_color = this.sanitizeHexColor(design.buttons.text_color, '#111827');
+                    design.colors.text = this.sanitizeHexColor(design.colors.text, '#111827');
+                    design.colors.title = this.sanitizeHexColor(design.colors.title, '#111827');
+                    design.colors.page_text = this.sanitizeHexColor(design.colors.page_text, '#111827');
+                    design.colors.btn_bg = design.buttons.bg_color;
+                    design.colors.btn_text = design.buttons.text_color;
+                    design.background.animation_colors = design.background.animation_colors.map((color, index) => {
+                        const fallback = index === 0 ? '#6366f1' : '#a855f7';
+                        return this.sanitizeHexColor(color, fallback);
+                    });
+                },
+
+                preparePayload(settings) {
+                    const payload = this.normalizeDesignSettings(settings || this.draftDesign);
+                    this.sanitizeAllColors(payload);
+                    return JSON.parse(JSON.stringify(payload));
                 },
 
                 updatePreview(settings) {
-                    const iframe = this.$refs.previewIframe;
-                    if (iframe && iframe.contentWindow) {
-                        const normalized = this.normalizeDesignSettings(settings || this.draftDesign);
-                        const payload = JSON.parse(JSON.stringify(normalized));
-                        this.sanitizeAllColors(payload);
-
-                        iframe.contentWindow.postMessage({
-                            type: 'DESIGN_UPDATE',
-                            payload
-                        }, '*');
-                    }
+                    this.pushPreview(true, settings);
                 },
 
-                saveDesign() {
+                async saveDesign() {
                     if (this.isSaving) return;
                     this.isSaving = true;
-                    this.draftDesign = this.normalizeDesignSettings(this.draftDesign);
-                    this.sanitizeAllColors(this.draftDesign);
+                    const payload = this.preparePayload(this.draftDesign);
+                    const hasFileUpload = Object.values(this.files).some((file) => file instanceof File);
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-                    const hasFileUpload = !!(this.files.hero_image || this.files.bg_image || this.files.bg_video);
-                    const headers = {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    const baseHeaders = {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                     };
 
-                    let requestOptions = {
-                        credentials: 'same-origin',
-                    };
-
-                    if (hasFileUpload) {
-                        const formData = new FormData();
-                        formData.append('_method', 'PATCH');
-                        formData.append('design_settings', JSON.stringify(this.draftDesign));
-
-                        if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
-                        if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
-                        if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
-
-                        requestOptions = {
-                            ...requestOptions,
-                            method: 'POST',
-                            headers,
-                            body: formData,
-                        };
-                    } else {
-                        requestOptions = {
-                            ...requestOptions,
-                            method: 'PATCH',
-                            headers: {
-                                ...headers,
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                design_settings: this.draftDesign,
-                            }),
-                        };
+                    if (csrfToken) {
+                        baseHeaders['X-CSRF-TOKEN'] = csrfToken;
                     }
 
-                    fetch("{{ route('profile.design.update') }}", requestOptions)
-                    .then(async response => {
-                        let data = {};
-                        const contentType = response.headers.get('content-type') || '';
+                    try {
+                        let response;
 
-                        if (contentType.includes('application/json')) {
-                            data = await response.json();
+                        if (hasFileUpload) {
+                            const formData = new FormData();
+                            formData.append('_method', 'PATCH');
+                            formData.append('design_settings', JSON.stringify(payload));
+
+                            if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
+                            if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
+                            if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
+
+                            response = await fetch("{{ route('profile.design.update') }}", {
+                                method: 'POST',
+                                headers: baseHeaders,
+                                body: formData,
+                                credentials: 'same-origin',
+                            });
                         } else {
-                            const text = await response.text();
-                            throw new Error(text || 'Unexpected response format');
+                            response = await fetch("{{ route('profile.design.update') }}", {
+                                method: 'PATCH',
+                                headers: {
+                                    ...baseHeaders,
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ design_settings: payload }),
+                                credentials: 'same-origin',
+                            });
+                        }
+
+                        const rawText = await response.text();
+                        let data = {};
+
+                        if (rawText) {
+                            try {
+                                data = JSON.parse(rawText);
+                            } catch (parseError) {
+                                throw new Error('Sunucu geçersiz bir cevap döndürdü.');
+                            }
                         }
 
                         if (!response.ok || data.success === false) {
-                            throw new Error(data.message || ('HTTP ' + response.status));
+                            throw new Error(data.message || `HTTP ${response.status}`);
                         }
 
-                        return data;
-                    })
-                    .then(data => {
-                        if (data.design_settings) {
-                            this.draftDesign = this.normalizeDesignSettings(data.design_settings);
-                        }
+                        const savedDesign = this.normalizeDesignSettings(data.design_settings || payload);
+                        this.draftDesign = savedDesign;
+                        this.lastSavedSnapshot = this.serializeDesign(savedDesign);
+                        this.isDirty = false;
+                        this.resetTransientFiles();
+                        this.pushPreview(true, savedDesign);
 
-                        Object.keys(this.objectUrls).forEach((key) => {
-                            if (this.objectUrls[key]) {
-                                URL.revokeObjectURL(this.objectUrls[key]);
-                                this.objectUrls[key] = null;
-                            }
-                        });
-
-                        this.files = { hero_image: null, bg_image: null, bg_video: null };
-                        this.updatePreview(this.draftDesign);
-                        window.dispatchEvent(new CustomEvent('notify', { detail: 'Tasarım kaydedildi!' }));
-                    })
-                    .catch(error => {
-                        console.error('Save error:', error);
-                        window.dispatchEvent(new CustomEvent('notify', { detail: 'Kaydedilirken hata oluştu!', type: 'error' }));
-                    })
-                    .finally(() => {
+                        window.dispatchEvent(new CustomEvent('notify', {
+                            detail: 'Tasarım kaydedildi!',
+                        }));
+                    } catch (error) {
+                        console.error('Design save error:', error);
+                        window.dispatchEvent(new CustomEvent('notify', {
+                            detail: error?.message || 'Kaydetme sırasında bir hata oluştu!',
+                            type: 'error',
+                        }));
+                    } finally {
                         this.isSaving = false;
-                    });
+                    }
+                },
+
+                resetTransientFiles() {
+                    this.clearAllObjectUrls();
+                    this.files = { hero_image: null, bg_image: null, bg_video: null };
                 }
             }));
         });

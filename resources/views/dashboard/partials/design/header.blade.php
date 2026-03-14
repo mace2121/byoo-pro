@@ -56,7 +56,7 @@
         <div class="flex items-center justify-between">
             <h4 class="text-xs font-semibold uppercase tracking-wider text-primary">{{ __('Hero Kapak Görseli') }}</h4>
             <div x-show="draftDesign.header.hero_image_url" class="flex gap-2">
-                <button @click="draftDesign.header.hero_image_url = ''" class="text-[10px] text-destructive hover:underline">{{ __('Görseli Kaldır') }}</button>
+                <button @click="clearDesignMedia('hero_image', 'header.hero_image_url')" class="text-[10px] text-destructive hover:underline">{{ __('Görseli Kaldır') }}</button>
             </div>
         </div>
         <div class="flex items-center gap-4">

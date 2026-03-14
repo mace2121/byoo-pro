@@ -458,23 +458,20 @@
                     
                     <!-- Text Info -->
                     <div class="{{ $headerLayout === 'left-aligned' ? 'flex-1 pt-1' : 'w-full' }}">
-                        @if($showName)
-                            <h2 class="{{ $headerLayout === 'hero-cover' ? 'mt-6 text-4xl' : 'mt-4 text-3xl' }} font-extrabold tracking-tight theme-name break-words">
-                                {{ $profile->user_name ?? $user->name }}
-                            </h2>
-                        @endif
-                        
-                        @if($showUsername)
-                            <p class="{{ $headerLayout === 'left-aligned' ? 'mt-0.5' : 'mt-1' }} text-sm font-medium theme-username opacity-80">
-                                {{ '@' . ($profile->username ?? $user->username) }}
-                            </p>
-                        @endif
+                        <h2 class="{{ $headerLayout === 'hero-cover' ? 'mt-6 text-4xl' : 'mt-4 text-3xl' }} font-extrabold tracking-tight theme-name break-words"
+                            style="display: {{ $showName ? 'block' : 'none' }};">
+                            {{ $user->name }}
+                        </h2>
 
-                        @if($showBio && ($profile->bio || isset($design['profile']['bio'])))
-                            <p class="{{ $headerLayout === 'hero-cover' ? 'mt-6 px-4' : 'mt-4' }} {{ $headerLayout === 'left-aligned' ? 'text-sm' : 'text-base' }} leading-relaxed theme-bio break-words">
-                                {{ $profile->bio }}
-                            </p>
-                        @endif
+                        <p class="{{ $headerLayout === 'left-aligned' ? 'mt-0.5' : 'mt-1' }} text-sm font-medium theme-username opacity-80"
+                           style="display: {{ $showUsername ? 'block' : 'none' }};">
+                            {{ '@' . ($profile->username ?? $user->username) }}
+                        </p>
+
+                        <p class="{{ $headerLayout === 'hero-cover' ? 'mt-6 px-4' : 'mt-4' }} {{ $headerLayout === 'left-aligned' ? 'text-sm' : 'text-base' }} leading-relaxed theme-bio break-words"
+                           style="display: {{ ($showBio && ($profile->bio || isset($design['profile']['bio']))) ? 'block' : 'none' }};">
+                            {{ $profile->bio }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -528,216 +525,260 @@
     <script>
         (() => {
             const initialDesign = @js($design);
+            const defaultName = @js($user->name);
             const defaultUsername = @js($profile->username ?? $user->username);
+            const defaultBio = @js($profile->bio ?? '');
+            const defaultHeroImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809';
 
-            const applyDesign = (design) => {
-                if (!design || typeof design !== 'object') return;
+            const normalizeDesign = (input) => {
+                const safe = input && typeof input === 'object' ? input : {};
 
+                const design = {
+                    profile: {
+                        name: typeof safe?.profile?.name === 'string' ? safe.profile.name : defaultName,
+                        username: typeof safe?.profile?.username === 'string' ? safe.profile.username : defaultUsername,
+                        bio: typeof safe?.profile?.bio === 'string' ? safe.profile.bio : defaultBio,
+                    },
+                    header: {
+                        layout: safe?.header?.layout || 'centered-classic',
+                        hero_image_url: safe?.header?.hero_image_url || '',
+                        avatar_size: safe?.header?.avatar_size || 'md',
+                        avatar_frame: safe?.header?.avatar_frame || 'circle',
+                        show_name: safe?.header?.show_name !== false,
+                        show_username: safe?.header?.show_username !== false,
+                        show_bio: safe?.header?.show_bio !== false,
+                    },
+                    theme: {
+                        preset: safe?.theme?.preset || 'minimal',
+                        custom_theme: !!safe?.theme?.custom_theme,
+                        font_family: safe?.theme?.font_family || 'inter',
+                    },
+                    background: {
+                        type: safe?.background?.type || 'color',
+                        color: safe?.background?.color || '#f9fafb',
+                        gradient: safe?.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        image_url: safe?.background?.image_url || '',
+                        video_url: safe?.background?.video_url || '',
+                        animation: safe?.background?.animation || 'anim-1',
+                        animation_colors: Array.isArray(safe?.background?.animation_colors) ? safe.background.animation_colors : ['#6366f1', '#a855f7'],
+                        overlay: Number.isFinite(Number(safe?.background?.overlay)) ? Number(safe.background.overlay) : 0,
+                        blur: Number.isFinite(Number(safe?.background?.blur)) ? Number(safe.background.blur) : 0,
+                    },
+                    buttons: {
+                        style: safe?.buttons?.style || 'pill',
+                        variant: safe?.buttons?.variant || 'solid',
+                        align: safe?.buttons?.align || 'center',
+                        shadow: safe?.buttons?.shadow !== false,
+                        bg_color: safe?.buttons?.bg_color || '#ffffff',
+                        text_color: safe?.buttons?.text_color || '#111827',
+                    },
+                    colors: {
+                        text: safe?.colors?.text || '#111827',
+                        title: safe?.colors?.title || safe?.colors?.text || '#111827',
+                        page_text: safe?.colors?.page_text || safe?.colors?.text || '#111827',
+                    },
+                };
+
+                if (!['centered-classic', 'left-aligned', 'hero-cover'].includes(design.header.layout)) {
+                    design.header.layout = 'centered-classic';
+                }
+
+                if (!['minimal', 'dark', 'neon', 'glass', 'midnight', 'sunset', 'aurora', 'forest', 'cyber', 'obsidian'].includes(design.theme.preset)) {
+                    design.theme.preset = 'minimal';
+                }
+
+                if (!['color', 'gradient', 'image', 'video', 'animation'].includes(design.background.type)) {
+                    design.background.type = 'color';
+                }
+
+                if (!['anim-1', 'anim-2', 'anim-3', 'anim-4', 'anim-5'].includes(design.background.animation)) {
+                    design.background.animation = 'anim-1';
+                }
+
+                design.background.overlay = Math.max(0, Math.min(100, design.background.overlay));
+                design.background.blur = Math.max(0, Math.min(50, design.background.blur));
+
+                return design;
+            };
+
+            const applyDesign = (incomingDesign) => {
+                const design = normalizeDesign(incomingDesign);
                 const root = document.documentElement;
                 const body = document.body;
+
                 const nameEl = document.querySelector('.theme-name');
                 const usernameEl = document.querySelector('.theme-username');
                 const bioEl = document.querySelector('.theme-bio');
+                const cardWrapper = document.querySelector('.anim-target');
+                const avatarImg = document.querySelector('.avatar-preview-img');
+                const flexContainer = avatarImg ? avatarImg.parentElement : null;
+                const heroCover = document.querySelector('.hero-cover-container');
+                const heroImage = heroCover ? heroCover.querySelector('.hero-image-bg') : null;
+                const textContainer = nameEl ? nameEl.parentElement : null;
+                const bgWrapper = document.querySelector('.bg-layer-wrapper');
+                const bgImageLayer = document.querySelector('.bg-image-layer');
+                const overlayEl = document.querySelector('.bg-overlay');
+                let videoContainer = document.querySelector('.bg-video-container');
+                let animContainer = document.querySelector('.bg-anim-container');
 
-                if (design.profile) {
-                    if (typeof design.profile.name === 'string' && nameEl) {
-                        nameEl.textContent = design.profile.name;
+                if (nameEl) nameEl.textContent = design.profile.name || defaultName;
+                if (usernameEl) {
+                    const username = String(design.profile.username || defaultUsername).replace(/^@/, '');
+                    usernameEl.textContent = username ? '@' + username : '';
+                }
+                if (bioEl) bioEl.textContent = design.profile.bio || '';
+
+                if (nameEl) nameEl.style.display = design.header.show_name ? 'block' : 'none';
+                if (usernameEl) usernameEl.style.display = design.header.show_username ? 'block' : 'none';
+                if (bioEl) bioEl.style.display = design.header.show_bio ? 'block' : 'none';
+
+                ['theme-minimal', 'theme-dark', 'theme-neon', 'theme-glass', 'theme-midnight', 'theme-sunset', 'theme-aurora', 'theme-forest', 'theme-cyber', 'theme-obsidian', 'theme-custom'].forEach((themeClass) => {
+                    body.classList.remove(themeClass);
+                });
+                body.classList.add(design.theme.custom_theme ? 'theme-custom' : 'theme-' + design.theme.preset);
+
+                root.style.setProperty('--text-title', design.colors.title);
+                root.style.setProperty('--text-page', design.colors.page_text);
+                root.style.setProperty('--text-secondary', design.colors.page_text + 'cc');
+                root.style.setProperty('--card-bg', design.buttons.variant === 'outline' ? 'transparent' : (design.buttons.variant === 'glass' ? 'rgba(255,255,255,0.1)' : design.buttons.bg_color));
+                root.style.setProperty('--card-border', design.buttons.variant === 'outline' ? design.buttons.bg_color : 'transparent');
+                root.style.setProperty('--link-color', design.buttons.variant === 'outline' ? design.buttons.bg_color : design.buttons.text_color);
+                root.style.setProperty('--card-shadow', design.buttons.shadow && design.buttons.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
+                root.style.setProperty('--icon-color', design.buttons.text_color);
+
+                const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+                root.style.setProperty('--btn-align', alignMap[design.buttons.align] || 'center');
+                root.style.setProperty('--btn-text-align', design.buttons.align || 'center');
+
+                const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
+                root.style.setProperty('--btn-radius', radiusMap[design.buttons.style] || '0.75rem');
+
+                const fontMap = {
+                    outfit: "'Outfit'",
+                    inter: "'Inter'",
+                    roboto: "'Roboto'",
+                    montserrat: "'Montserrat'",
+                    playfair: "'Playfair Display'",
+                    mono: "'JetBrains Mono'",
+                };
+                root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ', sans-serif');
+
+                document.querySelectorAll('.theme-card').forEach((card) => {
+                    card.classList.remove('variant-offset', 'backdrop-blur-md');
+                    if (design.buttons.variant === 'offset') card.classList.add('variant-offset');
+                    if (design.buttons.variant === 'glass') card.classList.add('backdrop-blur-md');
+                });
+
+                document.querySelectorAll('.theme-card > .flex-1.font-bold').forEach((titleEl) => {
+                    titleEl.classList.toggle('pr-10', design.buttons.align === 'center');
+                });
+
+                if (bgWrapper) {
+                    bgWrapper.style.backgroundImage = 'none';
+                    root.style.setProperty('--bg-color', design.background.color || '#f9fafb');
+
+                    if (bgImageLayer) {
+                        bgImageLayer.style.display = 'none';
+                        bgImageLayer.style.backgroundImage = 'none';
                     }
 
-                    if (typeof design.profile.bio === 'string' && bioEl) {
-                        bioEl.textContent = design.profile.bio;
+                    if (videoContainer) {
+                        videoContainer.style.display = 'none';
+                        const oldVideo = videoContainer.querySelector('video');
+                        if (oldVideo && design.background.type !== 'video') {
+                            oldVideo.removeAttribute('src');
+                            oldVideo.load();
+                        }
                     }
 
-                    if (usernameEl && typeof design.profile.username === 'string') {
-                        const username = design.profile.username.replace(/^@/, '');
-                        usernameEl.textContent = username ? '@' + username : '';
+                    if (animContainer) {
+                        animContainer.style.display = 'none';
                     }
-                }
 
-                if (design.theme) {
-                    Array.from(body.classList).forEach((className) => {
-                        if (className.startsWith('theme-') && className !== 'theme-page') {
-                            body.classList.remove(className);
+                    if (design.background.type === 'gradient') {
+                        bgWrapper.style.backgroundImage = design.background.gradient;
+                    } else if (design.background.type === 'image' && bgImageLayer) {
+                        bgImageLayer.style.display = 'block';
+                        bgImageLayer.style.backgroundImage = design.background.image_url ? `url('${design.background.image_url}')` : 'none';
+                    } else if (design.background.type === 'video') {
+                        if (!videoContainer) {
+                            videoContainer = document.createElement('div');
+                            videoContainer.className = 'bg-video-container';
+                            videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
+                            bgWrapper.appendChild(videoContainer);
                         }
-                    });
-
-                    if (design.theme.custom_theme) {
-                        body.classList.add('theme-custom');
-                    } else {
-                        body.classList.add('theme-' + (design.theme.preset || 'minimal'));
-                    }
-                }
-
-                if (design.colors) {
-                    root.style.setProperty('--text-title', design.colors.title || design.colors.text || '#111827');
-                    root.style.setProperty('--text-page', design.colors.page_text || design.colors.text || '#111827');
-                }
-
-                if (design.buttons) {
-                    const buttons = design.buttons;
-                    root.style.setProperty('--card-bg', buttons.variant === 'outline' ? 'transparent' : (buttons.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (buttons.bg_color || '#ffffff')));
-                    root.style.setProperty('--card-border', buttons.variant === 'outline' ? (buttons.bg_color || '#ffffff') : 'transparent');
-                    root.style.setProperty('--link-color', buttons.variant === 'outline' ? (buttons.bg_color || '#ffffff') : (buttons.text_color || '#111827'));
-                    root.style.setProperty('--card-shadow', buttons.shadow && buttons.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
-                    root.style.setProperty('--icon-color', buttons.text_color || (buttons.variant === 'outline' ? buttons.bg_color : '#111827'));
-
-                    const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
-                    root.style.setProperty('--btn-align', alignMap[buttons.align] || 'center');
-                    root.style.setProperty('--btn-text-align', buttons.align || 'center');
-
-                    const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
-                    root.style.setProperty('--btn-radius', radiusMap[buttons.style] || '0.75rem');
-
-                    document.querySelectorAll('.theme-card').forEach((card) => {
-                        card.classList.remove('variant-offset', 'backdrop-blur-md');
-                        if (buttons.variant === 'offset') card.classList.add('variant-offset');
-                        if (buttons.variant === 'glass') card.classList.add('backdrop-blur-md');
-                    });
-                }
-
-                if (design.background) {
-                    const background = design.background;
-                    const bgWrapper = document.querySelector('.bg-layer-wrapper');
-                    const bgImageLayer = document.querySelector('.bg-image-layer');
-                    const overlayEl = document.querySelector('.bg-overlay');
-                    let videoContainer = document.querySelector('.bg-video-container');
-                    let animContainer = document.querySelector('.bg-anim-container');
-
-                    if (bgWrapper) {
-                        bgWrapper.style.backgroundImage = 'none';
-
-                        if (bgImageLayer) {
-                            bgImageLayer.style.display = 'none';
-                            bgImageLayer.style.backgroundImage = 'none';
-                        }
-
-                        if (videoContainer) {
-                            videoContainer.style.display = 'none';
-                        }
-
-                        if (animContainer) {
-                            animContainer.style.display = 'none';
-                        }
-
-                        root.style.setProperty('--bg-color', background.color || '#f9fafb');
-
-                        if (background.type === 'gradient') {
-                            bgWrapper.style.backgroundImage = background.gradient || 'none';
-                        }
-
-                        if (background.type === 'image' && bgImageLayer) {
-                            bgImageLayer.style.display = 'block';
-                            bgImageLayer.style.backgroundImage = background.image_url ? `url('${background.image_url}')` : 'none';
-                        }
-
-                        if (background.type === 'video') {
-                            if (!videoContainer) {
-                                videoContainer = document.createElement('div');
-                                videoContainer.className = 'bg-video-container';
-                                videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
-                                bgWrapper.appendChild(videoContainer);
-                            }
-
-                            videoContainer.style.display = 'block';
-                            const videoEl = videoContainer.querySelector('video');
-                            if (videoEl && background.video_url && videoEl.src !== background.video_url) {
-                                videoEl.src = background.video_url;
+                        videoContainer.style.display = 'block';
+                        const videoEl = videoContainer.querySelector('video');
+                        if (videoEl && design.background.video_url) {
+                            if (videoEl.src !== design.background.video_url) {
+                                videoEl.src = design.background.video_url;
                                 videoEl.load();
                             }
                         }
-
-                        if (background.type === 'animation') {
-                            if (!animContainer) {
-                                animContainer = document.createElement('div');
-                                animContainer.className = 'bg-anim-container';
-                                bgWrapper.appendChild(animContainer);
-                            }
-
-                            animContainer.style.display = 'block';
-                            animContainer.className = 'bg-anim-container bg-' + (background.animation || 'none');
-
-                            if (Array.isArray(background.animation_colors)) {
-                                root.style.setProperty('--anim-color-1', background.animation_colors[0] || '#6366f1');
-                                root.style.setProperty('--anim-color-2', background.animation_colors[1] || '#a855f7');
-                            }
+                    } else if (design.background.type === 'animation') {
+                        if (!animContainer) {
+                            animContainer = document.createElement('div');
+                            animContainer.className = 'bg-anim-container';
+                            bgWrapper.appendChild(animContainer);
                         }
-
-                        if (overlayEl) {
-                            overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(background.overlay || 0) / 100})`;
-                            const blurValue = `${background.blur || 0}px`;
-                            overlayEl.style.backdropFilter = `blur(${blurValue})`;
-                            overlayEl.style.webkitBackdropFilter = `blur(${blurValue})`;
-                        }
+                        animContainer.style.display = 'block';
+                        animContainer.className = 'bg-anim-container bg-' + design.background.animation;
+                        root.style.setProperty('--anim-color-1', design.background.animation_colors[0] || '#6366f1');
+                        root.style.setProperty('--anim-color-2', design.background.animation_colors[1] || '#a855f7');
                     }
                 }
 
-                if (design.header) {
-                    const header = design.header;
-                    const avatarImg = document.querySelector('.avatar-preview-img');
-                    const cardWrapper = document.querySelector('.anim-target');
-                    const flexContainer = avatarImg ? avatarImg.parentElement : null;
-
-                    if (avatarImg) {
-                        avatarImg.className = 'avatar-preview-img object-cover theme-avatar-ring flex-shrink-0';
-
-                        const sizeMap = { sm: 'w-16 h-16', md: 'w-24 h-24', lg: 'w-32 h-32', xl: 'w-40 h-40' };
-                        const frameMap = { 'rounded-xl': 'rounded-xl', square: 'rounded-none', polygon: 'avatar-polygon', circle: 'rounded-full' };
-
-                        (sizeMap[header.avatar_size] || 'w-24 h-24').split(' ').forEach((className) => avatarImg.classList.add(className));
-                        avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
-                    }
-
-                    if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
-                    if (usernameEl) {
-                        usernameEl.style.display = header.show_username ? 'block' : 'none';
-                        if (!usernameEl.textContent.trim()) usernameEl.textContent = '@' + defaultUsername;
-                    }
-                    if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
-
-                    if (cardWrapper && flexContainer) {
-                        const heroCover = document.querySelector('.hero-cover-container');
-
-                        cardWrapper.className = 'relative z-10 p-2 anim-target';
-
-                        if (header.layout === 'left-aligned') {
-                            cardWrapper.classList.add('text-left');
-                            flexContainer.className = 'flex flex-row items-center gap-6';
-                            if (heroCover) heroCover.style.display = 'none';
-                            if (avatarImg) avatarImg.classList.add('w-20', 'h-20');
-                        } else if (header.layout === 'hero-cover') {
-                            cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
-                            flexContainer.className = 'flex flex-col items-center';
-
-                            if (avatarImg) {
-                                avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
-                            }
-
-                            if (heroCover) {
-                                heroCover.style.display = 'block';
-                                const heroImg = heroCover.querySelector('.hero-image-bg');
-                                if (heroImg) {
-                                    heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
-                                }
-                            }
-                        } else {
-                            cardWrapper.classList.add('text-center');
-                            flexContainer.className = 'flex flex-col items-center';
-                            if (heroCover) heroCover.style.display = 'none';
-                        }
-                    }
+                if (overlayEl) {
+                    overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${design.background.overlay / 100})`;
+                    const blurValue = `${design.background.blur}px`;
+                    overlayEl.style.backdropFilter = `blur(${blurValue})`;
+                    overlayEl.style.webkitBackdropFilter = `blur(${blurValue})`;
                 }
 
-                if (design.theme && design.theme.font_family) {
-                    const fontMap = {
-                        outfit: "'Outfit'",
-                        inter: "'Inter'",
-                        roboto: "'Roboto'",
-                        montserrat: "'Montserrat'",
-                        playfair: "'Playfair Display'",
-                        mono: "'JetBrains Mono'",
-                    };
+                if (cardWrapper && flexContainer && avatarImg) {
+                    avatarImg.className = 'avatar-preview-img object-cover theme-avatar-ring flex-shrink-0';
+                    const sizeMap = { sm: 'w-16 h-16', md: 'w-24 h-24', lg: 'w-32 h-32', xl: 'w-40 h-40' };
+                    const frameMap = { 'rounded-xl': 'rounded-xl', square: 'rounded-none', polygon: 'avatar-polygon', circle: 'rounded-full' };
 
-                    root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ', sans-serif');
+                    (sizeMap[design.header.avatar_size] || 'w-24 h-24').split(' ').forEach((className) => avatarImg.classList.add(className));
+                    avatarImg.classList.add(frameMap[design.header.avatar_frame] || 'rounded-full');
+
+                    cardWrapper.className = 'relative z-10 p-2 anim-target';
+
+                    if (textContainer) {
+                        textContainer.className = 'w-full';
+                    }
+
+                    if (nameEl) nameEl.className = 'mt-4 text-3xl font-extrabold tracking-tight theme-name break-words';
+                    if (usernameEl) usernameEl.className = 'mt-1 text-sm font-medium theme-username opacity-80';
+                    if (bioEl) bioEl.className = 'mt-4 text-base leading-relaxed theme-bio break-words';
+
+                    if (design.header.layout === 'left-aligned') {
+                        cardWrapper.classList.add('text-left');
+                        flexContainer.className = 'flex flex-row items-center gap-6';
+                        if (textContainer) textContainer.className = 'flex-1 pt-1';
+                        if (heroCover) heroCover.style.display = 'none';
+                        avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40');
+                        avatarImg.classList.add('w-20', 'h-20');
+                        if (usernameEl) usernameEl.className = 'mt-0.5 text-sm font-medium theme-username opacity-80';
+                        if (bioEl) bioEl.className = 'mt-4 text-sm leading-relaxed theme-bio break-words';
+                    } else if (design.header.layout === 'hero-cover') {
+                        cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
+                        flexContainer.className = 'flex flex-col items-center';
+                        if (heroCover) heroCover.style.display = 'block';
+                        if (heroImage) {
+                            heroImage.style.backgroundImage = `url('${design.header.hero_image_url || defaultHeroImage}')`;
+                        }
+
+                        avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40');
+                        avatarImg.classList.add('w-32', 'h-32', '-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
+                        if (nameEl) nameEl.className = 'mt-6 text-4xl font-extrabold tracking-tight theme-name break-words';
+                        if (bioEl) bioEl.className = 'mt-6 px-4 text-base leading-relaxed theme-bio break-words';
+                    } else {
+                        cardWrapper.classList.add('text-center');
+                        flexContainer.className = 'flex flex-col items-center';
+                        if (heroCover) heroCover.style.display = 'none';
+                    }
                 }
             };
 
@@ -746,6 +787,7 @@
             });
 
             window.addEventListener('message', (event) => {
+                if (event.origin !== window.location.origin) return;
                 if (event.data?.type === 'DESIGN_UPDATE') {
                     applyDesign(event.data.payload);
                 }
