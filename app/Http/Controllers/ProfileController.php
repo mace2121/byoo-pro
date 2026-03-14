@@ -146,40 +146,45 @@ class ProfileController extends Controller
     public function updateDesign(Request $request)
     {
         $user = $request->user();
-        $designSettings = $request->input('design_settings');
         
-        // If it's a standard JSON request (no files)
-        if ($request->isJson()) {
+        try {
+            // If it's a standard JSON request (no files)
+            if ($request->isJson()) {
+                $designSettings = $request->input('design_settings');
+                if ($user->profile) {
+                    if (isset($designSettings['profile'])) {
+                        $user->update(['name' => $designSettings['profile']['name']]);
+                        $user->profile->update(['bio' => $designSettings['profile']['bio']]);
+                    }
+                    
+                    $user->profile->update([
+                        'design_settings' => $designSettings,
+                    ]);
+                    $this->profileService->clearProfileCache($user);
+                }
+                return response()->json(['success' => true, 'design_settings' => $designSettings]);
+            }
+
+            // Handle multipart form-data (for file uploads)
+            $designSettingsInput = $request->input('design_settings');
+            $designSettings = is_string($designSettingsInput) ? json_decode($designSettingsInput, true) : $designSettingsInput;
+            
+            \Log::debug('Design Update Request:', [
+                'user_id' => $user->id,
+                'has_hero' => $request->hasFile('hero_image'),
+                'has_bg' => $request->hasFile('bg_image'),
+                'settings' => $designSettings
+            ]);
+
             if ($user->profile) {
-                // Update basic profile info if provided
+                // Update profile fields
                 if (isset($designSettings['profile'])) {
                     $user->update(['name' => $designSettings['profile']['name']]);
                     $user->profile->update(['bio' => $designSettings['profile']['bio']]);
                 }
-                
-                $user->profile->update([
-                    'design_settings' => $designSettings,
-                ]);
-                $this->profileService->clearProfileCache($user);
-            }
-            return response()->json(['success' => true, 'design_settings' => $designSettings]);
-        }
 
-        // Handle multipart form-data (for file uploads)
-        // design_settings comes as a stringified JSON in FormData
-        $designSettings = json_decode($request->input('design_settings'), true);
-        $profileData = [];
-
-        if ($user->profile) {
-            // Update profile fields
-            if (isset($designSettings['profile'])) {
-                $user->update(['name' => $designSettings['profile']['name']]);
-                $user->profile->update(['bio' => $designSettings['profile']['bio']]);
-            }
-
-            // Hero Image
-            if ($request->hasFile('hero_image')) {
-                try {
+                // Hero Image
+                if ($request->hasFile('hero_image')) {
                     $file = $request->file('hero_image');
                     $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                     $image = $manager->read($file);
@@ -193,14 +198,10 @@ class ProfileController extends Controller
                     
                     Storage::disk('public')->put($filename, (string) $encoded);
                     $designSettings['header']['hero_image_url'] = Storage::url($filename);
-                } catch (\Exception $e) {
-                    \Log::error('Hero upload failed: ' . $e->getMessage());
                 }
-            }
 
-            // Background Image
-            if ($request->hasFile('bg_image')) {
-                try {
+                // Background Image
+                if ($request->hasFile('bg_image')) {
                     $file = $request->file('bg_image');
                     $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                     $image = $manager->read($file);
@@ -214,27 +215,30 @@ class ProfileController extends Controller
                     
                     Storage::disk('public')->put($filename, (string) $encoded);
                     $designSettings['background']['image_url'] = Storage::url($filename);
-                } catch (\Exception $e) {
-                    \Log::error('Background upload failed: ' . $e->getMessage());
                 }
+
+                // Background Video
+                if ($request->hasFile('bg_video')) {
+                    $file = $request->file('bg_video');
+                    if ($file->getSize() <= 10 * 1024 * 1024) { // Increased to 10MB
+                        $filename = $file->store('videos', 'public');
+                        $designSettings['background']['video_url'] = Storage::url($filename);
+                    }
+                }
+
+                $user->profile->update([
+                    'design_settings' => $designSettings,
+                ]);
+                $this->profileService->clearProfileCache($user);
             }
 
-            // Background Video (Max 5MB)
-            if ($request->hasFile('bg_video')) {
-                $file = $request->file('bg_video');
-                if ($file->getSize() <= 5 * 1024 * 1024) { // 5MB limit
-                    $filename = $file->store('videos', 'public');
-                    $designSettings['background']['video_url'] = Storage::url($filename);
-                }
-            }
-
-            $user->profile->update([
-                'design_settings' => $designSettings,
+            return response()->json(['success' => true, 'design_settings' => $designSettings]);
+        } catch (\Exception $e) {
+            \Log::error('Design Update Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
             ]);
-            $this->profileService->clearProfileCache($user);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-
-        return response()->json(['success' => true, 'design_settings' => $designSettings]);
     }
 
     /**

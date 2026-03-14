@@ -197,24 +197,23 @@
             <!-- Animation Colors -->
             <div class="space-y-4 pt-2">
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Animasyon Renkleri') }}</h4>
-                <div class="flex items-center gap-4">
-                    <div class="flex -space-x-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                    <div class="flex gap-4">
                         <template x-for="(color, index) in draftDesign.background.animation_colors">
-                            <div class="relative group">
+                            <div class="flex flex-col items-center gap-2">
                                 <input type="color" x-model="draftDesign.background.animation_colors[index]" 
                                        class="h-10 w-10 rounded-full border-2 border-background cursor-pointer p-0 shadow-sm transition-transform hover:scale-110">
+                                <input type="text" x-model="draftDesign.background.animation_colors[index]" 
+                                       class="w-20 text-[10px] text-center rounded-md border-input bg-background font-mono px-1 py-1" placeholder="#ffffff">
                             </div>
                         </template>
                     </div>
-                    <div class="flex-1 flex gap-2">
-                        <template x-for="(color, index) in draftDesign.background.animation_colors">
-                            <input type="text" x-model="draftDesign.background.animation_colors[index]" 
-                                   class="w-full text-xs rounded-md border-input bg-background font-mono px-2 py-1.5" placeholder="#ffffff">
-                        </template>
+                    <div class="flex items-end justify-end pb-1">
+                        <button type="button" @click="draftDesign.background.animation_colors.reverse()" class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors text-[10px] font-medium border border-border/50">
+                            <i class="fas fa-sync-alt"></i>
+                            {{ __('Renkleri Değiştir') }}
+                        </button>
                     </div>
-                    <button type="button" @click="draftDesign.background.animation_colors.reverse()" class="p-2 rounded-md hover:bg-accent text-muted-foreground transition-colors" title="Renkleri Değiştir">
-                        <i class="fas fa-sync-alt text-xs"></i>
-                    </button>
                 </div>
             </div>
         </div>

@@ -415,33 +415,17 @@
 @php
     $design = $profile->design_settings ?? [];
 @endphp
+    @if(($design['header']['layout'] ?? '') === 'hero-cover')
+        <div class="hero-cover-container" style="display: block;">
+            <div class="hero-image-bg" style="background-image: url('{{ $design['header']['hero_image_url'] ?? $profile->hero_image_url ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')"></div>
+        </div>
+    @else
+        <div class="hero-cover-container" style="display: none;">
+            <div class="hero-image-bg"></div>
+        </div>
+    @endif
+
     <div class="bg-layer-wrapper" style="background-color: var(--bg-color); background-image: var(--bg-image, none);">
-        <!-- Background Video -->
-        @if(($design['background']['type'] ?? '') === 'video' && ($design['background']['video_url'] ?? $profile->bg_video_url))
-            <div class="bg-video-container">
-                <video autoplay muted loop playsinline>
-                    <source src="{{ $design['background']['video_url'] ?? $profile->bg_video_url }}" type="video/mp4">
-                </video>
-            </div>
-        @endif
-
-        <!-- Background Animation -->
-        @if(($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none')
-            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}"></div>
-        @endif
-
-        <!-- Background Overlay (Scope Fixed) -->
-        <div class="bg-overlay"></div>
-    </div>
-
-    <div class="theme-page">
-        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-32' : '' }}">
-            
-            @if($headerLayout === 'hero-cover')
-                <div class="hero-cover-container">
-                    <div class="hero-image-bg" style="background-image: url('{{ $design['header']['hero_image_url'] ?? $profile->hero_image_url ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')"></div>
-                </div>
-            @endif
 
             <!-- Profil Kartı -->
             <div class="{{ $layoutWrapperClass }} relative z-10 p-2 anim-{{ $design['background']['animation'] ?? 'none' }}">
@@ -611,6 +595,7 @@
                                     videoContainer = document.createElement('div');
                                     videoContainer.className = 'bg-video-container';
                                     videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
+                                    const bgWrapper = document.querySelector('.bg-layer-wrapper');
                                     bgWrapper.insertBefore(videoContainer, bgWrapper.firstChild);
                                 }
                                 videoContainer.style.display = 'block';
@@ -689,15 +674,12 @@
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
                                 maxWContainer.classList.add('pt-32');
                                 if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
-                                if (!heroCover) {
-                                    heroCover = document.createElement('div');
-                                    heroCover.className = 'hero-cover-container';
-                                    heroCover.innerHTML = '<div class="hero-image-bg"></div>';
-                                    themePage.insertBefore(heroCover, themePage.firstChild);
+                                
+                                if (heroCover) {
+                                    heroCover.style.display = 'block';
+                                    const heroImg = heroCover.querySelector('.hero-image-bg');
+                                    if (heroImg) heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
                                 }
-                                heroCover.style.display = 'block';
-                                const heroImg = heroCover.querySelector('.hero-image-bg');
-                                if (heroImg) heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
                             } else {
                                 cardWrapper.classList.add('text-center');
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
@@ -709,6 +691,21 @@
                     if (design.theme && design.theme.font_family) {
                         const fontMap = { outfit: "'Outfit'", inter: "'Inter'", roboto: "'Roboto'", montserrat: "'Montserrat'", playfair: "'Playfair Display'", mono: "'JetBrains Mono'" };
                         root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ", sans-serif");
+                    }
+
+                    // 5. Special Fix for Colors & Custom Theme Logic
+                    if (design.theme?.custom_theme) {
+                         // Ensure custom colors are applied if in custom theme mode
+                         if (design.colors) {
+                             root.style.setProperty('--text-title', design.colors.title || '#111827');
+                             root.style.setProperty('--text-page', design.colors.page_text || '#111827');
+                         }
+                         if (design.buttons) {
+                             const b = design.buttons;
+                             root.style.setProperty('--card-bg', b.variant === 'outline' ? 'transparent' : (b.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (b.bg_color || '#ffffff')));
+                             root.style.setProperty('--card-border', b.variant === 'outline' ? (b.bg_color || '#ffffff') : 'transparent');
+                             root.style.setProperty('--link-color', b.variant === 'outline' ? (b.bg_color || '#ffffff') : (b.text_color || '#111827'));
+                         }
                     }
                 }
             });
