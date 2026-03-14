@@ -2,7 +2,7 @@
     @php 
         $initialSettings = auth()->user()->profile?->design_settings ?? []; 
     @endphp
-    <div class="h-full flex" x-data="dashboardManager('{{ request()->query('tab', 'links') }}', {{ json_encode($initialSettings) }})">
+    <div class="h-full flex" x-data="dashboardManager(@js(request()->query('tab', 'links')), @js($initialSettings))">
         <!-- LEFT SIDEBAR (Navigation) -->
         <aside class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" 
                :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'">
@@ -317,6 +317,7 @@
                 activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
+                previewSyncTimer: null,
                 
                 // Track files for upload
                 files: {
@@ -329,7 +330,7 @@
                 draftDesign: {
                     profile: {
                         name: {!! json_encode(auth()->user()->name) !!},
-                        bio: {!! json_encode(auth()->user()->profile->bio ?? '') !!},
+                        bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
                     },
                     header: {
                         layout: initialSettings?.header?.layout || 'centered-classic',
@@ -375,9 +376,12 @@
                 },
                 
                 init() {
-                    // Watch for changes to update preview immediately
+                    // Debounced watcher prevents rapid recursive preview updates.
                     this.$watch('draftDesign', value => {
-                        this.updatePreview(value);
+                        clearTimeout(this.previewSyncTimer);
+                        this.previewSyncTimer = setTimeout(() => {
+                            this.updatePreview(value);
+                        }, 120);
                     }, { deep: true });
                 },
 
@@ -430,8 +434,8 @@
                     return c;
                 },
 
-                sanitizeAllColors() {
-                    const d = this.draftDesign;
+                sanitizeAllColors(design) {
+                    const d = design;
                     if (d.background) d.background.color = this.sanitizeColor(d.background.color);
                     if (d.background?.animation_colors) {
                         d.background.animation_colors = d.background.animation_colors.map(c => this.sanitizeColor(c));
@@ -450,18 +454,18 @@
                 updatePreview(settings) {
                     const iframe = this.$refs.previewIframe;
                     if (iframe && iframe.contentWindow) {
-                        // Periodic sanitize to prevent input corruption during typing
-                        this.sanitizeAllColors();
+                        const payload = JSON.parse(JSON.stringify(settings || this.draftDesign));
+                        this.sanitizeAllColors(payload);
                         
                         iframe.contentWindow.postMessage({
                             type: 'DESIGN_UPDATE',
-                            payload: JSON.parse(JSON.stringify(this.draftDesign))
+                            payload
                         }, '*');
                     }
                 },
 
                 saveDesign() {
-                    this.sanitizeAllColors();
+                    this.sanitizeAllColors(this.draftDesign);
                     const formData = new FormData();
                     formData.append('_method', 'PATCH');
                     formData.append('design_settings', JSON.stringify(this.draftDesign));

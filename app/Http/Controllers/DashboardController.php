@@ -14,10 +14,11 @@ class DashboardController extends Controller
         $user->load(['profile', 'links' => function($query) {
             $query->orderBy('order');
         }]);
+        $profile = $user->profile;
         
         $total_links = $user->links->count();
         $total_clicks = $user->links->sum('clicks');
-        $profile_views = $user->profile->views ?? 0;
+        $profile_views = $profile?->views ?? 0;
 
         // Analytics data
         $linkIds = $user->links->pluck('id');
@@ -44,7 +45,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'user' => $user,
-            'profile' => $user->profile,
+            'profile' => $profile,
             'links' => $user->links,
             'total_links' => $total_links,
             'total_clicks' => $total_clicks,
