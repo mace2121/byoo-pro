@@ -269,6 +269,7 @@
             Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
                 tab: initialTab,
                 designTab: 'header',
+                sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 
                 // Track files for upload
