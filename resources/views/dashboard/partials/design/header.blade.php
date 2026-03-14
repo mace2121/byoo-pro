@@ -1,4 +1,19 @@
 <div class="space-y-8">
+    <!-- Profile Info (NEW) -->
+    <div class="bg-muted/30 p-4 rounded-lg border border-border space-y-4">
+        <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Profil Bilgileri') }}</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-medium text-muted-foreground">{{ __('Profil İsmi') }}</label>
+                <input type="text" x-model="draftDesign.profile.name" class="w-full text-sm rounded-md border-input bg-background shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-medium text-muted-foreground">{{ __('Biyografi') }}</label>
+                <textarea x-model="draftDesign.profile.bio" rows="1" class="w-full text-sm rounded-md border-input bg-background shadow-sm focus:ring-primary focus:border-primary resize-none"></textarea>
+            </div>
+        </div>
+    </div>
+
     <!-- Header Layout Options -->
     <div class="space-y-3">
         <label class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Header Düzeni') }}</label>
@@ -33,6 +48,34 @@
                 </div>
                 <span class="text-[10px] font-medium text-center block mt-1.5 text-muted-foreground group-hover:text-foreground">Hero Kapak</span>
             </label>
+        </div>
+    </div>
+
+    <!-- Hero Image Upload (NEW) -->
+    <div x-show="draftDesign.header.layout === 'hero-cover'" x-cloak x-transition class="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20">
+        <div class="flex items-center justify-between">
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-primary">{{ __('Hero Kapak Görseli') }}</h4>
+            <div x-show="draftDesign.header.hero_image_url" class="flex gap-2">
+                <button @click="draftDesign.header.hero_image_url = ''" class="text-[10px] text-destructive hover:underline">{{ __('Görseli Kaldır') }}</button>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative w-24 h-16 rounded border border-input bg-background overflow-hidden flex-shrink-0 group">
+                <template x-if="draftDesign.header.hero_image_url">
+                    <img :src="draftDesign.header.hero_image_url" class="w-full h-full object-cover">
+                </template>
+                <div x-show="!draftDesign.header.hero_image_url" class="w-full h-full flex items-center justify-center bg-muted/30">
+                    <i class="fas fa-image text-muted-foreground/30"></i>
+                </div>
+            </div>
+            <div class="flex-1">
+                <label class="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-md border border-transparent hover:bg-primary/90 cursor-pointer shadow-sm transition-all">
+                    <i class="fas fa-upload mr-2"></i>
+                    {{ __('Görsel Seç') }}
+                    <input type="file" class="hidden" accept="image/*" @change="handleFileChange($event, 'hero_image')">
+                </label>
+                <p class="text-[9px] text-muted-foreground mt-2">{{ __('Önerilen boyut: 1200x400. Yatay bir görsel kullanmanız tavsiye edilir.') }}</p>
+            </div>
         </div>
     </div>
 
@@ -97,7 +140,7 @@
                 </label>
             </div>
             
-            <p class="text-[10px] text-muted-foreground">Profil isminizi ve biyografinizi <button @click="tab = 'settings'" class="text-primary hover:underline">Ayarlar</button> sekmesinden güncelleyebilirsiniz.</p>
+            <p class="text-[10px] text-muted-foreground">{{ __('Profil başlığı ve biyo ayarlarını buradan anlık değiştirebilirsiniz.') }}</p>
         </div>
     </div>
 </div>

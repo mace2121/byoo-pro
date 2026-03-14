@@ -271,10 +271,22 @@
                 designTab: 'header',
                 previewOpen: window.innerWidth >= 1280,
                 
+                // Track files for upload
+                files: {
+                    hero_image: null,
+                    bg_image: null,
+                    bg_video: null
+                },
+
                 // Design Draft State
                 draftDesign: {
+                    profile: {
+                        name: "{{ auth()->user()->name }}",
+                        bio: "{{ auth()->user()->profile->bio ?? '' }}",
+                    },
                     header: {
                         layout: initialSettings?.header?.layout || 'centered-classic',
+                        hero_image_url: initialSettings?.header?.hero_image_url || '',
                         avatar_size: initialSettings?.header?.avatar_size || 'md',
                         avatar_frame: initialSettings?.header?.avatar_frame || 'circle',
                         show_name: initialSettings?.header?.show_name ?? true,
@@ -291,17 +303,25 @@
                         color: initialSettings?.background?.color || '#f9fafb',
                         gradient: initialSettings?.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         image_url: initialSettings?.background?.image_url || '',
+                        video_url: initialSettings?.background?.video_url || '',
+                        animation: initialSettings?.background?.animation || 'none',
                         overlay: initialSettings?.background?.overlay || 0,
                         blur: initialSettings?.background?.blur || 0,
                     },
                     buttons: {
                         style: initialSettings?.buttons?.style || 'pill',
+                        variant: initialSettings?.buttons?.variant || 'solid', 
+                        align: initialSettings?.buttons?.align || 'center',
                         shadow: initialSettings?.buttons?.shadow ?? true,
                         bg_color: initialSettings?.buttons?.bg_color || '#ffffff',
                         text_color: initialSettings?.buttons?.text_color || '#111827',
                     },
                     colors: {
                         text: initialSettings?.colors?.text || '#111827',
+                        title: initialSettings?.colors?.title || '#111827',
+                        page_text: initialSettings?.colors?.page_text || '#111827',
+                        btn_bg: initialSettings?.colors?.btn_bg || '#ffffff',
+                        btn_text: initialSettings?.colors?.btn_text || '#111827',
                     }
                 },
                 
@@ -310,6 +330,22 @@
                     this.$watch('draftDesign', value => {
                         this.updatePreview(value);
                     }, { deep: true });
+                },
+
+                handleFileChange(event, type) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.files[type] = file;
+                        
+                        // Local preview for the iframe
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            if (type === 'hero_image') this.draftDesign.header.hero_image_url = e.target.result;
+                            if (type === 'bg_image') this.draftDesign.background.image_url = e.target.result;
+                            if (type === 'bg_video') this.draftDesign.background.video_url = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
                 },
 
                 updatePreview(settings) {
@@ -324,25 +360,35 @@
                 },
 
                 saveDesign() {
-                    // Function to submit the draftDesign payload
+                    const formData = new FormData();
+                    formData.append('_method', 'PATCH');
+                    formData.append('design_settings', JSON.stringify(this.draftDesign));
+                    
+                    if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
+                    if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
+                    if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
+
                     fetch("{{ route('profile.design.update') }}", {
-                        method: 'PATCH',
+                        method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ design_settings: this.draftDesign })
+                        body: formData
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Show toast or success indicator
+                            if (data.design_settings) {
+                                this.draftDesign = data.design_settings;
+                                this.files = { hero_image: null, bg_image: null, bg_video: null };
+                            }
                             window.dispatchEvent(new CustomEvent('notify', { detail: 'Tasarım kaydedildi!' }));
                         }
                     })
                     .catch(error => {
-                        console.error('Error saving design:', error);
+                        console.error('Save error:', error);
+                        window.dispatchEvent(new CustomEvent('notify', { detail: 'Kaydedilirken hata oluştu!', type: 'error' }));
                     });
                 }
             }));

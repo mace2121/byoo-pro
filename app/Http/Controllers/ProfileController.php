@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 use App\Services\ProfileService;
@@ -144,19 +145,96 @@ class ProfileController extends Controller
      */
     public function updateDesign(Request $request)
     {
-        $request->validate([
-            'design_settings' => 'required|array',
-        ]);
-
         $user = $request->user();
+        $designSettings = $request->input('design_settings');
+        
+        // If it's a standard JSON request (no files)
+        if ($request->isJson()) {
+            if ($user->profile) {
+                // Update basic profile info if provided
+                if (isset($designSettings['profile'])) {
+                    $user->update(['name' => $designSettings['profile']['name']]);
+                    $user->profile->update(['bio' => $designSettings['profile']['bio']]);
+                }
+                
+                $user->profile->update([
+                    'design_settings' => $designSettings,
+                ]);
+                $this->profileService->clearProfileCache($user);
+            }
+            return response()->json(['success' => true, 'design_settings' => $designSettings]);
+        }
+
+        // Handle multipart form-data (for file uploads)
+        // design_settings comes as a stringified JSON in FormData
+        $designSettings = json_decode($request->input('design_settings'), true);
+        $profileData = [];
+
         if ($user->profile) {
+            // Update profile fields
+            if (isset($designSettings['profile'])) {
+                $user->update(['name' => $designSettings['profile']['name']]);
+                $user->profile->update(['bio' => $designSettings['profile']['bio']]);
+            }
+
+            // Hero Image
+            if ($request->hasFile('hero_image')) {
+                try {
+                    $file = $request->file('hero_image');
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->read($file);
+                    $image->scale(1200, null);
+                    $encoded = $image->toWebp(80);
+                    $filename = 'hero/' . \Illuminate\Support\Str::random(40) . '.webp';
+                    
+                    if (!Storage::disk('public')->exists('hero')) {
+                        Storage::disk('public')->makeDirectory('hero');
+                    }
+                    
+                    Storage::disk('public')->put($filename, (string) $encoded);
+                    $designSettings['header']['hero_image_url'] = Storage::url($filename);
+                } catch (\Exception $e) {
+                    \Log::error('Hero upload failed: ' . $e->getMessage());
+                }
+            }
+
+            // Background Image
+            if ($request->hasFile('bg_image')) {
+                try {
+                    $file = $request->file('bg_image');
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->read($file);
+                    $image->scale(1920, null);
+                    $encoded = $image->toWebp(70);
+                    $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
+                    
+                    if (!Storage::disk('public')->exists('backgrounds')) {
+                        Storage::disk('public')->makeDirectory('backgrounds');
+                    }
+                    
+                    Storage::disk('public')->put($filename, (string) $encoded);
+                    $designSettings['background']['image_url'] = Storage::url($filename);
+                } catch (\Exception $e) {
+                    \Log::error('Background upload failed: ' . $e->getMessage());
+                }
+            }
+
+            // Background Video (Max 5MB)
+            if ($request->hasFile('bg_video')) {
+                $file = $request->file('bg_video');
+                if ($file->getSize() <= 5 * 1024 * 1024) { // 5MB limit
+                    $filename = $file->store('videos', 'public');
+                    $designSettings['background']['video_url'] = Storage::url($filename);
+                }
+            }
+
             $user->profile->update([
-                'design_settings' => $request->design_settings,
+                'design_settings' => $designSettings,
             ]);
             $this->profileService->clearProfileCache($user);
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'design_settings' => $designSettings]);
     }
 
     /**
