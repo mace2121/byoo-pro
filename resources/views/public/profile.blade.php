@@ -383,214 +383,152 @@
         </div>
     </div>
 
-    @if(request()->headers->has('referer') && str_contains(request()->headers->get('referer'), '/dashboard'))
     <script>
-        // Sadece iframe içindeyken (dashboard'dan geliyorsa) çalışır
-        window.addEventListener('message', (event) => {
-            if (event.data?.type === 'DESIGN_UPDATE') {
-                const design = event.data.payload;
-                if (!design || !design.header) return;
+        // Check if we are inside an iframe (preview mode)
+        if (window.self !== window.top) {
+            window.addEventListener('message', (event) => {
+                if (event.data?.type === 'DESIGN_UPDATE') {
+                    const design = event.data.payload;
+                    if (!design) return;
 
-                const header = design.header;
-                const avatarImg = document.querySelector('img[alt="{{ $user->name }}"]');
-                const nameEl = document.querySelector('.theme-name');
-                const usernameEl = document.querySelector('.theme-username');
-                const bioEl = document.querySelector('.theme-bio');
-                const cardWrapper = avatarImg?.closest('.relative.z-10');
-                const flexContainer = avatarImg?.parentElement;
-                const heroCover = document.querySelector('.bg-card\\/30.backdrop-blur-md');
-                const maxWContainer = document.querySelector('.max-w-md');
-                const textWrapper = nameEl?.parentElement;
+                    // Use requestAnimationFrame for smoother updates
+                    requestAnimationFrame(() => {
+                        const header = design.header;
+                        const avatarImg = document.querySelector('img[alt="{{ $user->name }}"]');
+                        const nameEl = document.querySelector('.theme-name');
+                        const usernameEl = document.querySelector('.theme-username');
+                        const bioEl = document.querySelector('.theme-bio');
+                        const cardWrapper = avatarImg?.closest('.relative.z-10');
+                        const flexContainer = avatarImg?.parentElement;
+                        const maxWContainer = document.querySelector('.max-w-md');
+                        const textWrapper = nameEl?.parentElement;
 
-                // 1. Avatar Size
-                if (avatarImg) {
-                    avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40');
-                    if (header.layout === 'hero-cover') {
-                        avatarImg.classList.add('w-32', 'h-32'); 
-                    } else if (header.layout === 'left-aligned') {
-                        avatarImg.classList.add('w-20', 'h-20');
-                    } else {
-                        switch(header.avatar_size) {
-                            case 'sm': avatarImg.classList.add('w-16', 'h-16'); break;
-                            case 'lg': avatarImg.classList.add('w-32', 'h-32'); break;
-                            case 'xl': avatarImg.classList.add('w-40', 'h-40'); break;
-                            case 'md':
-                            default: avatarImg.classList.add('w-24', 'h-24'); break;
-                        }
-                    }
-                }
-
-                // 2. Avatar Frame
-                if (avatarImg) {
-                    avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
-                    switch(header.avatar_frame) {
-                        case 'rounded-xl': avatarImg.classList.add('rounded-xl'); break;
-                        case 'square': avatarImg.classList.add('rounded-none'); break;
-                        case 'polygon': avatarImg.classList.add('avatar-polygon'); break;
-                        case 'circle':
-                        default: avatarImg.classList.add('rounded-full'); break;
-                    }
-                }
-
-                // 3. Visibility
-                if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
-                if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
-                if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
-
-                // 4. Layout
-                if (cardWrapper && flexContainer && maxWContainer && textWrapper && avatarImg) {
-                    // Reset all specific layout classes
-                    cardWrapper.className = 'relative z-10 p-2';
-                    flexContainer.className = '';
-                    avatarImg.classList.remove('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
-                    maxWContainer.classList.remove('pt-16');
-                    textWrapper.className = '';
-                    if (nameEl) nameEl.className = 'font-extrabold tracking-tight theme-name break-words';
-                    if (usernameEl) usernameEl.className = 'font-medium theme-username opacity-80';
-                    if (bioEl) bioEl.className = 'leading-relaxed theme-bio';
-
-                    if (heroCover) heroCover.style.display = 'none';
-
-                    if (header.layout === 'left-aligned') {
-                        cardWrapper.classList.add('text-left');
-                        flexContainer.classList.add('flex', 'flex-row', 'items-center', 'gap-6');
-                        textWrapper.classList.add('flex-1', 'pt-1');
-                        if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
-                        if (usernameEl) usernameEl.classList.add('mt-0.5', 'text-sm');
-                        if (bioEl) bioEl.classList.add('mt-4', 'text-sm', 'text-left', 'md:text-left');
-                    } else if (header.layout === 'hero-cover') {
-                        cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
-                        flexContainer.classList.add('flex', 'flex-col', 'items-center');
-                        maxWContainer.classList.add('pt-16');
-                        avatarImg.classList.add('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
-                        textWrapper.classList.add('w-full');
-                        if (nameEl) nameEl.classList.add('mt-6', 'text-4xl');
-                        if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
-                        if (bioEl) bioEl.classList.add('mt-6', 'px-4', 'text-base', 'text-center', 'md:text-center');
-                        
-                        if (heroCover) {
-                            heroCover.style.display = 'block';
-                        } else {
-                            // Dinamik olarak hero cover ekle
-                            const newHeroCover = document.createElement('div');
-                            newHeroCover.className = 'absolute top-0 left-[-2rem] right-[-2rem] h-40 bg-card/30 backdrop-blur-md rounded-b-[3rem] border-b border-card-border pointer-events-none z-0';
-                            maxWContainer.insertBefore(newHeroCover, cardWrapper);
-                        }
-                    } else { // centered-classic
-                        cardWrapper.classList.add('text-center');
-                        flexContainer.classList.add('flex', 'flex-col', 'items-center');
-                        textWrapper.classList.add('w-full');
-                        if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
-                        if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
-                        if (bioEl) bioEl.classList.add('mt-4', 'text-base', 'text-center', 'md:text-center');
-                    }
-                }
-
-                // 5. Theme Updates
-                if (design.theme) {
-                    const bodyEl = document.body;
-                    
-                    if (!design.theme.custom_theme && design.theme.preset) {
-                        bodyEl.classList.remove('theme-custom');
-                        // Mevcut preset temasını bul ve kaldır (theme-X formatında)
-                        const classes = Array.from(bodyEl.classList);
-                        classes.forEach(c => {
-                            if(c.startsWith('theme-') && c !== 'theme-page') {
-                                bodyEl.classList.remove(c);
+                        // 1. Avatar Update
+                        if (avatarImg && header) {
+                            avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40', 'w-20', 'h-20');
+                            avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
+                            
+                            if (header.layout === 'hero-cover') avatarImg.classList.add('w-32', 'h-32');
+                            else if (header.layout === 'left-aligned') avatarImg.classList.add('w-20', 'h-20');
+                            else {
+                                const sizeMap = { sm: 'w-16', md: 'w-24', lg: 'w-32', xl: 'w-40' };
+                                avatarImg.classList.add(sizeMap[header.avatar_size] || 'w-24');
+                                avatarImg.classList.add(sizeMap[header.avatar_size]?.replace('w-', 'h-') || 'h-24');
                             }
-                        });
-                        
-                        // Yeni temayı ekle
-                        bodyEl.classList.add(`theme-${design.theme.preset}`);
-                    } else if (design.theme.custom_theme) {
-                        bodyEl.classList.add('theme-custom');
-                        
-                        // Set CSS variables for Live Preview based on design draft
-                        const bgType = design.background?.type || 'color';
-                        const bgColor = design.background?.color || '#f9fafb';
-                        const bgGradient = design.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                        const bgImage = design.background?.image_url || '';
-                        const bgOverlay = design.background?.overlay || 0;
-                        const bgBlur = design.background?.blur || 0;
-                        
-                        const textColor = design.colors?.text || '#111827';
-                        
-                        const btnColor = design.buttons?.bg_color || '#ffffff';
-                        const btnTextColor = design.buttons?.text_color || '#111827';
-                        const btnShadow = design.buttons?.shadow ?? true;
-                        const btnStyle = design.buttons?.style || 'pill';
-                        
-                        const fontFamily = design.theme?.font_family || 'inter';
-
-                        // Background
-                        const themePage = document.querySelector('.theme-page');
-                        if (bgType === 'color') {
-                            document.documentElement.style.setProperty('--bg', bgColor);
-                            if(themePage) {
-                                themePage.style.backgroundImage = 'none';
-                                themePage.style.backgroundColor = 'var(--bg)';
-                            }
-                        } else if (bgType === 'gradient') {
-                            document.documentElement.style.setProperty('--bg', bgGradient);
-                            if(themePage) {
-                                themePage.style.backgroundImage = 'none';
-                                themePage.style.background = 'var(--bg)';
-                            }
-                        } else if (bgType === 'image') {
-                            if(themePage) {
-                                themePage.style.background = 'none';
-                                themePage.style.backgroundImage = `url('${bgImage}')`;
-                                themePage.style.backgroundSize = 'cover';
-                                themePage.style.backgroundPosition = 'center';
-                                themePage.style.backgroundAttachment = 'fixed';
-                            }
+                            
+                            const frameMap = { 'rounded-xl': 'rounded-xl', 'square': 'rounded-none', 'polygon': 'avatar-polygon', 'circle': 'rounded-full' };
+                            avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
                         }
 
-                        // Background Overlay/Blur (Requires pseudo-element handling or wrapper div)
-                        // Note: Inline styles can't edit ::before directly. So we find/create the pseudo-overlay instead.
-                        if (themePage) {
-                            let overlayEl = themePage.querySelector('.bg-dynamic-overlay');
-                            if (bgType === 'image') {
-                                if (!overlayEl) {
-                                    overlayEl = document.createElement('div');
-                                    overlayEl.className = 'bg-dynamic-overlay absolute inset-0 z-0 pointer-events-none';
-                                    themePage.insertBefore(overlayEl, themePage.firstChild);
-                                }
-                                overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${bgOverlay / 100})`;
-                                overlayEl.style.backdropFilter = `blur(${bgBlur}px)`;
-                                overlayEl.style.webkitBackdropFilter = `blur(${bgBlur}px)`;
+                        // 2. Visibility
+                        if (header) {
+                            if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
+                            if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
+                            if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
+                        }
+
+                        // 3. Layout Switching
+                        if (header && cardWrapper && flexContainer && maxWContainer && textWrapper && avatarImg) {
+                            const heroCover = document.querySelector('.bg-card\\/30.backdrop-blur-md');
+                            
+                            // Clear and Re-assign classes
+                            cardWrapper.className = 'relative z-10 p-2';
+                            flexContainer.className = '';
+                            avatarImg.classList.remove('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
+                            maxWContainer.classList.remove('pt-16');
+                            textWrapper.className = '';
+                            if (nameEl) nameEl.className = 'font-extrabold tracking-tight theme-name break-words';
+                            if (usernameEl) usernameEl.className = 'font-medium theme-username opacity-80';
+                            if (bioEl) bioEl.className = 'leading-relaxed theme-bio';
+
+                            if (header.layout === 'left-aligned') {
+                                cardWrapper.classList.add('text-left');
+                                flexContainer.classList.add('flex', 'flex-row', 'items-center', 'gap-6');
+                                textWrapper.classList.add('flex-1', 'pt-1');
+                                if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
+                                if (usernameEl) usernameEl.classList.add('mt-0.5', 'text-sm');
+                                if (bioEl) bioEl.classList.add('mt-4', 'text-sm', 'text-left');
+                            } else if (header.layout === 'hero-cover') {
+                                cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
+                                flexContainer.classList.add('flex', 'flex-col', 'items-center');
+                                maxWContainer.classList.add('pt-16');
+                                avatarImg.classList.add('-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-xl');
+                                if (nameEl) nameEl.classList.add('mt-6', 'text-4xl');
+                                if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
+                                if (bioEl) bioEl.classList.add('mt-6', 'px-4', 'text-base', 'text-center');
+                                if (heroCover) heroCover.style.display = 'block';
                             } else {
-                                if (overlayEl) overlayEl.remove();
+                                cardWrapper.classList.add('text-center');
+                                flexContainer.classList.add('flex', 'flex-col', 'items-center');
+                                if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
+                                if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
+                                if (bioEl) bioEl.classList.add('mt-4', 'text-base', 'text-center');
+                                if (heroCover) heroCover.style.display = 'none';
                             }
                         }
 
-                        // Text & Cards
-                        document.documentElement.style.setProperty('--text', textColor);
-                        document.documentElement.style.setProperty('--text-secondary', textColor + 'cc');
-                        document.documentElement.style.setProperty('--card-bg', btnColor);
-                        document.documentElement.style.setProperty('--card-hover', btnColor + 'ee');
-                        document.documentElement.style.setProperty('--link-color', btnTextColor);
-                        document.documentElement.style.setProperty('--footer-color', textColor + '88');
-                        document.documentElement.style.setProperty('--card-shadow', btnShadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' : 'none');
+                        // 4. Global CSS Variable Sync
+                        const bodyEl = document.body;
+                        const root = document.documentElement;
+                        const theme = design.theme;
+                        
+                        if (theme) {
+                            bodyEl.classList.remove('theme-custom');
+                            const classes = Array.from(bodyEl.classList);
+                            classes.forEach(c => { if(c.startsWith('theme-') && c !== 'theme-page') bodyEl.classList.remove(c); });
+                            
+                            if (theme.custom_theme) {
+                                bodyEl.classList.add('theme-custom');
+                                const bg = design.background || {};
+                                const colors = design.colors || {};
+                                const btns = design.buttons || {};
+                                
+                                // Background & Overlay Logic
+                                const themePage = document.querySelector('.theme-page');
+                                let overlayEl = themePage?.querySelector('.bg-dynamic-overlay');
+                                if (themePage) {
+                                    if (bg.type === 'color') {
+                                        root.style.setProperty('--bg', bg.color || '#f9fafb');
+                                        themePage.style.background = 'var(--bg)';
+                                    } else if (bg.type === 'gradient') {
+                                        root.style.setProperty('--bg', bg.gradient || '');
+                                        themePage.style.background = 'var(--bg)';
+                                    } else if (bg.type === 'image') {
+                                        themePage.style.background = 'none';
+                                        themePage.style.backgroundImage = `url('${bg.image_url}')`;
+                                        themePage.style.backgroundSize = 'cover';
+                                        themePage.style.backgroundPosition = 'center';
+                                        themePage.style.backgroundAttachment = 'fixed';
+                                        if (!overlayEl) {
+                                            overlayEl = document.createElement('div');
+                                            overlayEl.className = 'bg-dynamic-overlay absolute inset-0 z-0 pointer-events-none';
+                                            themePage.insertBefore(overlayEl, themePage.firstChild);
+                                        }
+                                        overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(bg.overlay || 0) / 100})`;
+                                        overlayEl.style.backdropFilter = overlayEl.style.webkitBackdropFilter = `blur(${bg.blur || 0}px)`;
+                                    }
+                                    if(bg.type !== 'image' && overlayEl) overlayEl.remove();
+                                }
 
-                        // Buttons Border Radius
-                        if (btnStyle === 'pill') document.documentElement.style.setProperty('--btn-radius', '9999px');
-                        else if (btnStyle === 'square') document.documentElement.style.setProperty('--btn-radius', '0px');
-                        else if (btnStyle === 'soft') document.documentElement.style.setProperty('--btn-radius', '2rem');
-
-                        // Font
-                        if (fontFamily === 'outfit') document.documentElement.style.setProperty('--font-family', "'Outfit', sans-serif");
-                        else if (fontFamily === 'inter') document.documentElement.style.setProperty('--font-family', "'Inter', sans-serif");
-                        else if (fontFamily === 'roboto') document.documentElement.style.setProperty('--font-family', "'Roboto', sans-serif");
-                        else if (fontFamily === 'montserrat') document.documentElement.style.setProperty('--font-family', "'Montserrat', sans-serif");
-                        else if (fontFamily === 'playfair') document.documentElement.style.setProperty('--font-family', "'Playfair Display', serif");
-                        else if (fontFamily === 'serif') document.documentElement.style.setProperty('--font-family', "Georgia, serif");
-                        else if (fontFamily === 'mono') document.documentElement.style.setProperty('--font-family', "'JetBrains Mono', monospace");
-                    }
+                                // Colors & Buttons
+                                root.style.setProperty('--text', colors.text || '#111827');
+                                root.style.setProperty('--card-bg', btns.bg_color || '#ffffff');
+                                root.style.setProperty('--link-color', btns.text_color || '#111827');
+                                root.style.setProperty('--card-shadow', btns.shadow ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
+                                
+                                const radiusMap = { pill: '9999px', square: '0px', soft: '2rem' };
+                                root.style.setProperty('--btn-radius', radiusMap[btns.style] || '0.75rem');
+                                
+                                const fontMap = { outfit: "'Outfit'", inter: "'Inter'", roboto: "'Roboto'", montserrat: "'Montserrat'", playfair: "'Playfair Display'", mono: "'JetBrains Mono'" };
+                                root.style.setProperty('--font-family', (fontMap[theme.font_family] || "'Inter'") + ", sans-serif");
+                            } else {
+                                bodyEl.classList.add(`theme-${theme.preset || 'minimal'}`);
+                            }
+                        }
+                    });
                 }
-            }
-        });
+            });
+        }
     </script>
-    @endif
 </body>
 </html>

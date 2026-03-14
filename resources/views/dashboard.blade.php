@@ -235,11 +235,23 @@
                                 </button>
                             </div>
                         </header>
-                        <div class="flex-1 flex items-start justify-center overflow-hidden">
-                            <div class="relative w-full max-w-[260px] aspect-[9/18.5] bg-background rounded-[2.5rem] border-[6px] border-foreground/90 shadow-2xl overflow-hidden ring-1 ring-border"
-                                 x-on:links-updated.window="$refs.previewIframe.src = $refs.previewIframe.src"
-                                 x-on:profile-updated.window="$refs.previewIframe.src = $refs.previewIframe.src">
-                                <iframe x-ref="previewIframe" src="{{ route('public.profile', auth()->user()->username) }}" class="w-full h-full border-none"></iframe>
+                        <div class="flex-1 flex items-center justify-center overflow-hidden bg-muted/20 rounded-2xl border border-border/50 shadow-inner">
+                            <div class="relative w-full max-w-[280px] h-[90%] bg-background rounded-[3rem] border-[8px] border-foreground shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden ring-1 ring-border/50 transition-all duration-500 hover:scale-[1.02]"
+                                 x-on:links-updated.window="if(tab !== 'design') $refs.previewIframe.src = $refs.previewIframe.src"
+                                 x-on:profile-updated.window="if(tab !== 'design') $refs.previewIframe.src = $refs.previewIframe.src">
+                                <!-- Status bar mockup -->
+                                <div class="absolute top-0 left-0 right-0 h-6 z-20 flex justify-between px-6 items-center pointer-events-none">
+                                    <span class="text-[8px] font-bold">9:41</span>
+                                    <div class="w-16 h-4 bg-foreground rounded-b-xl"></div>
+                                    <div class="flex gap-1 items-center">
+                                        <div class="w-2 h-2 rounded-full border-[1.5px] border-foreground/30"></div>
+                                        <div class="w-3 h-2 rounded-[2px] bg-foreground/20"></div>
+                                    </div>
+                                </div>
+                                <iframe x-ref="previewIframe" 
+                                        @load="updatePreview(draftDesign)"
+                                        src="{{ route('public.profile', auth()->user()->username) }}" 
+                                        class="w-full h-full border-none"></iframe>
                             </div>
                         </div>
                         <div class="mt-3 text-center flex-shrink-0">
@@ -301,12 +313,12 @@
                 },
 
                 updatePreview(settings) {
-                    // We will pass this data to the iframe via postMessage
+                    // Optimized update via postMessage
                     const iframe = this.$refs.previewIframe;
                     if (iframe && iframe.contentWindow) {
                         iframe.contentWindow.postMessage({
                             type: 'DESIGN_UPDATE',
-                            payload: settings
+                            payload: JSON.parse(JSON.stringify(settings)) // Ensure clean object
                         }, '*');
                     }
                 },
