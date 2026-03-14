@@ -37,9 +37,15 @@
                     'mono' => ['label' => 'Monochrome', 'bg' => '#fafafa', 'text' => '#000000', 'accent' => '#000000'],
                     'glass' => ['label' => 'Glass', 'bg' => '#f8fafc', 'text' => '#000000', 'accent' => 'rgba(0,0,0,0.05)'],
                     'obsidian' => ['label' => 'Pitch Black', 'bg' => '#000000', 'text' => '#a3a3a3', 'accent' => '#171717'],
+                    'neon' => ['label' => 'Neon', 'bg' => '#0a0a0a', 'text' => '#22d3ee', 'accent' => '#14532d'],
+                    'sunset' => ['label' => 'Sunset', 'bg' => '#1c1917', 'text' => '#fb923c', 'accent' => '#451a03'],
+                    'ocean' => ['label' => 'Ocean', 'bg' => '#0c4a6e', 'text' => '#e0f2fe', 'accent' => '#075985'],
+                    'forest' => ['label' => 'Forest', 'bg' => '#14532d', 'text' => '#d9f99d', 'accent' => '#166534'],
+                    'lavender' => ['label' => 'Lavender', 'bg' => '#faf5ff', 'text' => '#581c87', 'accent' => '#e9d5ff'],
                 ];
                 $currentTheme = $user->profile?->theme ?? 'minimal';
             @endphp
+
 
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-6">
                 @foreach($themes as $key => $theme)
