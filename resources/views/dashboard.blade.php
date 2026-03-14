@@ -138,7 +138,7 @@
             </nav>
 
             <!-- Content + Preview Row -->
-            <div class="flex-1 flex overflow-hidden min-h-0">
+            <div class="flex-1 flex flex-row overflow-hidden min-h-0" style="flex-direction: row !important;">
                 <!-- MAIN CONTENT AREA -->
                 <div class="flex-1 min-w-0 overflow-y-auto bg-background">
                     <div class="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
