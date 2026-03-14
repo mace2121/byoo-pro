@@ -1,11 +1,14 @@
 <x-app-layout>
-    <div class="h-[calc(100vh-57px)] overflow-hidden flex flex-col">
-        <div class="flex-1 flex overflow-hidden">
-            <!-- Admin Sidebar -->
-            @include('admin.partials.sidebar')
+    <div class="h-full flex">
+        <!-- Admin Sidebar -->
+        @include('admin.partials.sidebar')
+
+        <!-- Right Column: Navbar + Content -->
+        <div class="flex-1 min-w-0 flex flex-col">
+            @include('admin.partials.navbar')
 
             <!-- Main Content Area -->
-            <main class="flex-1 min-w-0 overflow-y-auto bg-background">
+            <main class="flex-1 overflow-y-auto bg-background">
                 <div class="max-w-6xl mx-auto p-6 md:p-10 space-y-8">
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">{{ __('Yönetici Paneli') }}</h1>

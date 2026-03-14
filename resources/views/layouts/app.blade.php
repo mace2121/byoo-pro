@@ -35,13 +35,8 @@
                 </a>
             </div>
         @endif
-        <div class="min-h-screen" x-data="{ sidebarOpen: window.innerWidth >= 768 }">
-            @include('layouts.navigation')
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+        <div class="h-screen overflow-hidden" x-data="{ sidebarOpen: window.innerWidth >= 768 }">
+            {{ $slot }}
         </div>
 
         @stack('scripts')
