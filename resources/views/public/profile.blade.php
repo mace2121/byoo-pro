@@ -129,6 +129,8 @@
             --footer-color: #9ca3af;
             --font-family: 'Inter', sans-serif;
             --btn-radius: 0.75rem; /* rounded-xl */
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
         }
 
         /* Minimal (default) */
