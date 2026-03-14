@@ -454,11 +454,11 @@
                        class="flex items-center p-3 transition-all duration-300 theme-card group relative {{ $variantClass }}">
                         
                         @if(($design['buttons']['variant'] ?? '') !== 'glass')
-                        <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 text-primary group-hover:scale-110 transition-transform">
+                        <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 group-hover:scale-110 transition-transform" style="color: var(--icon-color, var(--link-color))">
                             <i class="{{ $link->icon_class }} text-xl"></i>
                         </div>
                         @else
-                           <i class="{{ $link->icon_class }} text-xl mr-3"></i>
+                           <i class="{{ $link->icon_class }} text-xl mr-3" style="color: var(--icon-color, var(--link-color))"></i>
                         @endif
 
                         <div class="flex-1 font-bold {{ ($design['buttons']['align'] ?? 'center') === 'center' ? 'pr-10' : '' }}">
@@ -489,84 +489,159 @@
     </div>
 
     <script>
-        // Check if we are inside an iframe (preview mode)
         if (window.self !== window.top) {
             window.addEventListener('message', (event) => {
                 if (event.data?.type === 'DESIGN_UPDATE') {
                     const design = event.data.payload;
                     if (!design) return;
 
-                    // Use requestAnimationFrame for smoother updates
-                    requestAnimationFrame(() => {
+                    const root = document.documentElement;
+                    const body = document.body;
+
+                    // 1. Theme Mode
+                    if (design.theme) {
+                        body.classList.remove('theme-custom');
+                        const classes = Array.from(body.classList);
+                        classes.forEach(c => { if(c.startsWith('theme-') && c !== 'theme-page') body.classList.remove(c); });
+                        
+                        if (design.theme.custom_theme) {
+                            body.classList.add('theme-custom');
+                        } else {
+                            body.classList.add('theme-' + (design.theme.preset || 'minimal'));
+                        }
+                    }
+
+                    // 2. Colors & Buttons Sync
+                    if (design.colors) {
+                        root.style.setProperty('--text-title', design.colors.title || design.colors.text || '#111827');
+                        root.style.setProperty('--text-page', design.colors.page_text || design.colors.text || '#111827');
+                    }
+
+                    if (design.buttons) {
+                        const btns = design.buttons;
+                        root.style.setProperty('--card-bg', btns.variant === 'outline' ? 'transparent' : (btns.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (btns.bg_color || '#ffffff')));
+                        root.style.setProperty('--card-border', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : 'transparent');
+                        root.style.setProperty('--link-color', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : (btns.text_color || '#111827'));
+                        root.style.setProperty('--card-shadow', btns.shadow && btns.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
+                        
+                        // Icon Color Sync
+                        root.style.setProperty('--icon-color', btns.text_color || (btns.variant === 'outline' ? btns.bg_color : '#111827'));
+                        
+                        const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+                        root.style.setProperty('--btn-align', alignMap[btns.align] || 'center');
+                        root.style.setProperty('--btn-text-align', btns.align || 'center');
+
+                        const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
+                        root.style.setProperty('--btn-radius', radiusMap[btns.style] || '0.75rem');
+
+                        document.querySelectorAll('.theme-card').forEach(card => {
+                            card.classList.remove('variant-offset', 'backdrop-blur-md');
+                            if (btns.variant === 'offset') card.classList.add('variant-offset');
+                            else if (btns.variant === 'glass') card.classList.add('backdrop-blur-md');
+                        });
+                    }
+
+                    // 3. Background Sync
+                    if (design.background) {
+                        const bg = design.background;
+                        const themePage = document.querySelector('.theme-page');
+                        const overlayEl = document.querySelector('.bg-overlay');
+                        let videoContainer = document.querySelector('.bg-video-container');
+
+                        if (themePage) {
+                            themePage.style.background = '';
+                            themePage.style.backgroundImage = '';
+                            if (videoContainer) videoContainer.style.display = 'none';
+
+                            if (bg.type === 'color') {
+                                root.style.setProperty('--bg', bg.color || '#f9fafb');
+                            } else if (bg.type === 'gradient') {
+                                root.style.setProperty('--bg', bg.gradient || '');
+                            } else if (bg.type === 'image') {
+                                themePage.style.backgroundImage = `url('${bg.image_url}')`;
+                                themePage.style.backgroundSize = 'cover';
+                                themePage.style.backgroundPosition = 'center';
+                            } else if (bg.type === 'video') {
+                                if (!videoContainer) {
+                                    videoContainer = document.createElement('div');
+                                    videoContainer.className = 'bg-video-container';
+                                    videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
+                                    themePage.parentElement.insertBefore(videoContainer, themePage);
+                                }
+                                videoContainer.style.display = 'block';
+                                const video = videoContainer.querySelector('video');
+                                if (video.src !== bg.video_url) {
+                                    video.src = bg.video_url;
+                                    video.load();
+                                }
+                            }
+
+                            // Background Animation Pattern
+                            let animContainer = document.querySelector('.bg-anim-container');
+                            if (bg.type === 'animation' && bg.animation !== 'none') {
+                                if (!animContainer) {
+                                    animContainer = document.createElement('div');
+                                    animContainer.className = 'bg-anim-container';
+                                    themePage.parentElement.insertBefore(animContainer, themePage);
+                                }
+                                animContainer.className = 'bg-anim-container bg-' + bg.animation;
+                                if (bg.animation_colors) {
+                                    root.style.setProperty('--anim-color-1', bg.animation_colors[0]);
+                                    root.style.setProperty('--anim-color-2', bg.animation_colors[1]);
+                                }
+                            } else if (animContainer) {
+                                animContainer.remove();
+                            }
+
+                            if (overlayEl) {
+                                overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(bg.overlay || 0) / 100})`;
+                                overlayEl.style.backdropFilter = overlayEl.style.webkitBackdropFilter = `blur(${bg.blur || 0}px)`;
+                            }
+                        }
+                    }
+
+                    // 4. Header & Layout Sync
+                    if (design.header) {
                         const header = design.header;
                         const avatarImg = document.querySelector('img[alt="{{ $user->name }}"]');
                         const nameEl = document.querySelector('.theme-name');
                         const usernameEl = document.querySelector('.theme-username');
                         const bioEl = document.querySelector('.theme-bio');
-                        const cardWrapper = avatarImg?.closest('.z-10'); // Profil Bilgileri Wrapper
-                        const flexContainer = avatarImg?.parentElement;
                         const maxWContainer = document.querySelector('.max-w-md');
-                        const textWrapper = nameEl?.parentElement;
-
-                        // 1. Profil Bilgileri Güncelleme (Name/Bio)
-                        if (design.profile) {
-                            if (nameEl && design.profile.name) nameEl.textContent = design.profile.name;
-                            if (bioEl && design.profile.bio) bioEl.textContent = design.profile.bio;
-                        }
-
-                        // 2. Avatar Update
-                        if (avatarImg && header) {
+                        const cardWrapper = avatarImg?.closest('.z-10');
+                        const flexContainer = avatarImg?.parentElement;
+                        
+                        if (avatarImg) {
                             avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40', 'w-20', 'h-20');
                             avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
-                            
                             const sizeMap = { sm: 'w-16', md: 'w-24', lg: 'w-32', xl: 'w-40' };
                             const heightMap = { sm: 'h-16', md: 'h-24', lg: 'h-32', xl: 'h-40' };
-                            
                             avatarImg.classList.add(sizeMap[header.avatar_size] || 'w-24');
                             avatarImg.classList.add(heightMap[header.avatar_size] || 'h-24');
-                            
                             const frameMap = { 'rounded-xl': 'rounded-xl', 'square': 'rounded-none', 'polygon': 'avatar-polygon', 'circle': 'rounded-full' };
                             avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
                         }
 
-                        // 3. Visibility
-                        if (header) {
-                            if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
-                            if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
-                            if (bioEl) bioEl.style.display = (header.show_bio && (design.profile?.bio || bioEl.textContent.trim())) ? 'block' : 'none';
-                        }
+                        if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
+                        if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
+                        if (bioEl) bioEl.style.display = (header.show_bio) ? 'block' : 'none';
 
-                        // 4. Layout & Hero Cover Update
-                        if (header && cardWrapper && flexContainer && maxWContainer && textWrapper && avatarImg) {
+                        if (cardWrapper && flexContainer && maxWContainer) {
                             let heroCover = document.querySelector('.absolute.top-0.left-\\[-2rem\\]');
-                            
-                            // Clear and Re-assign classes
-                            cardWrapper.className = 'relative z-10 p-2';
-                            flexContainer.className = '';
-                            avatarImg.classList.remove('-mt-24', '-mt-20', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'shadow-xl');
+                            cardWrapper.classList.remove('text-left', 'text-center', 'relative', 'pt-12', 'mt-16');
+                            flexContainer.classList.remove('flex-row', 'items-center', 'gap-6', 'flex-col');
+                            avatarImg?.classList.remove('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110');
                             maxWContainer.classList.remove('pt-16');
-                            textWrapper.className = '';
-                            if (nameEl) nameEl.className = 'font-extrabold tracking-tight theme-name break-words';
-                            if (usernameEl) usernameEl.className = 'font-medium theme-username opacity-80';
-                            if (bioEl) bioEl.className = 'leading-relaxed theme-bio break-words';
 
                             if (header.layout === 'left-aligned') {
                                 cardWrapper.classList.add('text-left');
                                 flexContainer.classList.add('flex', 'flex-row', 'items-center', 'gap-6');
-                                textWrapper.classList.add('flex-1', 'pt-1');
-                                if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
-                                if (usernameEl) usernameEl.classList.add('mt-0.5', 'text-sm');
-                                if (bioEl) bioEl.classList.add('mt-4', 'text-sm');
                                 if (heroCover) heroCover.style.display = 'none';
                             } else if (header.layout === 'hero-cover') {
                                 cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
                                 maxWContainer.classList.add('pt-16');
-                                avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110');
-                                if (nameEl) nameEl.classList.add('mt-6', 'text-4xl');
-                                if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
-                                if (bioEl) bioEl.classList.add('mt-6', 'px-4', 'text-base');
-                                
+                                if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110');
                                 if (!heroCover) {
                                     heroCover = document.createElement('div');
                                     heroCover.className = 'absolute top-0 left-[-2rem] right-[-2rem] h-48 bg-cover bg-center rounded-b-[3rem] border-b border-white/10 shadow-lg pointer-events-none z-0 overflow-hidden';
@@ -578,121 +653,15 @@
                             } else {
                                 cardWrapper.classList.add('text-center');
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
-                                if (nameEl) nameEl.classList.add('mt-4', 'text-3xl');
-                                if (usernameEl) usernameEl.classList.add('mt-1', 'text-sm');
-                                if (bioEl) bioEl.classList.add('mt-4', 'text-base');
                                 if (heroCover) heroCover.style.display = 'none';
                             }
                         }
+                    }
 
-                        // 5. Global CSS Variable Sync
-                        const bodyEl = document.body;
-                        const root = document.documentElement;
-                        const theme = design.theme;
-                        
-                        if (theme) {
-                            bodyEl.classList.remove('theme-custom');
-                            const classes = Array.from(bodyEl.classList);
-                            classes.forEach(c => { if(c.startsWith('theme-') && c !== 'theme-page') bodyEl.classList.remove(c); });
-                            
-                            if (theme.custom_theme) {
-                                bodyEl.classList.add('theme-custom');
-                                const bg = design.background || {};
-                                const colors = design.colors || {};
-                                const btns = design.buttons || {};
-                                
-                                // Background & Overlay Logic
-                                const themePage = document.querySelector('.theme-page');
-                                const overlayEl = document.querySelector('.bg-overlay');
-                                let videoContainer = document.querySelector('.bg-video-container');
-
-                                if (themePage) {
-                                    // Reset
-                                    themePage.style.background = '';
-                                    themePage.style.backgroundImage = '';
-                                    if (videoContainer) videoContainer.style.display = 'none';
-                                    
-                                    if (bg.type === 'color') {
-                                        root.style.setProperty('--bg', bg.color || '#f9fafb');
-                                    } else if (bg.type === 'gradient') {
-                                        root.style.setProperty('--bg', bg.gradient || '');
-                                    } else if (bg.type === 'image') {
-                                        themePage.style.backgroundImage = `url('${bg.image_url}')`;
-                                    } else if (bg.type === 'video') {
-                                        if (!videoContainer) {
-                                            videoContainer = document.createElement('div');
-                                            videoContainer.className = 'bg-video-container';
-                                            videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
-                                            themePage.parentElement.insertBefore(videoContainer, themePage);
-                                        }
-                                        videoContainer.style.display = 'block';
-                                        const video = videoContainer.querySelector('video');
-                                        if (video.src !== bg.video_url) {
-                                            video.src = bg.video_url;
-                                            video.load();
-                                        }
-                                    }
-
-                                    if (overlayEl) {
-                                        overlayEl.style.backgroundColor = `rgba(0, 0, 0, ${(bg.overlay || 0) / 100})`;
-                                        overlayEl.style.backdropFilter = overlayEl.style.webkitBackdropFilter = `blur(${bg.blur || 0}px)`;
-                                    }
-
-                                    // Animation class update (Background Pattern)
-                                    let animContainer = document.querySelector('.bg-anim-container');
-                                    if (bg.type === 'animation' && bg.animation !== 'none') {
-                                        if (!animContainer) {
-                                            animContainer = document.createElement('div');
-                                            animContainer.className = 'bg-anim-container';
-                                            themePage.parentElement.insertBefore(animContainer, themePage);
-                                        }
-                                        animContainer.className = 'bg-anim-container bg-' + bg.animation;
-                                        
-                                        // Update colors
-                                        const c1 = bg.animation_colors ? bg.animation_colors[0] : '#6366f1';
-                                        const c2 = bg.animation_colors ? bg.animation_colors[1] : '#a855f7';
-                                        root.style.setProperty('--anim-color-1', c1);
-                                        root.style.setProperty('--anim-color-2', c2);
-                                    } else if (animContainer) {
-                                        animContainer.remove();
-                                    }
-
-                                    // Item animations (Floating, Pulse etc)
-                                    const animClasses = ['anim-floating', 'anim-pulse'];
-                                    animClasses.forEach(c => cardWrapper.classList.remove(c));
-                                    // These are now handled differently or kept for items
-                                    // if (bg.animation && bg.animation !== 'none') cardWrapper.classList.add('anim-' + bg.animation);
-                                }
-
-                                // Colors & Buttons
-                                root.style.setProperty('--text-title', colors.title || colors.text || '#111827');
-                                root.style.setProperty('--text-page', colors.page_text || colors.text || '#111827');
-                                root.style.setProperty('--card-bg', btns.variant === 'outline' ? 'transparent' : (btns.variant === 'glass' ? 'rgba(255,255,255,0.1)' : (btns.bg_color || '#ffffff')));
-                                root.style.setProperty('--card-border', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : 'transparent');
-                                root.style.setProperty('--link-color', btns.variant === 'outline' ? (btns.bg_color || '#ffffff') : (btns.text_color || '#111827'));
-                                root.style.setProperty('--card-shadow', btns.shadow && btns.variant !== 'glass' ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none');
-                                
-                                const alignMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
-                                root.style.setProperty('--btn-align', alignMap[btns.align] || 'center');
-                                root.style.setProperty('--btn-text-align', btns.align || 'center');
-
-                                const radiusMap = { pill: '9999px', square: '0px', soft: '1.25rem' };
-                                root.style.setProperty('--btn-radius', radiusMap[btns.style] || '0.75rem');
-                                
-                                const fontMap = { outfit: "'Outfit'", inter: "'Inter'", roboto: "'Roboto'", montserrat: "'Montserrat'", playfair: "'Playfair Display'", mono: "'JetBrains Mono'" };
-                                root.style.setProperty('--font-family', (fontMap[theme.font_family] || "'Inter'") + ", sans-serif");
-
-                                // Button Variant Classes
-                                document.querySelectorAll('.theme-card').forEach(card => {
-                                    card.classList.remove('variant-offset', 'backdrop-blur-md');
-                                    if (btns.variant === 'offset') card.classList.add('variant-offset');
-                                    else if (btns.variant === 'glass') card.classList.add('backdrop-blur-md');
-                                });
-                            } else {
-                                bodyEl.classList.add(`theme-${theme.preset || 'minimal'}`);
-                            }
-                        }
-                    });
+                    if (design.theme && design.theme.font_family) {
+                        const fontMap = { outfit: "'Outfit'", inter: "'Inter'", roboto: "'Roboto'", montserrat: "'Montserrat'", playfair: "'Playfair Display'", mono: "'JetBrains Mono'" };
+                        root.style.setProperty('--font-family', (fontMap[design.theme.font_family] || "'Inter'") + ", sans-serif");
+                    }
                 }
             });
         }

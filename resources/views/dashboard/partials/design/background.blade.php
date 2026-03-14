@@ -32,6 +32,13 @@
                 <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Görsel</span>
             </label>
             <label class="cursor-pointer group">
+                <input type="radio" x-model="draftDesign.background.type" value="video" class="sr-only peer">
+                <div class="h-20 rounded-md border border-input peer-only-child:border-primary peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
+                    <i class="fas fa-play-circle text-muted-foreground opacity-40"></i>
+                </div>
+                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Video</span>
+            </label>
+            <label class="cursor-pointer group">
                 <input type="radio" x-model="draftDesign.background.type" value="animation" class="sr-only peer">
                 <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
                     <i class="fas fa-magic text-muted-foreground opacity-40"></i>
@@ -130,23 +137,62 @@
             <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Animasyon Türü') }}</h4>
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <template x-for="anim in [
-                    {id:'anim-1', label:'Animasyon 1', style:'background: linear-gradient(45deg, #eee 25%, transparent 25%)'},
-                    {id:'anim-2', label:'Animasyon 2', style:'background: radial-gradient(circle, #eee 10%, transparent 10%)'},
-                    {id:'anim-3', label:'Animasyon 3', style:'background: repeating-linear-gradient(45deg, #eee, #eee 10px, transparent 10px, transparent 20px)'},
-                    {id:'anim-4', label:'Animasyon 4', style:'background: conic-gradient(from 0deg, #eee, transparent)'},
-                    {id:'anim-5', label:'Animasyon 5', style:'background: linear-gradient(135deg, #eee 25%, transparent 25%)'}
+                    {id:'anim-1', label:'Zigzag', class:'bg-anim-1'},
+                    {id:'anim-2', label:'Daireler', class:'bg-anim-2'},
+                    {id:'anim-3', label:'Çizgiler', class:'bg-anim-3'},
+                    {id:'anim-4', label:'Mesh', class:'bg-anim-4'},
+                    {id:'anim-5', label:'Oklar', class:'bg-anim-5'}
                 ]">
                     <label class="cursor-pointer group">
                         <input type="radio" x-model="draftDesign.background.animation" :value="anim.id" class="sr-only peer">
-                        <div class="h-24 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring bg-muted/20 hover:bg-muted/50 p-1 flex flex-col gap-1 overflow-hidden transition-all">
+                        <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-2 peer-checked:ring-primary/20 bg-muted/20 hover:bg-muted/50 p-1 flex flex-col gap-1 overflow-hidden transition-all">
                             <div class="flex-1 rounded bg-background border border-border/50 relative overflow-hidden">
-                                <div class="absolute inset-0 opacity-20" :style="anim.style"></div>
+                                <div class="absolute inset-0 opacity-60 pointer-events-none" :class="anim.class"></div>
                             </div>
-                            <span class="text-[8px] text-center font-medium py-1" x-text="anim.label"></span>
+                            <span class="text-[8px] text-center font-medium" x-text="anim.label"></span>
                         </div>
                     </label>
                 </template>
             </div>
+            
+            <style>
+                .bg-anim-1 {
+                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
+                    background-color: var(--anim-color-1);
+                    background-image:  linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(45deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(315deg, var(--anim-color-2) 25%, var(--anim-color-1) 25%);
+                    background-position:  10px 0, 10px 0, 0 0, 0 0; background-size: 20px 20px;
+                    animation: bg-move-mini 5s linear infinite;
+                }
+                .bg-anim-2 {
+                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
+                    background: var(--anim-color-1);
+                    background-image: radial-gradient(circle at 20% 30%, var(--anim-color-2) 0%, transparent 20%), radial-gradient(circle at 80% 70%, var(--anim-color-2) 0%, transparent 25%);
+                    background-size: 200% 200%;
+                    animation: bg-move-mini-alt 5s ease infinite alternate;
+                }
+                .bg-anim-3 {
+                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
+                    background: repeating-linear-gradient(45deg, var(--anim-color-1), var(--anim-color-1) 10px, var(--anim-color-2) 10px, var(--anim-color-2) 20px);
+                    background-size: 200% 200%;
+                    animation: bg-move-mini 10s linear infinite;
+                }
+                .bg-anim-4 {
+                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
+                    background: var(--anim-color-1);
+                    background-image: conic-gradient(from 180deg at 50% 50%, var(--anim-color-2), var(--anim-color-1), var(--anim-color-2));
+                    animation: bg-rotate-mini 5s linear infinite;
+                }
+                .bg-anim-5 {
+                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
+                    background-color: var(--anim-color-1);
+                    background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%);
+                    background-position: 0 0; background-size: 20px 20px;
+                    animation: bg-move-mini 2s linear infinite;
+                }
+                @keyframes bg-move-mini { from { background-position: 0 0; } to { background-position: 0 20px; } }
+                @keyframes bg-move-mini-alt { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+                @keyframes bg-rotate-mini { from { transform: scale(3) rotate(0deg); } to { transform: scale(3) rotate(360deg); } }
+            </style>
 
             <!-- Animation Colors -->
             <div class="space-y-4 pt-2">
