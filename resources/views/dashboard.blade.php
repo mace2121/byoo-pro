@@ -421,41 +421,47 @@
                     }
                 },
 
+                sanitizeColor(c) {
+                    if (typeof c === 'string' && c.includes('#')) {
+                        let parts = c.split('#').filter(Boolean);
+                        let hex = parts.pop(); // Get the last hex part
+                        return hex ? '#' + hex.slice(-6) : c;
+                    }
+                    return c;
+                },
+
+                sanitizeAllColors() {
+                    const d = this.draftDesign;
+                    if (d.background) d.background.color = this.sanitizeColor(d.background.color);
+                    if (d.background?.animation_colors) {
+                        d.background.animation_colors = d.background.animation_colors.map(c => this.sanitizeColor(c));
+                    }
+                    if (d.buttons) {
+                        d.buttons.bg_color = this.sanitizeColor(d.buttons.bg_color);
+                        d.buttons.text_color = this.sanitizeColor(d.buttons.text_color);
+                    }
+                    if (d.colors) {
+                        Object.keys(d.colors).forEach(k => {
+                            d.colors[k] = this.sanitizeColor(d.colors[k]);
+                        });
+                    }
+                },
+
                 updatePreview(settings) {
                     const iframe = this.$refs.previewIframe;
                     if (iframe && iframe.contentWindow) {
-                        const cleanSettings = JSON.parse(JSON.stringify(settings));
+                        // Periodic sanitize to prevent input corruption during typing
+                        this.sanitizeAllColors();
                         
-                        const sanitizeColor = (c) => {
-                            if (typeof c === 'string' && c.includes('#')) {
-                                let hex = c.split('#').filter(Boolean).pop(); // Get the last hex part
-                                return hex ? '#' + hex.slice(-6) : c;
-                            }
-                            return c;
-                        };
-
-                        if (cleanSettings.colors) {
-                            Object.keys(cleanSettings.colors).forEach(k => cleanSettings.colors[k] = sanitizeColor(cleanSettings.colors[k]));
-                        }
-                        if (cleanSettings.buttons) {
-                            cleanSettings.buttons.bg_color = sanitizeColor(cleanSettings.buttons.bg_color);
-                            cleanSettings.buttons.text_color = sanitizeColor(cleanSettings.buttons.text_color);
-                        }
-                        if (cleanSettings.background) {
-                            cleanSettings.background.color = sanitizeColor(cleanSettings.background.color);
-                            if (cleanSettings.background.animation_colors) {
-                                cleanSettings.background.animation_colors = cleanSettings.background.animation_colors.map(sanitizeColor);
-                            }
-                        }
-
                         iframe.contentWindow.postMessage({
                             type: 'DESIGN_UPDATE',
-                            payload: cleanSettings
+                            payload: JSON.parse(JSON.stringify(this.draftDesign))
                         }, '*');
                     }
                 },
 
                 saveDesign() {
+                    this.sanitizeAllColors();
                     const formData = new FormData();
                     formData.append('_method', 'PATCH');
                     formData.append('design_settings', JSON.stringify(this.draftDesign));
