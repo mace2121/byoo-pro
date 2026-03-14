@@ -157,41 +157,87 @@
 
                         <div x-show="tab === 'design'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" class="h-full">
                             <div class="bg-card border border-border rounded-lg shadow-sm overflow-hidden flex flex-col h-[calc(100vh-8rem)]">
-                                <!-- Sub Navigation -->
-                                <div class="border-b border-border bg-muted/30 px-4 flex gap-6 overflow-x-auto whitespace-nowrap">
-                                    <button @click="designTab = 'header'" :class="designTab === 'header' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Header') }}</button>
-                                    <button @click="designTab = 'theme'" :class="designTab === 'theme' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Tema') }}</button>
-                                    <button @click="designTab = 'background'" :class="designTab === 'background' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Arka Plan') }}</button>
-                                    <button @click="designTab = 'buttons'" :class="designTab === 'buttons' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Butonlar') }}</button>
-                                    <button @click="designTab = 'colors'" :class="designTab === 'colors' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'" class="py-3 px-1 border-b-2 text-sm font-medium transition-colors">{{ __('Renkler') }}</button>
+                                <!-- New Sticky Sub Navigation (Scroll Spy Style) -->
+                                <div class="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur px-4 flex items-center justify-between overflow-x-auto no-scrollbar py-2">
+                                    <div class="flex gap-1">
+                                        <button @click="scrollToSection('design-header')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'header' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-id-card text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Header') }}</span>
+                                        </button>
+                                        <button @click="scrollToSection('design-theme')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-layer-group text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Tema') }}</span>
+                                        </button>
+                                        <button @click="scrollToSection('design-background')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'background' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-bahai text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Arka Plan') }}</span>
+                                        </button>
+                                        <button @click="scrollToSection('design-buttons')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-hand-pointer text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Butonlar') }}</span>
+                                        </button>
+                                        <button @click="scrollToSection('design-colors')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-palette text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Renkler') }}</span>
+                                        </button>
+                                    </div>
+                                    <button @click="saveDesign" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg hover:opacity-90 transition-all">
+                                        <i class="fas fa-save text-xs"></i>
+                                        {{ __('Kaydet') }}
+                                    </button>
                                 </div>
 
-                                <!-- Content Area -->
-                                <div class="p-6 md:p-8 flex-1 overflow-y-auto">
-                                    <div x-show="designTab === 'header'" x-cloak>
+                                <!-- Content Area: Single Page Scrolling -->
+                                <div class="flex-1 overflow-y-auto scroll-smooth no-scrollbar p-6" x-ref="designScrollArea" @scroll="handleDesignScroll">
+                                    <div id="design-header" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-id-card"></i> Header
+                                        </h3>
                                         @include('dashboard.partials.design.header')
                                     </div>
-                                    <div x-show="designTab === 'theme'" x-cloak>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-theme" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-layer-group"></i> Tema
+                                        </h3>
                                         @include('dashboard.partials.design.theme')
                                     </div>
-                                    <div x-show="designTab === 'background'" x-cloak>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-background" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-bahai"></i> Arka Plan
+                                        </h3>
                                         @include('dashboard.partials.design.background')
                                     </div>
-                                    <div x-show="designTab === 'buttons'" x-cloak>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-buttons" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-hand-pointer"></i> Butonlar
+                                        </h3>
                                         @include('dashboard.partials.design.buttons')
                                     </div>
-                                    <div x-show="designTab === 'colors'" x-cloak>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-colors" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-palette"></i> Renkler
+                                        </h3>
                                         @include('dashboard.partials.design.colors')
                                     </div>
                                 </div>
 
-                                <!-- Action Bar -->
-                                <div class="border-t border-border bg-muted/10 p-4 flex items-center justify-between">
-                                    <p class="text-[10px] text-muted-foreground uppercase tracking-wider">{{ __('Değişikliklerinizi sağdan önizleyebilirsiniz') }}</p>
-                                    <button @click="saveDesign" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors hover:opacity-90 bg-primary text-primary-foreground h-9 px-6 gap-2 shadow-sm">
-                                        <i class="fas fa-save"></i>
-                                        {{ __('Kaydet') }}
-                                    </button>
+                                <!-- Action Bar (Hidden in single page as it is now in the nav bar) -->
+                                <div class="border-t border-border bg-muted/10 p-2 flex items-center justify-center">
+                                    <p class="text-[9px] text-muted-foreground uppercase tracking-wider opacity-60">{{ __('Tasarım ayarlarınız canlı önizleme ile senkronize edilir') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -268,6 +314,7 @@
             Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
                 tab: initialTab,
                 designTab: 'header',
+                activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 
@@ -332,6 +379,30 @@
                     this.$watch('draftDesign', value => {
                         this.updatePreview(value);
                     }, { deep: true });
+                },
+
+                scrollToSection(id) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                        this.activeDesignSection = id.replace('design-', '');
+                    }
+                },
+
+                handleDesignScroll() {
+                    const sections = ['header', 'theme', 'background', 'buttons', 'colors'];
+                    const area = this.$refs.designScrollArea;
+                    for (const section of sections) {
+                        const el = document.getElementById('design-' + section);
+                        if (el) {
+                            const rect = el.getBoundingClientRect();
+                            const areaRect = area.getBoundingClientRect();
+                            if (rect.top >= areaRect.top && rect.top <= areaRect.top + 100) {
+                                this.activeDesignSection = section;
+                                break;
+                            }
+                        }
+                    }
                 },
 
                 handleFileChange(event, type) {

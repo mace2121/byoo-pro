@@ -234,9 +234,9 @@
 
         /* ===== BACKGROUND ANIMATIONS ===== */
         .bg-anim-container {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
+            z-index: 2;
             pointer-events: none;
         }
 
@@ -300,9 +300,15 @@
             justify-content: center;
             padding: 3rem 1rem;
             position: relative;
-            background: {{ (($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none') ? 'transparent' : 'var(--bg)' }};
-            overflow-x: hidden;
-            z-index: 10;
+            z-index: 10; /* Content Layer Context */
+        }
+
+        .bg-layer-wrapper {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -10; /* Fixed Behind Content */
+            pointer-events: none;
+            background-color: var(--bg-color, #f9fafb);
             @if((($design['theme']['custom_theme'] ?? false) || $profile->theme_type === 'custom') && ($design['background']['type'] ?? $profile->bg_type ?? '') === 'image')
                 background-image: url('{{ $design['background']['image_url'] ?? $profile->bg_image_url ?? '' }}');
                 background-size: cover;
@@ -312,9 +318,9 @@
         }
 
         .bg-video-container {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 1;
             overflow: hidden;
         }
         .bg-video-container video {
@@ -327,13 +333,34 @@
         }
 
         .bg-overlay {
-            position: fixed;
+            position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0, {{ ($design['background']['overlay'] ?? 0) / 100 }});
             backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
             -webkit-backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px);
             z-index: 5;
             pointer-events: none;
+        }
+
+        /* Hero Blend Mask - Professional CSS Mask version */
+        .hero-cover-container {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 24rem; /* 384px */
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+        .hero-image-bg {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
         }
 
         /* Animations */
@@ -388,8 +415,7 @@
 @php
     $design = $profile->design_settings ?? [];
 @endphp
-<body class="h-full theme-{{ $theme }} {{ $profile->theme_type === 'custom' ? 'theme-custom' : '' }}">
-    <div class="theme-page">
+    <div class="bg-layer-wrapper" style="background-color: var(--bg-color); background-image: var(--bg-image, none);">
         <!-- Background Video -->
         @if(($design['background']['type'] ?? '') === 'video' && ($design['background']['video_url'] ?? $profile->bg_video_url))
             <div class="bg-video-container">
@@ -399,18 +425,21 @@
             </div>
         @endif
 
-        <div class="bg-overlay" style="z-index: 5;"></div>
-
+        <!-- Background Animation -->
         @if(($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none')
-            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}" style="z-index: 0;"></div>
+            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}"></div>
         @endif
 
-        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
+        <!-- Background Overlay (Scope Fixed) -->
+        <div class="bg-overlay"></div>
+    </div>
+
+    <div class="theme-page">
+        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-32' : '' }}">
             
             @if($headerLayout === 'hero-cover')
-                <div class="absolute top-0 left-[-2rem] right-[-2rem] h-48 bg-cover bg-center rounded-b-[3rem] border-b border-white/10 shadow-lg pointer-events-none z-0 overflow-hidden"
-                     style="background-image: url('{{ $design['header']['hero_image_url'] ?? $profile->hero_image_url ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')">
-                    <div class="absolute inset-0 bg-black/20"></div>
+                <div class="hero-cover-container">
+                    <div class="hero-image-bg" style="background-image: url('{{ $design['header']['hero_image_url'] ?? $profile->hero_image_url ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')"></div>
                 </div>
             @endif
 
@@ -500,6 +529,17 @@
                     const root = document.documentElement;
                     const body = document.body;
 
+                    // 0. Profile Data Sync (MOVED TO TOP FOR ROBUSTNESS)
+                    if (design.profile) {
+                        const nameEl = document.querySelector('.theme-name');
+                        const usernameEl = document.querySelector('.theme-username');
+                        const bioEl = document.querySelector('.theme-bio');
+                        
+                        if (nameEl) nameEl.textContent = design.profile.name || '';
+                        if (usernameEl) usernameEl.textContent = design.profile.username ? ('@' + design.profile.username) : '';
+                        if (bioEl) bioEl.textContent = design.profile.bio || '';
+                    }
+
                     // 1. Theme Mode
                     if (design.theme) {
                         body.classList.remove('theme-custom');
@@ -551,24 +591,27 @@
                         let videoContainer = document.querySelector('.bg-video-container');
 
                         if (themePage) {
-                            themePage.style.background = '';
-                            themePage.style.backgroundImage = '';
+                            const bgWrapper = document.querySelector('.bg-layer-wrapper');
+                            bgWrapper.style.backgroundImage = '';
+                            bgWrapper.style.backgroundColor = '';
                             if (videoContainer) videoContainer.style.display = 'none';
 
                             if (bg.type === 'color') {
-                                root.style.setProperty('--bg', bg.color || '#f9fafb');
+                                root.style.setProperty('--bg-color', bg.color || '#f9fafb');
+                                bgWrapper.style.backgroundColor = 'var(--bg-color)';
                             } else if (bg.type === 'gradient') {
-                                root.style.setProperty('--bg', bg.gradient || '');
+                                root.style.setProperty('--bg-image', bg.gradient || '');
+                                bgWrapper.style.backgroundImage = 'var(--bg-image)';
                             } else if (bg.type === 'image') {
-                                themePage.style.backgroundImage = `url('${bg.image_url}')`;
-                                themePage.style.backgroundSize = 'cover';
-                                themePage.style.backgroundPosition = 'center';
+                                bgWrapper.style.backgroundImage = `url('${bg.image_url}')`;
+                                bgWrapper.style.backgroundSize = 'cover';
+                                bgWrapper.style.backgroundPosition = 'center';
                             } else if (bg.type === 'video') {
                                 if (!videoContainer) {
                                     videoContainer = document.createElement('div');
                                     videoContainer.className = 'bg-video-container';
                                     videoContainer.innerHTML = '<video autoplay muted loop playsinline></video>';
-                                    themePage.parentElement.insertBefore(videoContainer, themePage);
+                                    bgWrapper.insertBefore(videoContainer, bgWrapper.firstChild);
                                 }
                                 videoContainer.style.display = 'block';
                                 const video = videoContainer.querySelector('video');
@@ -584,7 +627,7 @@
                                 if (!animContainer) {
                                     animContainer = document.createElement('div');
                                     animContainer.className = 'bg-anim-container';
-                                    themePage.parentElement.insertBefore(animContainer, themePage);
+                                    bgWrapper.appendChild(animContainer);
                                 }
                                 animContainer.className = 'bg-anim-container bg-' + bg.animation;
                                 themePage.style.background = 'transparent';
@@ -594,6 +637,7 @@
                                 }
                             } else if (animContainer) {
                                 animContainer.remove();
+                                themePage.style.background = '';
                             }
 
                             if (overlayEl) {
@@ -627,14 +671,14 @@
 
                         if (nameEl) nameEl.style.display = header.show_name ? 'block' : 'none';
                         if (usernameEl) usernameEl.style.display = header.show_username ? 'block' : 'none';
-                        if (bioEl) bioEl.style.display = (header.show_bio) ? 'block' : 'none';
+                        if (bioEl) bioEl.style.display = header.show_bio ? 'block' : 'none';
 
                         if (cardWrapper && flexContainer && maxWContainer) {
-                            let heroCover = document.querySelector('.absolute.top-0.left-\\[-2rem\\]');
+                            let heroCover = document.querySelector('.hero-cover-container');
                             cardWrapper.classList.remove('text-left', 'text-center', 'relative', 'pt-12', 'mt-16');
                             flexContainer.classList.remove('flex-row', 'items-center', 'gap-6', 'flex-col');
-                            avatarImg?.classList.remove('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110');
-                            maxWContainer.classList.remove('pt-16');
+                            avatarImg?.classList.remove('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
+                            maxWContainer.classList.remove('pt-16', 'pt-32');
 
                             if (header.layout === 'left-aligned') {
                                 cardWrapper.classList.add('text-left');
@@ -643,16 +687,17 @@
                             } else if (header.layout === 'hero-cover') {
                                 cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
-                                maxWContainer.classList.add('pt-16');
-                                if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110');
+                                maxWContainer.classList.add('pt-32');
+                                if (avatarImg) avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'scale-110', 'mb-4');
                                 if (!heroCover) {
                                     heroCover = document.createElement('div');
-                                    heroCover.className = 'absolute top-0 left-[-2rem] right-[-2rem] h-48 bg-cover bg-center rounded-b-[3rem] border-b border-white/10 shadow-lg pointer-events-none z-0 overflow-hidden';
-                                    heroCover.innerHTML = '<div class="absolute inset-0 bg-black/20"></div>';
-                                    maxWContainer.insertBefore(heroCover, maxWContainer.firstChild);
+                                    heroCover.className = 'hero-cover-container';
+                                    heroCover.innerHTML = '<div class="hero-image-bg"></div>';
+                                    themePage.insertBefore(heroCover, themePage.firstChild);
                                 }
                                 heroCover.style.display = 'block';
-                                heroCover.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
+                                const heroImg = heroCover.querySelector('.hero-image-bg');
+                                if (heroImg) heroImg.style.backgroundImage = `url('${header.hero_image_url || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809'}')`;
                             } else {
                                 cardWrapper.classList.add('text-center');
                                 flexContainer.classList.add('flex', 'flex-col', 'items-center');
