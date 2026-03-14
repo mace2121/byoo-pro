@@ -224,10 +224,10 @@
                      :class="previewOpen ? 'border-l border-border overflow-y-auto' : 'overflow-hidden'"
                      style="min-width: 0;">
                     <div class="h-full flex flex-col p-5">
-                        <header class="mb-4 flex items-center justify-between flex-shrink-0">
+                        <header class="mb-4 flex items-center justify-between flex-shrink-0 border-b border-border/50 pb-2">
                             <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('Canlı Önizleme') }}</h3>
                             <div class="flex items-center gap-2">
-                                <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                                <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent">
                                     <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <button @click="previewOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
@@ -235,19 +235,18 @@
                                 </button>
                             </div>
                         </header>
-                        <div class="flex-1 flex items-center justify-center overflow-hidden bg-muted/20 rounded-2xl border border-border/50 shadow-inner">
-                            <div class="relative w-full max-w-[280px] h-[90%] bg-background rounded-[3rem] border-[8px] border-foreground shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] overflow-hidden ring-1 ring-border/50 transition-all duration-500 hover:scale-[1.02]"
-                                 x-on:links-updated.window="if(tab !== 'design') $refs.previewIframe.src = $refs.previewIframe.src"
-                                 x-on:profile-updated.window="if(tab !== 'design') $refs.previewIframe.src = $refs.previewIframe.src">
-                                <!-- Status bar mockup -->
-                                <div class="absolute top-0 left-0 right-0 h-6 z-20 flex justify-between px-6 items-center pointer-events-none">
-                                    <span class="text-[8px] font-bold">9:41</span>
-                                    <div class="w-16 h-4 bg-foreground rounded-b-xl"></div>
-                                    <div class="flex gap-1 items-center">
-                                        <div class="w-2 h-2 rounded-full border-[1.5px] border-foreground/30"></div>
-                                        <div class="w-3 h-2 rounded-[2px] bg-foreground/20"></div>
-                                    </div>
+                        <div class="flex-1 flex flex-col min-h-0 bg-background rounded-xl border border-border shadow-2xl overflow-hidden relative group">
+                            <!-- Minimal status bar -->
+                            <div class="h-6 flex items-center justify-between px-4 bg-muted/20 border-b border-border/10 flex-shrink-0">
+                                <div class="flex gap-1">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-destructive/40"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-yellow-500/40"></div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-green-500/40"></div>
                                 </div>
+                                <span class="text-[8px] font-mono opacity-30">{{ $user->username }}.byoo.pro</span>
+                            </div>
+                            
+                            <div class="flex-1 relative overflow-hidden">
                                 <iframe x-ref="previewIframe" 
                                         @load="updatePreview(draftDesign)"
                                         src="{{ route('public.profile', auth()->user()->username) }}" 
@@ -255,7 +254,7 @@
                             </div>
                         </div>
                         <div class="mt-3 text-center flex-shrink-0">
-                            <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-50">{{ __('Anlık Senkronize') }}</p>
+                            <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-40">{{ __('Görünüm anlık olarak güncellenir') }}</p>
                         </div>
                     </div>
                 </div>
@@ -306,6 +305,8 @@
                         image_url: initialSettings?.background?.image_url || '',
                         video_url: initialSettings?.background?.video_url || '',
                         animation: initialSettings?.background?.animation || 'none',
+                        animation_speed: initialSettings?.background?.animation_speed || 10,
+                        animation_colors: initialSettings?.background?.animation_colors || ['#6366f1', '#a855f7'],
                         overlay: initialSettings?.background?.overlay || 0,
                         blur: initialSettings?.background?.blur || 0,
                     },

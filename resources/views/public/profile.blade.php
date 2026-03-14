@@ -6,7 +6,7 @@
     if(isset($design['theme']) && !empty($design['theme'])) {
         if(($design['theme']['custom_theme'] ?? false) == true) {
             $theme = 'custom';
-            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
+            $profile->theme_type = 'custom'; 
         } else if(isset($design['theme']['preset'])) {
             $theme = $design['theme']['preset'];
             $profile->theme_type = 'preset';
@@ -50,62 +50,7 @@
     } elseif ($headerLayout === 'hero-cover') {
         $layoutWrapperClass = 'text-center relative pt-12 mt-16';
         $layoutFlexClass = 'flex flex-col items-center';
-        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
-    }
-@endphp
-@php
-    $design = $profile->design_settings ?? [];
-    
-    // Theme Defaults & Overrides
-    $theme = $profile->theme ?? 'minimal';
-    if(isset($design['theme']) && !empty($design['theme'])) {
-        if(($design['theme']['custom_theme'] ?? false) == true) {
-            $theme = 'custom';
-            $profile->theme_type = 'custom'; // For backward compatibility with CSS blocks below
-        } else if(isset($design['theme']['preset'])) {
-            $theme = $design['theme']['preset'];
-            $profile->theme_type = 'preset';
-        }
-    }
-    $headerLayout = $design['header']['layout'] ?? 'centered-classic';
-    $avatarSize = $design['header']['avatar_size'] ?? 'md';
-    $avatarFrame = $design['header']['avatar_frame'] ?? 'circle';
-    $showName = $design['header']['show_name'] ?? true;
-    $showUsername = $design['header']['show_username'] ?? true;
-    $showBio = $design['header']['show_bio'] ?? true;
-
-    // Avatar Size Mapping
-    $avatarClasses = '';
-    switch($avatarSize) {
-        case 'sm': $avatarClasses = 'w-16 h-16'; break;
-        case 'lg': $avatarClasses = 'w-32 h-32'; break;
-        case 'xl': $avatarClasses = 'w-40 h-40'; break;
-        case 'md':
-        default: $avatarClasses = 'w-24 h-24'; break;
-    }
-
-    // Avatar Frame Mapping
-    $frameClasses = '';
-    switch($avatarFrame) {
-        case 'rounded-xl': $frameClasses = 'rounded-xl'; break;
-        case 'square': $frameClasses = 'rounded-none'; break;
-        case 'polygon': $frameClasses = 'avatar-polygon'; break;
-        case 'circle':
-        default: $frameClasses = 'rounded-full'; break;
-    }
-
-    // Layout Classes
-    $layoutWrapperClass = 'text-center';
-    $layoutFlexClass = 'flex flex-col items-center';
-    $heroCoverClass = '';
-    
-    if ($headerLayout === 'left-aligned') {
-        $layoutWrapperClass = 'text-left';
-        $layoutFlexClass = 'flex flex-row items-center gap-6';
-    } elseif ($headerLayout === 'hero-cover') {
-        $layoutWrapperClass = 'text-center relative pt-12 mt-16';
-        $layoutFlexClass = 'flex flex-col items-center';
-        $heroCoverClass = 'absolute top-0 left-0 w-full h-32 bg-foreground/10 rounded-t-3xl';
+        $heroCoverClass = 'absolute top-0 left-0 w-full h-48 bg-cover bg-center rounded-t-[3rem] border-b border-white/10 shadow-lg';
     }
 @endphp
 <!DOCTYPE html>
@@ -275,8 +220,74 @@
             @elseif($btnStyle === 'soft')
                 --btn-radius: 1.25rem;
             @endif
+
+            /* Animation Colors */
+            @php
+                $animColors = $design['background']['animation_colors'] ?? ['#6366f1', '#a855f7'];
+            @endphp
+            --anim-color-1: {{ $animColors[0] }};
+            --anim-color-2: {{ $animColors[1] }};
         }
         @endif
+
+        /* ===== BACKGROUND ANIMATIONS ===== */
+        .bg-anim-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Animasyon 1: Zigzag Gradient */
+        .bg-anim-1 {
+            background-color: var(--anim-color-1);
+            background-image:  linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), 
+                               linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%), 
+                               linear-gradient(45deg, var(--anim-color-2) 25%, transparent 25%), 
+                               linear-gradient(315deg, var(--anim-color-2) 25%, var(--anim-color-1) 25%);
+            background-position:  40px 0, 40px 0, 0 0, 0 0;
+            background-size: 80px 80px;
+            background-repeat: repeat;
+            animation: bg-move-1 20s linear infinite;
+        }
+        @keyframes bg-move-1 { from { background-position: 40px 0, 40px 0, 0 0, 0 0; } to { background-position: 40px 80px, 40px 80px, 0 80px, 0 80px; } }
+
+        /* Animasyon 2: Floating Circles */
+        .bg-anim-2 {
+            background: var(--anim-color-1);
+            background-image: radial-gradient(circle at 20% 30%, var(--anim-color-2) 0%, transparent 20%),
+                              radial-gradient(circle at 80% 70%, var(--anim-color-2) 0%, transparent 25%);
+            background-size: 200% 200%;
+            animation: bg-move-2 15s ease infinite alternate;
+        }
+        @keyframes bg-move-2 { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
+
+        /* Animasyon 3: Scanning Stripes */
+        .bg-anim-3 {
+            background: repeating-linear-gradient(45deg, var(--anim-color-1), var(--anim-color-1) 100px, var(--anim-color-2) 100px, var(--anim-color-2) 200px);
+            background-size: 400% 400%;
+            animation: bg-move-3 30s linear infinite;
+        }
+        @keyframes bg-move-3 { from { background-position: 0 0; } to { background-position: 400% 400%; } }
+
+        /* Animasyon 4: Mesh Gradient */
+        .bg-anim-4 {
+            background: var(--anim-color-1);
+            background-image: conic-gradient(from 180deg at 50% 50%, var(--anim-color-2), var(--anim-color-1), var(--anim-color-2));
+            animation: bg-move-4 10s linear infinite;
+        }
+        @keyframes bg-move-4 { from { transform: scale(1.5) rotate(0deg); } to { transform: scale(1.5) rotate(360deg); } }
+
+        /* Animasyon 5: Large Moving Chevrons (User requested) */
+        .bg-anim-5 {
+            background-color: var(--anim-color-1);
+            background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), 
+                               linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%);
+            background-position: 0 0;
+            background-size: 100px 100px;
+            animation: bg-move-5 4s linear infinite;
+        }
+        @keyframes bg-move-5 { from { background-position: 0 0; } to { background-position: 0 100px; } }
 
         /* Apply Styles */
         body { font-family: var(--font-family); }
@@ -383,6 +394,10 @@
                     <source src="{{ $design['background']['video_url'] ?? $profile->bg_video_url }}" type="video/mp4">
                 </video>
             </div>
+        @endif
+
+        @if(($design['background']['type'] ?? '') === 'animation' && ($design['background']['animation'] ?? 'none') !== 'none')
+            <div class="bg-anim-container bg-{{ $design['background']['animation'] }}"></div>
         @endif
 
         <!-- Background Overlay -->
@@ -504,13 +519,11 @@
                             avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40', 'w-20', 'h-20');
                             avatarImg.classList.remove('rounded-full', 'rounded-xl', 'rounded-none', 'avatar-polygon');
                             
-                            if (header.layout === 'hero-cover') avatarImg.classList.add('w-32', 'h-32');
-                            else if (header.layout === 'left-aligned') avatarImg.classList.add('w-20', 'h-20');
-                            else {
-                                const sizeMap = { sm: 'w-16', md: 'w-24', lg: 'w-32', xl: 'w-40' };
-                                avatarImg.classList.add(sizeMap[header.avatar_size] || 'w-24');
-                                avatarImg.classList.add(sizeMap[header.avatar_size]?.replace('w-', 'h-') || 'h-24');
-                            }
+                            const sizeMap = { sm: 'w-16', md: 'w-24', lg: 'w-32', xl: 'w-40' };
+                            const heightMap = { sm: 'h-16', md: 'h-24', lg: 'h-32', xl: 'h-40' };
+                            
+                            avatarImg.classList.add(sizeMap[header.avatar_size] || 'w-24');
+                            avatarImg.classList.add(heightMap[header.avatar_size] || 'h-24');
                             
                             const frameMap = { 'rounded-xl': 'rounded-xl', 'square': 'rounded-none', 'polygon': 'avatar-polygon', 'circle': 'rounded-full' };
                             avatarImg.classList.add(frameMap[header.avatar_frame] || 'rounded-full');
@@ -625,14 +638,30 @@
                                         overlayEl.style.backdropFilter = overlayEl.style.webkitBackdropFilter = `blur(${bg.blur || 0}px)`;
                                     }
 
-                                    // Animation class update
-                                    if (cardWrapper) {
-                                        const animClasses = ['anim-floating', 'anim-pulse', 'anim-zigzag', 'anim-dots', 'anim-waves'];
-                                        animClasses.forEach(c => cardWrapper.classList.remove(c));
-                                        if (bg.animation && bg.animation !== 'none') {
-                                            cardWrapper.classList.add('anim-' + bg.animation);
+                                    // Animation class update (Background Pattern)
+                                    let animContainer = document.querySelector('.bg-anim-container');
+                                    if (bg.type === 'animation' && bg.animation !== 'none') {
+                                        if (!animContainer) {
+                                            animContainer = document.createElement('div');
+                                            animContainer.className = 'bg-anim-container';
+                                            themePage.parentElement.insertBefore(animContainer, themePage);
                                         }
+                                        animContainer.className = 'bg-anim-container bg-' + bg.animation;
+                                        
+                                        // Update colors
+                                        const c1 = bg.animation_colors ? bg.animation_colors[0] : '#6366f1';
+                                        const c2 = bg.animation_colors ? bg.animation_colors[1] : '#a855f7';
+                                        root.style.setProperty('--anim-color-1', c1);
+                                        root.style.setProperty('--anim-color-2', c2);
+                                    } else if (animContainer) {
+                                        animContainer.remove();
                                     }
+
+                                    // Item animations (Floating, Pulse etc)
+                                    const animClasses = ['anim-floating', 'anim-pulse'];
+                                    animClasses.forEach(c => cardWrapper.classList.remove(c));
+                                    // These are now handled differently or kept for items
+                                    // if (bg.animation && bg.animation !== 'none') cardWrapper.classList.add('anim-' + bg.animation);
                                 }
 
                                 // Colors & Buttons
