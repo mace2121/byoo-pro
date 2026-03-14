@@ -138,8 +138,8 @@
             </nav>
 
             <!-- Content + Preview Row -->
-            <div style="display: grid; grid-template-columns: 1fr; height: calc(100% - 56px); overflow: hidden;"
-                 :style="previewOpen ? 'grid-template-columns: 1fr 340px' : 'grid-template-columns: 1fr'">
+            <div style="display: grid; height: calc(100% - 56px); overflow: hidden;"
+                 :style="previewOpen ? 'grid-template-columns: 1fr 340px' : 'grid-template-columns: 1fr 0px'">
                 <!-- MAIN CONTENT AREA (always first column) -->
                 <div style="overflow-y: auto; min-width: 0;">
                     <div class="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
@@ -182,13 +182,10 @@
                     </div>
                 </div>
 
-                <!-- RIGHT PREVIEW SIDEBAR (second column, toggleable) -->
-                <div x-show="previewOpen" x-cloak 
-                     class="border-l border-border bg-muted/50" 
-                     style="overflow-y: auto; min-width: 0;"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100">
+                <!-- RIGHT PREVIEW SIDEBAR (second column, grid-controlled) -->
+                <div class="bg-muted/50 transition-all duration-300" 
+                     :class="previewOpen ? 'border-l border-border overflow-y-auto' : 'overflow-hidden'"
+                     style="min-width: 0;">
                     <div class="h-full flex flex-col p-5">
                         <header class="mb-4 flex items-center justify-between flex-shrink-0">
                             <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('Canlı Önizleme') }}</h3>
