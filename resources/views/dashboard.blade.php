@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="h-full flex" x-data="{ tab: '{{ request()->query('tab', 'links') }}' }">
-        <!-- Sidebar (Full Height) -->
+    <div class="h-full flex" x-data="{ tab: '{{ request()->query('tab', 'links') }}', previewOpen: window.innerWidth >= 1280 }">
+        <!-- LEFT SIDEBAR (Navigation) -->
         <aside class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" 
                :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'">
             <div class="h-full flex flex-col w-64">
@@ -80,23 +80,31 @@
             </div>
         </aside>
 
-        <!-- Right Column: Navbar + Content + Preview -->
+        <!-- CENTER COLUMN: Navbar + Content -->
         <div class="flex-1 min-w-0 flex flex-col">
-            <!-- Inline Navbar (sits beside sidebar, not above) -->
+            <!-- Navbar -->
             <nav class="h-14 flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-4 md:px-6">
-                <!-- Sidebar open button (only when collapsed) -->
+                <!-- Sidebar toggle (only when collapsed) -->
                 <button x-show="!sidebarOpen" x-cloak @click="sidebarOpen = true" class="p-2 rounded-md hover:bg-accent transition-colors mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
                 </button>
 
-                <div class="flex flex-1 items-center justify-end space-x-4">
+                <div class="flex flex-1 items-center justify-end space-x-3">
+                    <!-- Preview Toggle Button -->
+                    <button @click="previewOpen = !previewOpen" 
+                            :class="previewOpen ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
+                        <i class="fas fa-mobile-alt text-[10px]"></i>
+                        <span class="hidden sm:inline">{{ __('Önizleme') }}</span>
+                    </button>
+
                     <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" 
                        class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm">
                         <i class="fas fa-external-link-alt text-[10px]"></i>
                         {{ __('Sayfamı Gör') }}
                     </a>
 
-                    <div class="flex items-center gap-2 border-l border-border pl-4">
+                    <div class="flex items-center gap-2 border-l border-border pl-3">
                         <x-dropdown align="right" width="48">
                             <x-slot name="trigger">
                                 <button class="inline-flex items-center px-2 py-1.5 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors group">
@@ -129,10 +137,10 @@
                 </div>
             </nav>
 
-            <!-- Content Row: Main + Preview -->
-            <div class="flex-1 flex overflow-hidden">
-                <!-- Main Content -->
-                <main class="flex-1 min-w-0 overflow-y-auto bg-background">
+            <!-- Content + Preview Row -->
+            <div class="flex-1 flex overflow-hidden min-h-0">
+                <!-- MAIN CONTENT AREA -->
+                <div class="flex-1 min-w-0 overflow-y-auto bg-background">
                     <div class="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
                         <div x-show="tab === 'links'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
                             @include('dashboard.partials.links-management')
@@ -171,23 +179,31 @@
                             </div>
                         </div>
                     </div>
-                </main>
+                </div>
 
-                <!-- Right Preview Panel -->
-                <aside class="hidden lg:block w-[380px] border-l border-border bg-muted/50 p-6 overflow-y-auto flex-shrink-0">
-                    <div class="sticky top-0">
-                        <header class="mb-6 flex items-center justify-between">
+                <!-- RIGHT PREVIEW SIDEBAR (toggleable) -->
+                <aside class="border-l border-border bg-muted/50 flex-shrink-0 transition-all duration-300 overflow-hidden"
+                       :class="previewOpen ? 'w-[340px]' : 'w-0'">
+                    <div class="w-[340px] h-full flex flex-col p-5">
+                        <header class="mb-4 flex items-center justify-between flex-shrink-0">
                             <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('Canlı Önizleme') }}</h3>
-                            <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                <button @click="previewOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                </button>
+                            </div>
                         </header>
-                        <div class="relative mx-auto w-full max-w-[280px] aspect-[9/18.5] bg-background rounded-[2.5rem] border-[6px] border-foreground/90 shadow-2xl overflow-hidden ring-1 ring-border"
-                             x-on:links-updated.window="$refs.previewIframe.src = $refs.previewIframe.src"
-                             x-on:profile-updated.window="$refs.previewIframe.src = $refs.previewIframe.src">
-                            <iframe x-ref="previewIframe" src="{{ route('public.profile', auth()->user()->username) }}" class="w-full h-full border-none"></iframe>
+                        <div class="flex-1 flex items-start justify-center overflow-hidden">
+                            <div class="relative w-full max-w-[260px] aspect-[9/18.5] bg-background rounded-[2.5rem] border-[6px] border-foreground/90 shadow-2xl overflow-hidden ring-1 ring-border"
+                                 x-on:links-updated.window="$refs.previewIframe.src = $refs.previewIframe.src"
+                                 x-on:profile-updated.window="$refs.previewIframe.src = $refs.previewIframe.src">
+                                <iframe x-ref="previewIframe" src="{{ route('public.profile', auth()->user()->username) }}" class="w-full h-full border-none"></iframe>
+                            </div>
                         </div>
-                        <div class="mt-6 text-center">
+                        <div class="mt-3 text-center flex-shrink-0">
                             <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-50">{{ __('Anlık Senkronize') }}</p>
                         </div>
                     </div>
