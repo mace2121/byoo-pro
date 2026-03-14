@@ -787,7 +787,6 @@
             });
 
             window.addEventListener('message', (event) => {
-                if (event.origin !== window.location.origin) return;
                 if (event.data?.type === 'DESIGN_UPDATE') {
                     applyDesign(event.data.payload);
                 }

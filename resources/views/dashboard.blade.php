@@ -160,70 +160,74 @@
                                 <!-- New Sticky Sub Navigation (Scroll Spy Style) -->
                                 <div class="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur px-4 flex items-center justify-between overflow-x-auto no-scrollbar py-2">
                                     <div class="flex gap-1">
-                                        <button @click="setDesignTab('header')" 
+                                        <button @click="scrollToSection('design-header')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="designTab === 'header' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="activeDesignSection === 'header' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-id-card text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Header') }}</span>
                                         </button>
-                                        <button @click="setDesignTab('theme')" 
+                                        <button @click="scrollToSection('design-theme')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="designTab === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="activeDesignSection === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-layer-group text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Tema') }}</span>
                                         </button>
-                                        <button @click="setDesignTab('background')" 
+                                        <button @click="scrollToSection('design-background')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="designTab === 'background' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="activeDesignSection === 'background' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-bahai text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Arka Plan') }}</span>
                                         </button>
-                                        <button @click="setDesignTab('buttons')" 
+                                        <button @click="scrollToSection('design-buttons')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="designTab === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="activeDesignSection === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-hand-pointer text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Butonlar') }}</span>
                                         </button>
-                                        <button @click="setDesignTab('colors')" 
+                                        <button @click="scrollToSection('design-colors')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="designTab === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                                :class="activeDesignSection === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-palette text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Renkler') }}</span>
                                         </button>
                                     </div>
                                     <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
                                         <i class="fas fa-save text-xs"></i>
-                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : (isDirty ? '{{ __('Kaydet') }} *' : '{{ __('Kaydedildi') }}')"></span>
+                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
                                     </button>
                                 </div>
 
                                 <!-- Content Area: Single Page Scrolling -->
-                                <div class="flex-1 overflow-y-auto no-scrollbar p-6">
-                                    <div x-show="designTab === 'header'" x-transition.opacity.duration.200ms>
+                                <div class="flex-1 overflow-y-auto scroll-smooth no-scrollbar p-6" x-ref="designScrollArea" @scroll="handleDesignScroll">
+                                    <div id="design-header" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-id-card"></i> Header
                                         </h3>
                                         @include('dashboard.partials.design.header')
                                     </div>
-                                    <div x-show="designTab === 'theme'" x-cloak x-transition.opacity.duration.200ms>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-theme" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-layer-group"></i> Tema
                                         </h3>
                                         @include('dashboard.partials.design.theme')
                                     </div>
-                                    <div x-show="designTab === 'background'" x-cloak x-transition.opacity.duration.200ms>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-background" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-bahai"></i> Arka Plan
                                         </h3>
                                         @include('dashboard.partials.design.background')
                                     </div>
-                                    <div x-show="designTab === 'buttons'" x-cloak x-transition.opacity.duration.200ms>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-buttons" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-hand-pointer"></i> Butonlar
                                         </h3>
                                         @include('dashboard.partials.design.buttons')
                                     </div>
-                                    <div x-show="designTab === 'colors'" x-cloak x-transition.opacity.duration.200ms>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-colors" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-palette"></i> Renkler
                                         </h3>
@@ -309,7 +313,7 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
                 tab: initialTab,
-                designTab: 'header',
+                activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 previewSyncTimer: null,
@@ -414,10 +418,6 @@
                         window.removeEventListener('beforeunload', this.beforeUnloadHandler);
                     }
                     this.clearAllObjectUrls();
-                },
-
-                setDesignTab(tab) {
-                    this.designTab = tab;
                 },
 
                 handlePreviewLoad() {
@@ -560,6 +560,32 @@
                     return normalized;
                 },
 
+                scrollToSection(id) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+
+                    el.scrollIntoView({ behavior: 'smooth' });
+                    this.activeDesignSection = id.replace('design-', '');
+                },
+
+                handleDesignScroll() {
+                    const area = this.$refs.designScrollArea;
+                    if (!area) return;
+
+                    const sections = ['header', 'theme', 'background', 'buttons', 'colors'];
+                    for (const section of sections) {
+                        const el = document.getElementById('design-' + section);
+                        if (!el) continue;
+
+                        const rect = el.getBoundingClientRect();
+                        const areaRect = area.getBoundingClientRect();
+                        if (rect.top >= areaRect.top && rect.top <= areaRect.top + 100) {
+                            this.activeDesignSection = section;
+                            break;
+                        }
+                    }
+                },
+
                 clearAllObjectUrls() {
                     Object.keys(this.objectUrls).forEach((key) => {
                         if (this.objectUrls[key]) {
@@ -611,17 +637,14 @@
 
                     if (type === 'hero_image') {
                         this.draftDesign.header.hero_image_url = previewUrl;
-                        this.designTab = 'header';
                     }
                     if (type === 'bg_image') {
                         this.draftDesign.background.image_url = previewUrl;
                         this.draftDesign.background.type = 'image';
-                        this.designTab = 'background';
                     }
                     if (type === 'bg_video') {
                         this.draftDesign.background.video_url = previewUrl;
                         this.draftDesign.background.type = 'video';
-                        this.designTab = 'background';
                     }
 
                     if (event?.target) {
