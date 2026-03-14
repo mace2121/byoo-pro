@@ -191,9 +191,9 @@
                                             <span class="text-[10px] font-semibold">{{ __('Renkler') }}</span>
                                         </button>
                                     </div>
-                                    <button @click="saveDesign" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg hover:opacity-90 transition-all">
+                                    <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
                                         <i class="fas fa-save text-xs"></i>
-                                        {{ __('Kaydet') }}
+                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
                                     </button>
                                 </div>
 
@@ -326,6 +326,11 @@
                     bg_image: null,
                     bg_video: null
                 },
+                objectUrls: {
+                    hero_image: null,
+                    bg_image: null,
+                    bg_video: null,
+                },
 
                 // Design Draft State
                 draftDesign: {
@@ -378,13 +383,86 @@
                 },
                 
                 init() {
+                    this.draftDesign = this.normalizeDesignSettings(this.draftDesign);
+
                     // Debounced watcher prevents rapid recursive preview updates.
                     this.$watch('draftDesign', value => {
                         clearTimeout(this.previewSyncTimer);
                         this.previewSyncTimer = setTimeout(() => {
-                            this.updatePreview(value);
+                            this.updatePreview(this.normalizeDesignSettings(value));
                         }, 120);
                     }, { deep: true });
+
+                    this.updatePreview(this.draftDesign);
+                },
+
+                normalizeDesignSettings(settings) {
+                    const defaults = {
+                        profile: {
+                            name: {!! json_encode(auth()->user()->name) !!},
+                            username: {!! json_encode(auth()->user()->username) !!},
+                            bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
+                        },
+                        header: {
+                            layout: 'centered-classic',
+                            hero_image_url: '',
+                            avatar_size: 'md',
+                            avatar_frame: 'circle',
+                            show_name: true,
+                            show_username: true,
+                            show_bio: true,
+                        },
+                        theme: {
+                            preset: 'minimal',
+                            custom_theme: false,
+                            font_family: 'inter',
+                        },
+                        background: {
+                            type: 'color',
+                            color: '#f9fafb',
+                            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            image_url: '',
+                            video_url: '',
+                            animation: 'none',
+                            animation_speed: 10,
+                            animation_colors: ['#6366f1', '#a855f7'],
+                            overlay: 0,
+                            blur: 0,
+                        },
+                        buttons: {
+                            style: 'pill',
+                            variant: 'solid',
+                            align: 'center',
+                            shadow: true,
+                            bg_color: '#ffffff',
+                            text_color: '#111827',
+                        },
+                        colors: {
+                            text: '#111827',
+                            title: '#111827',
+                            page_text: '#111827',
+                            btn_bg: '#ffffff',
+                            btn_text: '#111827',
+                        },
+                    };
+
+                    const safe = settings && typeof settings === 'object' ? settings : {};
+                    const normalized = {
+                        ...defaults,
+                        ...safe,
+                        profile: { ...defaults.profile, ...(safe.profile || {}) },
+                        header: { ...defaults.header, ...(safe.header || {}) },
+                        theme: { ...defaults.theme, ...(safe.theme || {}) },
+                        background: { ...defaults.background, ...(safe.background || {}) },
+                        buttons: { ...defaults.buttons, ...(safe.buttons || {}) },
+                        colors: { ...defaults.colors, ...(safe.colors || {}) },
+                    };
+
+                    if (!Array.isArray(normalized.background.animation_colors) || normalized.background.animation_colors.length < 2) {
+                        normalized.background.animation_colors = [...defaults.background.animation_colors];
+                    }
+
+                    return normalized;
                 },
 
                 scrollToSection(id) {
@@ -415,15 +493,18 @@
                     const file = event.target.files[0];
                     if (file) {
                         this.files[type] = file;
-                        
-                        // Local preview for the iframe
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            if (type === 'hero_image') this.draftDesign.header.hero_image_url = e.target.result;
-                            if (type === 'bg_image') this.draftDesign.background.image_url = e.target.result;
-                            if (type === 'bg_video') this.draftDesign.background.video_url = e.target.result;
-                        };
-                        reader.readAsDataURL(file);
+
+                        if (this.objectUrls[type]) {
+                            URL.revokeObjectURL(this.objectUrls[type]);
+                            this.objectUrls[type] = null;
+                        }
+
+                        const previewUrl = URL.createObjectURL(file);
+                        this.objectUrls[type] = previewUrl;
+
+                        if (type === 'hero_image') this.draftDesign.header.hero_image_url = previewUrl;
+                        if (type === 'bg_image') this.draftDesign.background.image_url = previewUrl;
+                        if (type === 'bg_video') this.draftDesign.background.video_url = previewUrl;
                     }
                 },
 
@@ -456,9 +537,10 @@
                 updatePreview(settings) {
                     const iframe = this.$refs.previewIframe;
                     if (iframe && iframe.contentWindow) {
-                        const payload = JSON.parse(JSON.stringify(settings || this.draftDesign));
+                        const normalized = this.normalizeDesignSettings(settings || this.draftDesign);
+                        const payload = JSON.parse(JSON.stringify(normalized));
                         this.sanitizeAllColors(payload);
-                        
+
                         iframe.contentWindow.postMessage({
                             type: 'DESIGN_UPDATE',
                             payload
@@ -469,6 +551,7 @@
                 saveDesign() {
                     if (this.isSaving) return;
                     this.isSaving = true;
+                    this.draftDesign = this.normalizeDesignSettings(this.draftDesign);
                     this.sanitizeAllColors(this.draftDesign);
 
                     const hasFileUpload = !!(this.files.hero_image || this.files.bg_image || this.files.bg_video);
@@ -531,8 +614,15 @@
                     })
                     .then(data => {
                         if (data.design_settings) {
-                            this.draftDesign = data.design_settings;
+                            this.draftDesign = this.normalizeDesignSettings(data.design_settings);
                         }
+
+                        Object.keys(this.objectUrls).forEach((key) => {
+                            if (this.objectUrls[key]) {
+                                URL.revokeObjectURL(this.objectUrls[key]);
+                                this.objectUrls[key] = null;
+                            }
+                        });
 
                         this.files = { hero_image: null, bg_image: null, bg_video: null };
                         this.updatePreview(this.draftDesign);
