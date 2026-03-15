@@ -1,114 +1,87 @@
-<div class="space-y-8 relative">
-    <!-- Block overlay - REMOVED so settings stay open as requested -->
-    <div x-show="false" class="hidden"></div>
-
+﻿<div class="space-y-8">
     <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Buton Stili') }}</h3>
-        <p class="text-[10px] text-muted-foreground mt-1">{{ __('Profilinizdeki link kartlarının görünümünü ayarlayın.') }}</p>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Butonlar') }}</h3>
+        <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Bu bölümde yalnızca buton biçimini yönetirsiniz. Renk ayarları ayrı olarak Renk menüsünde bulunur.') }}</p>
     </div>
 
-    <div class="space-y-6">
-        
-        <!-- Button Variants (NEW) -->
+    <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5">
         <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Görünüm Varyantı') }}</h4>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <template x-for="v in [
-                {id:'solid', label:'Solid', icon:'fas fa-square'},
-                {id:'outline', label:'Outline', icon:'far fa-square'},
-                {id:'glass', label:'Glass', icon:'fas fa-square-full opacity-30'},
-                {id:'offset', label:'Offset', icon:'fas fa-folder'}
-            ]">
-                <label class="cursor-pointer group">
-                    <input type="radio" x-model="draftDesign.buttons.variant" :value="v.id" class="sr-only peer">
-                    <div class="h-14 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-1 bg-muted/20 hover:bg-muted/50 p-2 transition-all">
-                        <i :class="v.icon" class="text-[10px] text-muted-foreground group-hover:text-primary"></i>
-                        <span class="text-[9px] font-medium" x-text="v.label"></span>
-                    </div>
-                </label>
+        <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <template x-for="variant in buttonVariantOptions" :key="variant.id">
+                <button type="button"
+                        @click="draftDesign.buttons.variant = variant.id"
+                        :class="draftDesign.buttons.variant === variant.id ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                        class="flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-2xl border p-3 text-center transition-all">
+                    <i :class="variant.icon" class="text-base"></i>
+                    <span class="text-[11px] font-semibold" x-text="variant.label"></span>
+                </button>
             </template>
         </div>
+    </div>
 
-        <hr class="border-border">
-
-        <!-- Button Shape Mapping -->
-        <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Köşe Yuvarlaklığı') }}</h4>
-        <div class="grid grid-cols-3 gap-3">
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.buttons.style" value="square" class="sr-only peer">
-                <div class="h-14 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex items-center justify-center bg-muted/20 hover:bg-muted/50 p-2">
-                    <div class="w-full h-6 bg-foreground/10 rounded-none relative"></div>
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Köşe Yuvarlaklığı') }}</h4>
+                    <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Slider hareket ettikçe canlı önizleme anında güncellenir.') }}</p>
                 </div>
-                <span class="text-[9px] text-center block mt-1 text-muted-foreground">Kare</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.buttons.style" value="soft" class="sr-only peer">
-                <div class="h-14 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex items-center justify-center bg-muted/20 hover:bg-muted/50 p-2">
-                    <div class="w-full h-6 bg-foreground/10 rounded-md relative"></div>
-                </div>
-                <span class="text-[9px] text-center block mt-1 text-muted-foreground">Yumuşak</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.buttons.style" value="pill" class="sr-only peer">
-                <div class="h-14 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex items-center justify-center bg-muted/20 hover:bg-muted/50 p-2">
-                    <div class="w-full h-6 bg-foreground/10 rounded-full relative"></div>
-                </div>
-                <span class="text-[9px] text-center block mt-1 text-muted-foreground">Hap</span>
-            </label>
+                <span class="rounded-full bg-background px-3 py-1 text-[11px] font-mono text-muted-foreground" x-text="draftDesign.buttons.radius + 'px'"></span>
+            </div>
+            <input type="range" x-model.number="draftDesign.buttons.radius" min="0" max="36" class="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary">
         </div>
 
-        <hr class="border-border">
-
-        <!-- Text Alignment (NEW) -->
-        <div class="flex items-center justify-between">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Metin Hizalama') }}</h4>
-            <div class="flex bg-muted/30 p-1 rounded-md border border-border">
-                <button @click="draftDesign.buttons.align = 'left'" :class="draftDesign.buttons.align === 'left' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'" class="p-1.5 rounded transition-all">
-                    <i class="fas fa-align-left text-xs"></i>
-                </button>
-                <button @click="draftDesign.buttons.align = 'center'" :class="draftDesign.buttons.align === 'center' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'" class="p-1.5 rounded transition-all">
-                    <i class="fas fa-align-center text-xs"></i>
-                </button>
-                <button @click="draftDesign.buttons.align = 'right'" :class="draftDesign.buttons.align === 'right' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'" class="p-1.5 rounded transition-all">
-                    <i class="fas fa-align-right text-xs"></i>
-                </button>
-            </div>
-        </div>
-
-        <hr class="border-border">
-
-        <!-- Button Colors -->
-        <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Buton Renkleri') }}</h4>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-2">
-                <label class="text-[10px] text-muted-foreground block">Arka Plan Rengi</label>
-                <div class="flex items-center gap-2">
-                    <input type="color" x-model="draftDesign.buttons.bg_color" class="h-8 w-10 rounded cursor-pointer border-0 p-0">
-                    <input type="text" x-model="draftDesign.buttons.bg_color" class="flex-1 w-full text-xs rounded-md border-input bg-background font-mono" placeholder="#ffffff">
+        <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Metin Hizalama') }}</h4>
+                    <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Link başlıklarının yatay hizasını belirler.') }}</p>
                 </div>
-            </div>
-            
-            <div class="space-y-2">
-                <label class="text-[10px] text-muted-foreground block">Metin Rengi</label>
-                <div class="flex items-center gap-2">
-                    <input type="color" x-model="draftDesign.buttons.text_color" class="h-8 w-10 rounded cursor-pointer border-0 p-0">
-                    <input type="text" x-model="draftDesign.buttons.text_color" class="flex-1 w-full text-xs rounded-md border-input bg-background font-mono" placeholder="#111827">
+                <div class="inline-flex rounded-xl border border-border bg-background p-1">
+                    <button type="button" @click="draftDesign.buttons.align = 'left'" :class="draftDesign.buttons.align === 'left' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'" class="rounded-lg px-3 py-2 transition-all"><i class="fas fa-align-left text-xs"></i></button>
+                    <button type="button" @click="draftDesign.buttons.align = 'center'" :class="draftDesign.buttons.align === 'center' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'" class="rounded-lg px-3 py-2 transition-all"><i class="fas fa-align-center text-xs"></i></button>
+                    <button type="button" @click="draftDesign.buttons.align = 'right'" :class="draftDesign.buttons.align === 'right' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'" class="rounded-lg px-3 py-2 transition-all"><i class="fas fa-align-right text-xs"></i></button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <hr class="border-border">
-
-        <!-- Button Shadow -->
-        <div class="flex items-center justify-between">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5" :class="draftDesign.buttons.variant === 'offset' ? 'opacity-60' : ''">
             <div>
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Gölge Efekti') }}</h4>
-                <p class="text-[9px] text-muted-foreground mt-1">Butonların çevresinde hafif bir kaldırılma efekti oluşturur.</p>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Kenarlık Stili') }}</h4>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Offset varyantında bu alan pasif kalır.') }}</p>
             </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" x-model="draftDesign.buttons.shadow" class="sr-only peer">
-                <div class="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
+            <select x-model="draftDesign.buttons.border_style" :disabled="draftDesign.buttons.variant === 'offset'" class="h-11 w-full rounded-xl border-input bg-background text-sm shadow-sm disabled:cursor-not-allowed disabled:opacity-70">
+                <option value="solid">{{ __('Düz') }}</option>
+                <option value="dashed">{{ __('Kesik') }}</option>
+                <option value="dotted">{{ __('Noktalı') }}</option>
+                <option value="double">{{ __('Çift') }}</option>
+            </select>
         </div>
 
+        <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5" :class="draftDesign.buttons.variant === 'offset' ? 'opacity-60' : ''">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Kenarlık Kalınlığı') }}</h4>
+                    <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Offset varyantında gölge rengi kenarlık renginden alınır.') }}</p>
+                </div>
+                <span class="rounded-full bg-background px-3 py-1 text-[11px] font-mono text-muted-foreground" x-text="draftDesign.buttons.border_width + 'px'"></span>
+            </div>
+            <input type="range" x-model.number="draftDesign.buttons.border_width" :disabled="draftDesign.buttons.variant === 'offset'" min="0" max="8" class="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary disabled:cursor-not-allowed disabled:opacity-70">
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between rounded-2xl border border-border bg-muted/10 p-5">
+        <div>
+            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Gölge') }}</h4>
+            <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Solid ve outline varyantlarında hafif derinlik sağlar.') }}</p>
+        </div>
+        <button type="button"
+                @click="draftDesign.buttons.shadow = !draftDesign.buttons.shadow"
+                :class="draftDesign.buttons.shadow ? 'bg-primary' : 'bg-muted-foreground/30'"
+                class="relative inline-flex h-6 w-11 rounded-full border-2 border-transparent transition-colors">
+            <span :class="draftDesign.buttons.shadow ? 'translate-x-5' : 'translate-x-0'" class="inline-block h-5 w-5 rounded-full bg-background shadow transition-transform"></span>
+        </button>
     </div>
 </div>

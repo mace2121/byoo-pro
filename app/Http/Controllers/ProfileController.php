@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ProfileService;
+use App\Support\DesignEditor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
-
-use App\Services\ProfileService;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class ProfileController extends Controller
 {
@@ -21,6 +24,7 @@ class ProfileController extends Controller
     {
         $this->profileService = $profileService;
     }
+
     /**
      * Display the user's profile form.
      */
@@ -37,7 +41,7 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        
+
         $user->fill([
             'username' => trim(strtolower($request->username)),
             'name' => $request->name,
@@ -50,92 +54,56 @@ class ProfileController extends Controller
 
         $user->save();
 
-        if ($user->profile) {
-            $profileData = [
-                'username' => $user->username,
-                'bio' => $request->bio,
-                'theme' => $request->input('theme', 'minimal'),
-                'theme_type' => $request->input('theme_type', 'preset'),
-                'bg_type' => $request->input('bg_type'),
-                'bg_color' => $request->input('bg_color'),
-                'bg_gradient' => $request->input('bg_gradient'),
-                'bg_blur' => $request->input('bg_blur', 0),
-                'bg_overlay' => $request->input('bg_overlay', 0),
-                'text_color' => $request->input('text_color'),
-                'button_color' => $request->input('button_color'),
-                'button_text_color' => $request->input('button_text_color'),
-                'button_style' => $request->input('button_style', 'rounded'),
-                'button_shadow' => $request->has('button_shadow'),
-                'font_family' => $request->input('font_family', 'inter'),
-                'custom_css' => $request->input('custom_css'),
-                'meta_title' => $request->input('meta_title'),
-                'meta_description' => $request->input('meta_description'),
-                'custom_domain' => $request->input('custom_domain'),
-            ];
+        $profile = $user->profile ?: $user->profile()->create([
+            'username' => $user->username,
+        ]);
 
-            // If custom_domain is changed, reset verified status (for now)
-            if ($user->profile->custom_domain !== $request->input('custom_domain')) {
-                $profileData['custom_domain_verified'] = false;
-            }
+        $profileData = [
+            'username' => $user->username,
+            'bio' => $request->bio,
+            'meta_title' => $request->input('meta_title'),
+            'meta_description' => $request->input('meta_description'),
+            'custom_domain' => $request->input('custom_domain'),
+        ];
 
-            // Avatar Upload
-            if ($request->hasFile('avatar')) {
-                try {
-                    if ($user->profile->avatar) {
-                        Storage::disk('public')->delete($user->profile->avatar);
-                    }
-
-                    $file = $request->file('avatar');
-                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                    $image = $manager->read($file);
-                    $image->scale(512, 512);
-                    $encoded = $image->toWebp(80);
-                    $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.webp';
-                    
-                    // Ensure directory exists
-                    if (!Storage::disk('public')->exists('avatars')) {
-                        Storage::disk('public')->makeDirectory('avatars');
-                    }
-                    
-                    Storage::disk('public')->put($filename, (string) $encoded);
-                    $profileData['avatar'] = $filename;
-                } catch (\Exception $e) {
-                    \Log::error('Avatar processing failed: ' . $e->getMessage());
-                }
-            }
-
-            // Background Image Upload
-            if ($request->hasFile('bg_image')) {
-                try {
-                    if ($user->profile->bg_image) {
-                        Storage::disk('public')->delete($user->profile->bg_image);
-                    }
-
-                    $file = $request->file('bg_image');
-                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                    $image = $manager->read($file);
-                    
-                    // Max height 1080 while maintaining aspect ratio
-                    $image->scale(null, 1080);
-                    
-                    $encoded = $image->toWebp(70); 
-                    $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
-                    
-                    // Ensure directory exists
-                    if (!Storage::disk('public')->exists('backgrounds')) {
-                        Storage::disk('public')->makeDirectory('backgrounds');
-                    }
-                    
-                    Storage::disk('public')->put($filename, (string) $encoded);
-                    $profileData['bg_image'] = $filename;
-                } catch (\Exception $e) {
-                    \Log::error('Background processing failed: ' . $e->getMessage());
-                }
-            }
-
-            $user->profile->update($profileData);
-            $this->profileService->clearProfileCache($user);
+        if ($profile->custom_domain !== $request->input('custom_domain')) {
+            $profileData['custom_domain_verified'] = false;
         }
+
+        if ($request->hasFile('avatar')) {
+            try {
+                if ($profile->avatar) {
+                    Storage::disk('public')->delete($profile->avatar);
+                }
+
+                $file = $request->file('avatar');
+                $manager = new ImageManager(new Driver);
+                $image = $manager->read($file);
+                $image->scale(512, 512);
+                $encoded = $image->toWebp(80);
+                $filename = 'avatars/'.Str::random(40).'.webp';
+
+                if (! Storage::disk('public')->exists('avatars')) {
+                    Storage::disk('public')->makeDirectory('avatars');
+                }
+
+                Storage::disk('public')->put($filename, (string) $encoded);
+                $profileData['avatar'] = $filename;
+            } catch (\Exception $e) {
+                Log::error('Avatar processing failed: '.$e->getMessage());
+            }
+        }
+
+        $profileData['design_settings'] = DesignEditor::resolve($profile, [
+            'profile' => [
+                'name' => $user->name,
+                'username' => $user->username,
+                'bio' => $request->bio ?? '',
+            ],
+        ]);
+
+        $profile->update($profileData);
+        $this->profileService->clearProfileCache($user);
 
         return Redirect::route('dashboard', ['tab' => 'design'])->with('status', 'profile-updated');
     }
@@ -148,18 +116,18 @@ class ProfileController extends Controller
         $user = $request->user();
         $profile = $user->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             $profile = $user->profile()->create([
                 'username' => $user->username,
             ]);
         }
-        
+
         try {
             // If it's a standard JSON request (no files)
             if ($request->isJson()) {
                 $designSettings = $request->input('design_settings');
 
-                if (!is_array($designSettings)) {
+                if (! is_array($designSettings)) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Invalid design payload.',
@@ -170,7 +138,16 @@ class ProfileController extends Controller
                     $user->update(['name' => $designSettings['profile']['name'] ?? $user->name]);
                     $profile->update(['bio' => $designSettings['profile']['bio'] ?? $profile->bio]);
                 }
-                
+
+                $profile->design_settings = $designSettings;
+                $designSettings = DesignEditor::resolve($profile, [
+                    'profile' => [
+                        'name' => $user->name,
+                        'username' => $user->username,
+                        'bio' => $profile->bio ?? '',
+                    ],
+                ]);
+
                 $profile->update([
                     'design_settings' => $designSettings,
                 ]);
@@ -183,18 +160,18 @@ class ProfileController extends Controller
             $designSettingsInput = $request->input('design_settings');
             $designSettings = is_string($designSettingsInput) ? json_decode($designSettingsInput, true) : $designSettingsInput;
 
-            if (!is_array($designSettings)) {
+            if (! is_array($designSettings)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid design payload.',
                 ], 422);
             }
-            
+
             \Log::debug('Design Update Request:', [
                 'user_id' => $user->id,
                 'has_hero' => $request->hasFile('hero_image'),
                 'has_bg' => $request->hasFile('bg_image'),
-                'settings' => $designSettings
+                'settings' => $designSettings,
             ]);
 
             // Update profile fields
@@ -206,16 +183,16 @@ class ProfileController extends Controller
             // Hero Image
             if ($request->hasFile('hero_image')) {
                 $file = $request->file('hero_image');
-                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $manager = new ImageManager(new Driver);
                 $image = $manager->read($file);
                 $image->scale(1200, null);
                 $encoded = $image->toWebp(80);
-                $filename = 'hero/' . \Illuminate\Support\Str::random(40) . '.webp';
-                
-                if (!Storage::disk('public')->exists('hero')) {
+                $filename = 'hero/'.Str::random(40).'.webp';
+
+                if (! Storage::disk('public')->exists('hero')) {
                     Storage::disk('public')->makeDirectory('hero');
                 }
-                
+
                 Storage::disk('public')->put($filename, (string) $encoded);
                 $designSettings['header']['hero_image_url'] = Storage::url($filename);
             }
@@ -223,16 +200,16 @@ class ProfileController extends Controller
             // Background Image
             if ($request->hasFile('bg_image')) {
                 $file = $request->file('bg_image');
-                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $manager = new ImageManager(new Driver);
                 $image = $manager->read($file);
                 $image->scale(1920, null);
                 $encoded = $image->toWebp(70);
-                $filename = 'backgrounds/' . \Illuminate\Support\Str::random(40) . '.webp';
-                
-                if (!Storage::disk('public')->exists('backgrounds')) {
+                $filename = 'backgrounds/'.Str::random(40).'.webp';
+
+                if (! Storage::disk('public')->exists('backgrounds')) {
                     Storage::disk('public')->makeDirectory('backgrounds');
                 }
-                
+
                 Storage::disk('public')->put($filename, (string) $encoded);
                 $designSettings['background']['image_url'] = Storage::url($filename);
             }
@@ -251,6 +228,15 @@ class ProfileController extends Controller
                 }
             }
 
+            $profile->design_settings = $designSettings;
+            $designSettings = DesignEditor::resolve($profile, [
+                'profile' => [
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'bio' => $profile->bio ?? '',
+                ],
+            ]);
+
             $profile->update([
                 'design_settings' => $designSettings,
             ]);
@@ -258,9 +244,10 @@ class ProfileController extends Controller
 
             return response()->json(['success' => true, 'design_settings' => $designSettings]);
         } catch (\Exception $e) {
-            \Log::error('Design Update Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+            \Log::error('Design Update Error: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

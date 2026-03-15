@@ -26,7 +26,7 @@ class AdminPanelTest extends TestCase
         $response = $this->actingAs($admin)->get('/admin');
 
         $response->assertStatus(200);
-        $response->assertSee('Admin Dashboard');
+        $response->assertSee('Yönetici Paneli');
     }
 
     public function test_admin_can_view_users_list()

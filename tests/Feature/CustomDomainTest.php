@@ -66,7 +66,7 @@ class CustomDomainTest extends TestCase
             'custom_domain' => 'new.domain.com',
         ]);
 
-        $response->assertRedirect('/profile');
+        $response->assertRedirect(route('dashboard', ['tab' => 'design']));
         $this->assertDatabaseHas('profiles', [
             'user_id' => $user->id,
             'custom_domain' => 'new.domain.com',

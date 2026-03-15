@@ -42,7 +42,7 @@ class SaasPlansTest extends TestCase
             'url' => 'https://example.com',
         ]);
 
-        $response->assertRedirect(route('links.index'));
+        $response->assertRedirect(route('dashboard'));
         $this->assertDatabaseHas('links', ['user_id' => $user->id, 'title' => 'Test Link']);
     }
 
@@ -66,7 +66,7 @@ class SaasPlansTest extends TestCase
             'url' => 'https://overlimit.com',
         ]);
 
-        $response->assertRedirect(route('links.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('error');
         $this->assertDatabaseMissing('links', ['title' => 'Over Limit Link']);
     }

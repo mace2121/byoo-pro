@@ -1,6 +1,12 @@
 <x-app-layout>
-    @php 
-        $initialSettings = auth()->user()->profile?->design_settings ?? []; 
+    @php
+        $initialSettings = \App\Support\DesignEditor::resolve(auth()->user()->profile, [
+            'profile' => [
+                'name' => auth()->user()->name,
+                'username' => auth()->user()->username,
+                'bio' => auth()->user()->profile?->bio ?? '',
+            ],
+        ]);
     @endphp
     <div class="h-full flex" x-data="dashboardManager(@js(request()->query('tab', 'links')), @js($initialSettings))">
         <!-- LEFT SIDEBAR (Navigation) -->
@@ -166,6 +172,12 @@
                                             <i class="fas fa-id-card text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Header') }}</span>
                                         </button>
+                                        <button @click="scrollToSection('design-font')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'font' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-font text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Font') }}</span>
+                                        </button>
                                         <button @click="scrollToSection('design-theme')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
                                                 :class="activeDesignSection === 'theme' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
@@ -178,23 +190,33 @@
                                             <i class="fas fa-bahai text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Arka Plan') }}</span>
                                         </button>
+                                        <button @click="scrollToSection('design-colors')" 
+                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
+                                                :class="activeDesignSection === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
+                                            <i class="fas fa-palette text-xs mb-1"></i>
+                                            <span class="text-[10px] font-semibold">{{ __('Renk') }}</span>
+                                        </button>
                                         <button @click="scrollToSection('design-buttons')" 
                                                 class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
                                                 :class="activeDesignSection === 'buttons' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
                                             <i class="fas fa-hand-pointer text-xs mb-1"></i>
                                             <span class="text-[10px] font-semibold">{{ __('Butonlar') }}</span>
                                         </button>
-                                        <button @click="scrollToSection('design-colors')" 
-                                                class="flex flex-col items-center justify-center p-2 rounded-lg transition-all min-w-[70px] hover:bg-muted"
-                                                :class="activeDesignSection === 'colors' ? 'bg-primary/10 text-primary' : 'text-muted-foreground'">
-                                            <i class="fas fa-palette text-xs mb-1"></i>
-                                            <span class="text-[10px] font-semibold">{{ __('Renkler') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 pl-3">
+                                        <div class="hidden md:flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
+                                            <span class="inline-flex h-2 w-2 rounded-full" :class="isSaving ? 'bg-amber-500 animate-pulse' : (isDirty ? 'bg-orange-500' : 'bg-emerald-500')"></span>
+                                            <span x-text="isSaving ? '{{ __('Kaydediliyor') }}' : (isDirty ? '{{ __('Kaydedilmemiş değişiklikler') }}' : '{{ __('Tüm değişiklikler kaydedildi') }}')"></span>
+                                        </div>
+                                        <button x-show="isDirty && !isSaving" x-cloak @click="restoreLastSaved" class="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted">
+                                            <i class="fas fa-rotate-left text-[10px]"></i>
+                                            <span>{{ __('Geri Al') }}</span>
+                                        </button>
+                                        <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
+                                            <i class="fas fa-save text-xs"></i>
+                                            <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
                                         </button>
                                     </div>
-                                    <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
-                                        <i class="fas fa-save text-xs"></i>
-                                        <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
-                                    </button>
                                 </div>
 
                                 <!-- Content Area: Single Page Scrolling -->
@@ -204,6 +226,13 @@
                                             <i class="fas fa-id-card"></i> Header
                                         </h3>
                                         @include('dashboard.partials.design.header')
+                                    </div>
+                                    <hr class="border-border/50 my-10">
+                                    <div id="design-font" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-font"></i> Font
+                                        </h3>
+                                        @include('dashboard.partials.design.font')
                                     </div>
                                     <hr class="border-border/50 my-10">
                                     <div id="design-theme" class="mb-12 scroll-mt-20">
@@ -220,24 +249,31 @@
                                         @include('dashboard.partials.design.background')
                                     </div>
                                     <hr class="border-border/50 my-10">
+                                    <div id="design-colors" class="mb-12 scroll-mt-20">
+                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                            <i class="fas fa-palette"></i> Renk
+                                        </h3>
+                                        @include('dashboard.partials.design.colors')
+                                    </div>
+                                    <hr class="border-border/50 my-10">
                                     <div id="design-buttons" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-hand-pointer"></i> Butonlar
                                         </h3>
                                         @include('dashboard.partials.design.buttons')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-colors" class="mb-12 scroll-mt-20">
-                                        <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <i class="fas fa-palette"></i> Renkler
-                                        </h3>
-                                        @include('dashboard.partials.design.colors')
-                                    </div>
                                 </div>
 
                                 <!-- Action Bar (Hidden in single page as it is now in the nav bar) -->
-                                <div class="border-t border-border bg-muted/10 p-2 flex items-center justify-center">
-                                    <p class="text-[9px] text-muted-foreground uppercase tracking-wider opacity-60">{{ __('Tasarım ayarlarınız canlı önizleme ile senkronize edilir') }}</p>
+                                <div class="border-t border-border bg-muted/10 px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                                    <div class="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                        <i class="fas fa-bolt text-[10px]"></i>
+                                        <span>{{ __('Tasarım ayarlarınız canlı önizleme ile senkronize edilir') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-[10px] font-medium">
+                                        <span class="text-muted-foreground">{{ __('Kısayol:') }} <kbd class="rounded border border-border bg-background px-1.5 py-0.5 font-mono">Ctrl/Cmd + S</kbd></span>
+                                        <span x-show="saveFeedback.message" x-cloak :class="saveFeedback.type === 'error' ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400'" x-text="saveFeedback.message"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -309,97 +345,143 @@
     </div>
 
     @push('scripts')
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('dashboardManager', (initialTab, initialSettings) => ({
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('dashboardManager', (initialTab, initialSettings) => {
+            const shared = window.DesignEditorShared;
+            const runtimeDefaults = {
+                profile: {
+                    name: {!! json_encode(auth()->user()->name) !!},
+                    username: {!! json_encode(auth()->user()->username) !!},
+                    bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
+                },
+            };
+
+            const fontSizeLabels = {
+                sm: 'Küçük',
+                md: 'Orta',
+                lg: 'Büyük',
+                xl: 'Çok Büyük',
+            };
+
+            const themePresetOptions = Object.values(shared.themePresets).map((preset) => {
+                const previewStyle = preset.background?.active_type === 'gradient'
+                    ? `background:${shared.buildGradient(preset.background)}`
+                    : `background:${preset.background?.color || '#f8fafc'}`;
+
+                return {
+                    id: preset.id,
+                    label: preset.label,
+                    previewStyle,
+                    card: preset.buttons?.variant === 'glass'
+                        ? 'rgba(255,255,255,0.12)'
+                        : (preset.colors?.button_bg || '#ffffff'),
+                    border: preset.colors?.button_border || '#d1d5db',
+                    text: preset.colors?.title || '#111827',
+                    muted: preset.colors?.username || '#6b7280',
+                };
+            });
+
+            return {
+                runtimeDefaults,
                 tab: initialTab,
                 activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
                 previewSyncTimer: null,
                 beforeUnloadHandler: null,
+                shortcutHandler: null,
+                feedbackTimer: null,
                 isSaving: false,
                 isDirty: false,
                 lastSavedSnapshot: '',
-                
-                // Track files for upload
+                saveFeedback: {
+                    message: '',
+                    type: 'success',
+                },
+                themePresetOptions,
+                fontOptions: shared.fontOptions.map((font) => ({
+                    id: font.id,
+                    label: font.label,
+                    family: font.family,
+                })),
+                fontSizeOptions: Object.keys(shared.fontSizePresets).map((sizeId) => ({
+                    id: sizeId,
+                    label: fontSizeLabels[sizeId] || sizeId,
+                    preview: sizeId.toUpperCase(),
+                })),
+                backgroundTypeOptions: [
+                    { id: 'color', label: 'Renk' },
+                    { id: 'gradient', label: 'Gradyan' },
+                    { id: 'image', label: 'Görsel' },
+                    { id: 'video', label: 'Video' },
+                    { id: 'animation', label: 'Animasyon' },
+                ],
+                buttonVariantOptions: [
+                    { id: 'solid', label: 'Dolu', icon: 'fas fa-square' },
+                    { id: 'outline', label: 'Çizgili', icon: 'far fa-square' },
+                    { id: 'glass', label: 'Cam', icon: 'fas fa-layer-group' },
+                    { id: 'offset', label: 'Ofset', icon: 'fas fa-clone' },
+                ],
+                avatarSizeOptions: [
+                    { id: 'sm', label: 'Küçük' },
+                    { id: 'md', label: 'Orta' },
+                    { id: 'lg', label: 'Büyük' },
+                    { id: 'xl', label: 'Dev' },
+                ],
+                headerToggleOptions: [
+                    { key: 'show_name', label: 'Profil ismini göster' },
+                    { key: 'show_username', label: '@kullaniciadini göster' },
+                    { key: 'show_bio', label: 'Biyografiyi göster' },
+                ],
+                animationOptions: [
+                    { id: 'anim-1', label: 'Zigzag', class: 'bg-anim-1' },
+                    { id: 'anim-2', label: 'Daireler', class: 'bg-anim-2' },
+                    { id: 'anim-3', label: 'Çizgiler', class: 'bg-anim-3' },
+                    { id: 'anim-4', label: 'Mesh', class: 'bg-anim-4' },
+                    { id: 'anim-5', label: 'Oklar', class: 'bg-anim-5' },
+                ],
                 files: {
                     hero_image: null,
                     bg_image: null,
-                    bg_video: null
+                    bg_video: null,
                 },
                 objectUrls: {
                     hero_image: null,
                     bg_image: null,
                     bg_video: null,
                 },
+                draftDesign: shared.normalizeDesign(initialSettings, runtimeDefaults),
 
-                // Design Draft State
-                draftDesign: {
-                    profile: {
-                        name: {!! json_encode(auth()->user()->name) !!},
-                        username: {!! json_encode(auth()->user()->username) !!},
-                        bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
-                    },
-                    header: {
-                        layout: initialSettings?.header?.layout || 'centered-classic',
-                        hero_image_url: initialSettings?.header?.hero_image_url || '',
-                        avatar_size: initialSettings?.header?.avatar_size || 'md',
-                        avatar_frame: initialSettings?.header?.avatar_frame || 'circle',
-                        show_name: initialSettings?.header?.show_name ?? true,
-                        show_username: initialSettings?.header?.show_username ?? true,
-                        show_bio: initialSettings?.header?.show_bio ?? true,
-                    },
-                    theme: {
-                        preset: initialSettings?.theme?.preset || 'minimal',
-                        custom_theme: initialSettings?.theme?.custom_theme || false,
-                        font_family: initialSettings?.theme?.font_family || 'inter',
-                    },
-                    background: {
-                        type: initialSettings?.background?.type || 'color',
-                        color: initialSettings?.background?.color || '#f9fafb',
-                        gradient: initialSettings?.background?.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        image_url: initialSettings?.background?.image_url || '',
-                        video_url: initialSettings?.background?.video_url || '',
-                        animation: initialSettings?.background?.animation || 'none',
-                        animation_speed: initialSettings?.background?.animation_speed || 10,
-                        animation_colors: initialSettings?.background?.animation_colors || ['#6366f1', '#a855f7'],
-                        overlay: initialSettings?.background?.overlay || 0,
-                        blur: initialSettings?.background?.blur || 0,
-                    },
-                    buttons: {
-                        style: initialSettings?.buttons?.style || 'pill',
-                        variant: initialSettings?.buttons?.variant || 'solid', 
-                        align: initialSettings?.buttons?.align || 'center',
-                        shadow: initialSettings?.buttons?.shadow ?? true,
-                        bg_color: initialSettings?.buttons?.bg_color || '#ffffff',
-                        text_color: initialSettings?.buttons?.text_color || '#111827',
-                    },
-                    colors: {
-                        text: initialSettings?.colors?.text || '#111827',
-                        title: initialSettings?.colors?.title || '#111827',
-                        page_text: initialSettings?.colors?.page_text || '#111827',
-                        btn_bg: initialSettings?.colors?.btn_bg || '#ffffff',
-                        btn_text: initialSettings?.colors?.btn_text || '#111827',
-                    }
-                },
-                
                 init() {
                     this.draftDesign = this.normalizeDesignSettings(initialSettings);
                     this.lastSavedSnapshot = this.serializeDesign(this.draftDesign);
                     this.isDirty = false;
+                    this.loadTypographyFont();
+                    this.shortcutHandler = (event) => {
+                        const isSaveCombo = (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's';
+                        if (!isSaveCombo || this.tab !== 'design') return;
+                        event.preventDefault();
+                        this.saveDesign();
+                    };
 
                     this.beforeUnloadHandler = (event) => {
                         if (!this.isDirty) return;
                         event.preventDefault();
                         event.returnValue = '';
                     };
+
                     window.addEventListener('beforeunload', this.beforeUnloadHandler);
+                    window.addEventListener('keydown', this.shortcutHandler);
 
                     this.$watch('draftDesign', () => {
                         this.isDirty = this.serializeDesign(this.draftDesign) !== this.lastSavedSnapshot;
                         this.pushPreview(false);
                     }, { deep: true });
+
+                    this.$watch('draftDesign.typography.font_family', () => {
+                        this.loadTypographyFont();
+                    });
 
                     this.$watch('tab', (nextTab) => {
                         if (nextTab === 'design') {
@@ -414,14 +496,47 @@
 
                 destroy() {
                     clearTimeout(this.previewSyncTimer);
+                    clearTimeout(this.feedbackTimer);
                     if (this.beforeUnloadHandler) {
                         window.removeEventListener('beforeunload', this.beforeUnloadHandler);
+                    }
+                    if (this.shortcutHandler) {
+                        window.removeEventListener('keydown', this.shortcutHandler);
                     }
                     this.clearAllObjectUrls();
                 },
 
                 handlePreviewLoad() {
                     this.pushPreview(true);
+                },
+
+                loadTypographyFont() {
+                    shared.loadGoogleFont(this.draftDesign?.typography?.font_family);
+                },
+
+                selectThemePreset(presetId) {
+                    this.draftDesign = shared.applyThemePreset(this.draftDesign, presetId, this.runtimeDefaults);
+                    this.loadTypographyFont();
+                    this.pushPreview(true);
+                },
+
+                handleHeaderLayoutChange(layout) {
+                    this.draftDesign.header.layout = layout;
+                    if (layout === 'hero-cover') {
+                        this.draftDesign.header.avatar_size = 'md';
+                    }
+                },
+
+                buildGradientPreview(background) {
+                    return shared.buildGradient(background);
+                },
+
+                flashSaveFeedback(message, type = 'success') {
+                    clearTimeout(this.feedbackTimer);
+                    this.saveFeedback = { message, type };
+                    this.feedbackTimer = setTimeout(() => {
+                        this.saveFeedback = { message: '', type: 'success' };
+                    }, 3200);
                 },
 
                 pushPreview(force = false, settings = null) {
@@ -443,128 +558,18 @@
                 },
 
                 normalizeDesignSettings(settings) {
-                    const defaults = {
-                        profile: {
-                            name: {!! json_encode(auth()->user()->name) !!},
-                            username: {!! json_encode(auth()->user()->username) !!},
-                            bio: {!! json_encode(auth()->user()->profile?->bio ?? '') !!},
-                        },
-                        header: {
-                            layout: 'centered-classic',
-                            hero_image_url: '',
-                            avatar_size: 'md',
-                            avatar_frame: 'circle',
-                            show_name: true,
-                            show_username: true,
-                            show_bio: true,
-                        },
-                        theme: {
-                            preset: 'minimal',
-                            custom_theme: false,
-                            font_family: 'inter',
-                        },
-                        background: {
-                            type: 'color',
-                            color: '#f9fafb',
-                            gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            image_url: '',
-                            video_url: '',
-                            animation: 'none',
-                            animation_speed: 10,
-                            animation_colors: ['#6366f1', '#a855f7'],
-                            overlay: 0,
-                            blur: 0,
-                        },
-                        buttons: {
-                            style: 'pill',
-                            variant: 'solid',
-                            align: 'center',
-                            shadow: true,
-                            bg_color: '#ffffff',
-                            text_color: '#111827',
-                        },
-                        colors: {
-                            text: '#111827',
-                            title: '#111827',
-                            page_text: '#111827',
-                            btn_bg: '#ffffff',
-                            btn_text: '#111827',
-                        },
-                    };
-
-                    const safe = settings && typeof settings === 'object' ? settings : {};
-                    const normalized = {
-                        ...defaults,
-                        ...safe,
-                        profile: { ...defaults.profile, ...(safe.profile || {}) },
-                        header: { ...defaults.header, ...(safe.header || {}) },
-                        theme: { ...defaults.theme, ...(safe.theme || {}) },
-                        background: { ...defaults.background, ...(safe.background || {}) },
-                        buttons: { ...defaults.buttons, ...(safe.buttons || {}) },
-                        colors: { ...defaults.colors, ...(safe.colors || {}) },
-                    };
-
-                    if (!Array.isArray(normalized.background.animation_colors) || normalized.background.animation_colors.length < 2) {
-                        normalized.background.animation_colors = [...defaults.background.animation_colors];
-                    }
-
-                    const allowedLayouts = ['centered-classic', 'left-aligned', 'hero-cover'];
-                    const allowedPresets = ['minimal', 'dark', 'neon', 'glass', 'midnight', 'sunset', 'aurora', 'forest', 'cyber', 'obsidian'];
-                    const allowedFonts = ['inter', 'outfit', 'roboto', 'montserrat', 'playfair', 'mono'];
-                    const allowedBgTypes = ['color', 'gradient', 'image', 'video', 'animation'];
-                    const allowedAnimations = ['anim-1', 'anim-2', 'anim-3', 'anim-4', 'anim-5'];
-                    const allowedButtonStyles = ['pill', 'soft', 'square'];
-                    const allowedButtonVariants = ['solid', 'outline', 'glass', 'offset'];
-                    const allowedButtonAligns = ['left', 'center', 'right'];
-
-                    if (!allowedLayouts.includes(normalized.header.layout)) normalized.header.layout = defaults.header.layout;
-                    if (!allowedPresets.includes(normalized.theme.preset)) normalized.theme.preset = defaults.theme.preset;
-                    if (!allowedFonts.includes(normalized.theme.font_family)) normalized.theme.font_family = defaults.theme.font_family;
-                    if (!allowedBgTypes.includes(normalized.background.type)) normalized.background.type = defaults.background.type;
-                    if (!allowedAnimations.includes(normalized.background.animation)) normalized.background.animation = 'anim-1';
-                    if (!allowedButtonStyles.includes(normalized.buttons.style)) normalized.buttons.style = defaults.buttons.style;
-                    if (!allowedButtonVariants.includes(normalized.buttons.variant)) normalized.buttons.variant = defaults.buttons.variant;
-                    if (!allowedButtonAligns.includes(normalized.buttons.align)) normalized.buttons.align = defaults.buttons.align;
-
-                    normalized.profile.username = defaults.profile.username;
-                    normalized.theme.custom_theme = !!normalized.theme.custom_theme;
-                    normalized.header.show_name = !!normalized.header.show_name;
-                    normalized.header.show_username = !!normalized.header.show_username;
-                    normalized.header.show_bio = !!normalized.header.show_bio;
-                    normalized.buttons.shadow = !!normalized.buttons.shadow;
-
-                    normalized.profile.name = String(normalized.profile.name ?? defaults.profile.name);
-                    normalized.profile.bio = String(normalized.profile.bio ?? defaults.profile.bio);
-                    normalized.background.gradient = String(normalized.background.gradient || defaults.background.gradient);
-                    normalized.background.image_url = String(normalized.background.image_url || '');
-                    normalized.background.video_url = String(normalized.background.video_url || '');
-                    normalized.header.hero_image_url = String(normalized.header.hero_image_url || '');
-
-                    const overlay = Number(normalized.background.overlay);
-                    const blur = Number(normalized.background.blur);
-                    normalized.background.overlay = Number.isFinite(overlay) ? Math.max(0, Math.min(100, overlay)) : defaults.background.overlay;
-                    normalized.background.blur = Number.isFinite(blur) ? Math.max(0, Math.min(50, blur)) : defaults.background.blur;
-
-                    normalized.background.color = this.sanitizeHexColor(normalized.background.color, defaults.background.color);
-                    normalized.buttons.bg_color = this.sanitizeHexColor(normalized.buttons.bg_color ?? normalized.colors.btn_bg, defaults.buttons.bg_color);
-                    normalized.buttons.text_color = this.sanitizeHexColor(normalized.buttons.text_color ?? normalized.colors.btn_text, defaults.buttons.text_color);
-                    normalized.colors.text = this.sanitizeHexColor(normalized.colors.text, defaults.colors.text);
-                    normalized.colors.title = this.sanitizeHexColor(normalized.colors.title, defaults.colors.title);
-                    normalized.colors.page_text = this.sanitizeHexColor(normalized.colors.page_text, defaults.colors.page_text);
-                    normalized.colors.btn_bg = normalized.buttons.bg_color;
-                    normalized.colors.btn_text = normalized.buttons.text_color;
-                    normalized.background.animation_colors = normalized.background.animation_colors.slice(0, 2).map((color, index) => {
-                        return this.sanitizeHexColor(color, defaults.background.animation_colors[index] || defaults.background.animation_colors[0]);
-                    });
-
-                    return normalized;
+                    return shared.normalizeDesign(settings, this.runtimeDefaults);
                 },
 
                 scrollToSection(id) {
+                    const area = this.$refs.designScrollArea;
                     const el = document.getElementById(id);
-                    if (!el) return;
+                    if (!area || !el) return;
 
-                    el.scrollIntoView({ behavior: 'smooth' });
+                    area.scrollTo({
+                        top: Math.max(0, el.offsetTop - 24),
+                        behavior: 'smooth',
+                    });
                     this.activeDesignSection = id.replace('design-', '');
                 },
 
@@ -572,18 +577,32 @@
                     const area = this.$refs.designScrollArea;
                     if (!area) return;
 
-                    const sections = ['header', 'theme', 'background', 'buttons', 'colors'];
-                    for (const section of sections) {
-                        const el = document.getElementById('design-' + section);
-                        if (!el) continue;
+                    const sections = ['header', 'font', 'theme', 'background', 'colors', 'buttons'];
+                    let closestSection = 'header';
+                    let closestDistance = Number.POSITIVE_INFINITY;
 
-                        const rect = el.getBoundingClientRect();
-                        const areaRect = area.getBoundingClientRect();
-                        if (rect.top >= areaRect.top && rect.top <= areaRect.top + 100) {
-                            this.activeDesignSection = section;
-                            break;
+                    sections.forEach((section) => {
+                        const el = document.getElementById('design-' + section);
+                        if (!el) return;
+
+                        const distance = Math.abs((el.offsetTop - area.scrollTop) - 24);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestSection = section;
                         }
-                    }
+                    });
+
+                    this.activeDesignSection = closestSection;
+                },
+
+                restoreLastSaved() {
+                    if (!this.lastSavedSnapshot) return;
+
+                    this.draftDesign = JSON.parse(this.lastSavedSnapshot);
+                    this.isDirty = false;
+                    this.resetTransientFiles();
+                    this.pushPreview(true, this.draftDesign);
+                    this.flashSaveFeedback('{{ __('Son kaydedilen sürüm geri yüklendi.') }}');
                 },
 
                 clearAllObjectUrls() {
@@ -638,13 +657,15 @@
                     if (type === 'hero_image') {
                         this.draftDesign.header.hero_image_url = previewUrl;
                     }
+
                     if (type === 'bg_image') {
                         this.draftDesign.background.image_url = previewUrl;
-                        this.draftDesign.background.type = 'image';
+                        this.draftDesign.background.active_type = 'image';
                     }
+
                     if (type === 'bg_video') {
                         this.draftDesign.background.video_url = previewUrl;
-                        this.draftDesign.background.type = 'video';
+                        this.draftDesign.background.active_type = 'video';
                     }
 
                     if (event?.target) {
@@ -652,37 +673,11 @@
                     }
                 },
 
-                sanitizeHexColor(value, fallback) {
-                    if (typeof value !== 'string') return fallback;
-                    const raw = value.trim();
-
-                    if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw;
-                    if (/^#[0-9a-fA-F]{3}$/.test(raw)) {
-                        return '#' + raw.slice(1).split('').map((part) => part + part).join('');
-                    }
-
-                    return fallback;
-                },
-
-                sanitizeAllColors(design) {
-                    design.background.color = this.sanitizeHexColor(design.background.color, '#f9fafb');
-                    design.buttons.bg_color = this.sanitizeHexColor(design.buttons.bg_color, '#ffffff');
-                    design.buttons.text_color = this.sanitizeHexColor(design.buttons.text_color, '#111827');
-                    design.colors.text = this.sanitizeHexColor(design.colors.text, '#111827');
-                    design.colors.title = this.sanitizeHexColor(design.colors.title, '#111827');
-                    design.colors.page_text = this.sanitizeHexColor(design.colors.page_text, '#111827');
-                    design.colors.btn_bg = design.buttons.bg_color;
-                    design.colors.btn_text = design.buttons.text_color;
-                    design.background.animation_colors = design.background.animation_colors.map((color, index) => {
-                        const fallback = index === 0 ? '#6366f1' : '#a855f7';
-                        return this.sanitizeHexColor(color, fallback);
-                    });
-                },
-
                 preparePayload(settings) {
-                    const payload = this.normalizeDesignSettings(settings || this.draftDesign);
-                    this.sanitizeAllColors(payload);
-                    return JSON.parse(JSON.stringify(payload));
+                    return JSON.parse(JSON.stringify(shared.normalizeDesign(
+                        settings || this.draftDesign,
+                        this.runtimeDefaults,
+                    )));
                 },
 
                 updatePreview(settings) {
@@ -691,13 +686,14 @@
 
                 async saveDesign() {
                     if (this.isSaving) return;
+
                     this.isSaving = true;
                     const payload = this.preparePayload(this.draftDesign);
                     const hasFileUpload = Object.values(this.files).some((file) => file instanceof File);
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
                     const baseHeaders = {
-                        'Accept': 'application/json',
+                        Accept: 'application/json',
                         'X-Requested-With': 'XMLHttpRequest',
                     };
 
@@ -757,15 +753,10 @@
                         this.resetTransientFiles();
                         this.pushPreview(true, savedDesign);
 
-                        window.dispatchEvent(new CustomEvent('notify', {
-                            detail: 'Tasarım kaydedildi!',
-                        }));
+                        this.flashSaveFeedback('{{ __('Tasarım kaydedildi.') }}');
                     } catch (error) {
                         console.error('Design save error:', error);
-                        window.dispatchEvent(new CustomEvent('notify', {
-                            detail: error?.message || 'Kaydetme sırasında bir hata oluştu!',
-                            type: 'error',
-                        }));
+                        this.flashSaveFeedback(error?.message || '{{ __('Kaydetme sırasında bir hata oluştu.') }}', 'error');
                     } finally {
                         this.isSaving = false;
                     }
@@ -774,9 +765,10 @@
                 resetTransientFiles() {
                     this.clearAllObjectUrls();
                     this.files = { hero_image: null, bg_image: null, bg_video: null };
-                }
-            }));
+                },
+            };
         });
-    </script>
-    @endpush
+    });
+</script>
+@endpush
 </x-app-layout>

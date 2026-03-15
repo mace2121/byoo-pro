@@ -1,246 +1,250 @@
-<div class="space-y-8 relative">
-    <!-- Block overlay - REMOVED so settings stay open as requested -->
-    <div x-show="false" class="hidden"></div>
-
+﻿<div class="space-y-8">
     <div>
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Arka Plan Düzeni') }}</h3>
-        <p class="text-[10px] text-muted-foreground mt-1">{{ __('Sayfanızın genel arkaplan stilini belirleyin.') }}</p>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Arka Plan') }}</h3>
+        <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Aynı anda yalnızca tek arka plan modu aktiftir. Mod değiştiğinde önizleme katmanları temizlenir ve yeni görünüm anında uygulanır.') }}</p>
     </div>
 
-    <div class="space-y-6">
-        <!-- Background Type Mapping -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.background.type" value="color" class="sr-only peer">
-                <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
-                    <div class="w-6 h-6 rounded-full border border-border/50 shadow-sm z-10" :style="`background-color: ${draftDesign.background.color || '#f9fafb'}`"></div>
-                </div>
-                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Renk</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.background.type" value="gradient" class="sr-only peer">
-                <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
-                    <div class="absolute inset-0" :style="`background: ${draftDesign.background.gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}`"></div>
-                </div>
-                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Gradyan</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.background.type" value="image" class="sr-only peer">
-                <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
-                    <i class="fas fa-image text-muted-foreground opacity-40"></i>
-                </div>
-                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Görsel</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.background.type" value="video" class="sr-only peer">
-                <div class="h-20 rounded-md border border-input peer-only-child:border-primary peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
-                    <i class="fas fa-play-circle text-muted-foreground opacity-40"></i>
-                </div>
-                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Video</span>
-            </label>
-            <label class="cursor-pointer group">
-                <input type="radio" x-model="draftDesign.background.type" value="animation" class="sr-only peer">
-                <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-1 peer-checked:ring-ring flex flex-col items-center justify-center gap-2 bg-muted/20 hover:bg-muted/50 transition-all p-2 relative overflow-hidden">
-                    <i class="fas fa-magic text-muted-foreground opacity-40"></i>
-                </div>
-                <span class="text-[9px] font-medium text-center block mt-1 text-muted-foreground group-hover:text-foreground">Animasyon</span>
-            </label>
-        </div>
-
-        <hr class="border-border">
-
-        <!-- Solid Color Settings -->
-        <div x-show="draftDesign.background.type === 'color'" x-cloak x-transition class="space-y-4">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Renk Seçimi') }}</h4>
-            <div class="flex items-center gap-4">
-                <input type="color" x-model="draftDesign.background.color" class="h-10 w-14 rounded cursor-pointer border-0 p-0 shadow-sm">
-                <input type="text" x-model="draftDesign.background.color" class="flex-1 text-sm rounded-md border-input bg-background font-mono" placeholder="#f9fafb">
-            </div>
-        </div>
-
-        <!-- Gradient Settings -->
-        <div x-show="draftDesign.background.type === 'gradient'" x-cloak x-transition class="space-y-4">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Gradyan Ayarı') }}</h4>
-            <div class="space-y-2">
-                <label class="text-[10px] text-muted-foreground">CSS Gradient Kodu</label>
-                <input type="text" x-model="draftDesign.background.gradient" class="w-full text-xs rounded-md border-input bg-background font-mono" placeholder="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-            </div>
-            
-            <div class="grid grid-cols-5 gap-2 pt-1">
-                <template x-for="g in [
-                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                    'linear-gradient(135deg, #0c3547 0%, #204060 100%)',
-                    'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-                    'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)'
-                ]">
-                    <button type="button" @click="draftDesign.background.gradient = g" class="h-6 rounded border border-border/50 shadow-sm transition-transform hover:scale-105" :style="`background: ${g}`" :title="g"></button>
-                </template>
-            </div>
-        </div>
-
-        <!-- Image Settings -->
-        <div x-show="draftDesign.background.type === 'image'" x-cloak x-transition class="space-y-4 bg-muted/5 p-4 rounded-lg border border-border/50">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Özel Arka Plan Görseli') }}</h4>
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 rounded-lg bg-background border border-input overflow-hidden flex-shrink-0">
-                    <template x-if="draftDesign.background.image_url">
-                        <img :src="draftDesign.background.image_url" class="w-full h-full object-cover">
+    <div class="grid grid-cols-5 gap-2 lg:gap-3">
+        <template x-for="type in backgroundTypeOptions" :key="type.id">
+            <button type="button"
+                    @click="draftDesign.background.active_type = type.id"
+                    :class="draftDesign.background.active_type === type.id ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                    class="group flex min-h-[106px] flex-col items-center justify-center gap-2 rounded-2xl border px-2 py-3 text-center transition-all">
+                <div class="relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted/20">
+                    <template x-if="type.id === 'color'">
+                        <div class="h-8 w-8 rounded-full border border-border/50 shadow-sm" :style="`background:${draftDesign.background.color}`"></div>
                     </template>
-                    <div x-show="!draftDesign.background.image_url" class="w-full h-full flex items-center justify-center opacity-20"><i class="fas fa-image"></i></div>
+                    <template x-if="type.id === 'gradient'">
+                        <div class="absolute inset-0" :style="`background:${buildGradientPreview(draftDesign.background)}`"></div>
+                    </template>
+                    <template x-if="type.id === 'image'">
+                        <i class="fas fa-image text-sm opacity-50"></i>
+                    </template>
+                    <template x-if="type.id === 'video'">
+                        <i class="fas fa-film text-sm opacity-50"></i>
+                    </template>
+                    <template x-if="type.id === 'animation'">
+                        <i class="fas fa-wand-magic-sparkles text-sm opacity-50"></i>
+                    </template>
                 </div>
-                <div class="flex-1">
-                    <div class="flex gap-2">
-                        <label class="inline-flex items-center px-4 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:bg-primary/90 cursor-pointer shadow-sm transition-colors">
-                            <i class="fas fa-upload mr-2"></i>
-                            {{ __('Görsel Yükle') }}
-                            <input type="file" class="hidden" accept="image/*" @change="handleFileChange($event, 'bg_image')">
-                        </label>
-                        <button type="button" x-show="draftDesign.background.image_url" @click="clearDesignMedia('bg_image', 'background.image_url')" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
-                            <i class="fas fa-trash-alt mr-2"></i>
-                            {{ __('Kaldır') }}
-                        </button>
-                    </div>
-                    <p class="text-[9px] text-muted-foreground mt-2">Dikey görseller (9:16) mobil için daha iyi sonuç verir.</p>
-                </div>
-            </div>
-        </div>
+                <span class="text-[11px] font-semibold" x-text="type.label"></span>
+            </button>
+        </template>
+    </div>
 
-        <!-- Video Settings -->
-        <div x-show="draftDesign.background.type === 'video'" x-cloak x-transition class="space-y-4 bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-primary">{{ __('Arka Plan Videosu') }}</h4>
+    <div x-show="draftDesign.background.active_type === 'color'" x-cloak class="rounded-2xl border border-border bg-muted/10 p-5">
+        <div class="space-y-4">
+            <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Düz Renk') }}</h4>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Tek renk arka plan canlı önizlemeye anında uygulanır.') }}</p>
+            </div>
             <div class="flex items-center gap-4">
-                <div class="w-16 h-16 rounded-lg bg-background border border-input overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <i class="fas fa-film text-primary/40"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="flex gap-2">
-                        <label class="inline-flex items-center px-4 py-1.5 bg-primary text-primary-foreground text-xs font-semibold rounded-md hover:bg-primary/90 cursor-pointer shadow-sm transition-colors">
-                            <i class="fas fa-video mr-2"></i>
-                            {{ __('Video Yükle') }}
-                            <input type="file" class="hidden" accept="video/mp4,video/webm" @change="handleFileChange($event, 'bg_video')">
-                        </label>
-                        <button type="button" x-show="draftDesign.background.video_url" @click="clearDesignMedia('bg_video', 'background.video_url')" class="inline-flex items-center px-3 py-1.5 bg-destructive/10 text-destructive text-xs font-semibold rounded-md hover:bg-destructive/20 transition-colors">
-                            <i class="fas fa-trash-alt mr-2"></i>
-                            {{ __('Kaldır') }}
-                        </button>
+                <input type="color" x-model="draftDesign.background.color" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
+                <input type="text" x-model="draftDesign.background.color" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#f8fafc">
+            </div>
+        </div>
+    </div>
+
+    <div x-show="draftDesign.background.active_type === 'gradient'" x-cloak class="rounded-2xl border border-border bg-muted/10 p-5">
+        <div class="space-y-5">
+            <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Gradyan') }}</h4>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('İki renk seçin, açı ve yön belirleyin. Sistem gradyanı otomatik üretir.') }}</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr_0.9fr]">
+                <div class="space-y-3">
+                    <label class="text-[11px] font-medium text-muted-foreground">{{ __('Renk 1') }}</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" x-model="draftDesign.background.gradient_color_1" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
+                        <input type="text" x-model="draftDesign.background.gradient_color_1" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#667eea">
                     </div>
-                    <p class="text-[9px] text-muted-foreground mt-2">Maksimum 5MB. En iyi deneyim için kısa (5-10sn) loop videolar tercih edin.</p>
+                </div>
+                <div class="space-y-3">
+                    <label class="text-[11px] font-medium text-muted-foreground">{{ __('Renk 2') }}</label>
+                    <div class="flex items-center gap-3">
+                        <input type="color" x-model="draftDesign.background.gradient_color_2" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
+                        <input type="text" x-model="draftDesign.background.gradient_color_2" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#764ba2">
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-border/70" :style="`background:${buildGradientPreview(draftDesign.background)}`"></div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div class="space-y-2">
+                    <label class="text-[11px] font-medium text-muted-foreground">{{ __('Yön') }}</label>
+                    <select x-model="draftDesign.background.gradient_direction" class="h-11 w-full rounded-xl border-input bg-background text-sm shadow-sm">
+                        <option value="linear">{{ __('Doğrusal') }}</option>
+                        <option value="radial">{{ __('Radyal') }}</option>
+                    </select>
+                </div>
+                <div class="space-y-2" x-show="draftDesign.background.gradient_direction === 'linear'" x-cloak>
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-medium text-muted-foreground">{{ __('Açı') }}</label>
+                        <span class="text-[11px] font-mono text-muted-foreground" x-text="draftDesign.background.gradient_angle + '°'"></span>
+                    </div>
+                    <input type="range" x-model.number="draftDesign.background.gradient_angle" min="0" max="360" class="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary">
                 </div>
             </div>
         </div>
+    </div>
 
-        <hr class="border-border">
-
-        <!-- Animation Category (NEW) -->
-        <div x-show="draftDesign.background.type === 'animation'" x-cloak x-transition class="space-y-6">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Animasyon Türü') }}</h4>
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                <template x-for="anim in [
-                    {id:'anim-1', label:'Zigzag', class:'bg-anim-1'},
-                    {id:'anim-2', label:'Daireler', class:'bg-anim-2'},
-                    {id:'anim-3', label:'Çizgiler', class:'bg-anim-3'},
-                    {id:'anim-4', label:'Mesh', class:'bg-anim-4'},
-                    {id:'anim-5', label:'Oklar', class:'bg-anim-5'}
-                ]">
-                    <label class="cursor-pointer group">
-                        <input type="radio" x-model="draftDesign.background.animation" :value="anim.id" class="sr-only peer">
-                        <div class="h-20 rounded-md border border-input peer-checked:border-primary peer-checked:ring-2 peer-checked:ring-primary/20 bg-muted/20 hover:bg-muted/50 p-1 flex flex-col gap-1 overflow-hidden transition-all">
-                            <div class="flex-1 rounded bg-background border border-border/50 relative overflow-hidden">
-                                <div class="absolute inset-0 opacity-60 pointer-events-none" :class="anim.class"></div>
-                            </div>
-                            <span class="text-[8px] text-center font-medium" x-text="anim.label"></span>
-                        </div>
+    <div x-show="draftDesign.background.active_type === 'image'" x-cloak class="rounded-2xl border border-border bg-muted/10 p-5">
+        <div class="space-y-4">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Görsel Arka Plan') }}</h4>
+                    <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Yüklediğiniz görsel arka plan olarak anında önizlemede görünür.') }}</p>
+                </div>
+                <button type="button" x-show="draftDesign.background.image_url" @click="clearDesignMedia('bg_image', 'background.image_url')" class="text-[11px] font-semibold text-destructive hover:underline">{{ __('Görseli Kaldır') }}</button>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex h-20 w-16 items-center justify-center overflow-hidden rounded-2xl border border-input bg-background">
+                    <template x-if="draftDesign.background.image_url">
+                        <img :src="draftDesign.background.image_url" class="h-full w-full object-cover">
+                    </template>
+                    <template x-if="!draftDesign.background.image_url">
+                        <i class="fas fa-image text-muted-foreground/40"></i>
+                    </template>
+                </div>
+                <div class="space-y-2">
+                    <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90">
+                        <i class="fas fa-upload text-[11px]"></i>
+                        {{ __('Görsel Seç') }}
+                        <input type="file" class="hidden" accept="image/*" @change="handleFileChange($event, 'bg_image')">
                     </label>
+                    <p class="text-[11px] text-muted-foreground">{{ __('Mobil görünüm için dikey görseller daha iyi sonuç verir.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="draftDesign.background.active_type === 'video'" x-cloak class="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+        <div class="space-y-4">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h4 class="text-xs font-semibold uppercase tracking-wider text-primary">{{ __('Video Arka Plan') }}</h4>
+                    <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Yüklediğiniz video önizlemede gerçek video olarak oynatılır.') }}</p>
+                </div>
+                <button type="button" x-show="draftDesign.background.video_url" @click="clearDesignMedia('bg_video', 'background.video_url')" class="text-[11px] font-semibold text-destructive hover:underline">{{ __('Videoyu Kaldır') }}</button>
+            </div>
+            <label class="inline-flex w-max cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90">
+                <i class="fas fa-video text-[11px]"></i>
+                {{ __('Video Seç') }}
+                <input type="file" class="hidden" accept="video/mp4,video/webm" @change="handleFileChange($event, 'bg_video')">
+            </label>
+        </div>
+    </div>
+
+    <div x-show="draftDesign.background.active_type === 'animation'" x-cloak class="rounded-2xl border border-border bg-muted/10 p-5">
+        <div class="space-y-5">
+            <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Animasyon') }}</h4>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Hazır animasyonlardan birini seçin. Renk değişiklikleri anında önizlemeye yansır.') }}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 lg:grid-cols-5">
+                <template x-for="anim in animationOptions" :key="anim.id">
+                    <button type="button"
+                            @click="draftDesign.background.animation = anim.id"
+                            :class="draftDesign.background.animation === anim.id ? 'border-primary bg-primary/5' : 'border-input bg-background hover:bg-muted/40'"
+                            class="rounded-2xl border p-2 transition-all">
+                        <div class="relative h-20 overflow-hidden rounded-xl border border-border/60 bg-muted/20">
+                            <div class="absolute inset-0 opacity-70" :class="anim.class"></div>
+                        </div>
+                        <span class="mt-2 block text-[11px] font-semibold text-foreground" x-text="anim.label"></span>
+                    </button>
                 </template>
             </div>
-            
-            <style>
-                .bg-anim-1 {
-                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
-                    background-color: var(--anim-color-1);
-                    background-image:  linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(45deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(315deg, var(--anim-color-2) 25%, var(--anim-color-1) 25%);
-                    background-position:  10px 0, 10px 0, 0 0, 0 0; background-size: 20px 20px;
-                    animation: bg-move-mini 5s linear infinite;
-                }
-                .bg-anim-2 {
-                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
-                    background: var(--anim-color-1);
-                    background-image: radial-gradient(circle at 20% 30%, var(--anim-color-2) 0%, transparent 20%), radial-gradient(circle at 80% 70%, var(--anim-color-2) 0%, transparent 25%);
-                    background-size: 200% 200%;
-                    animation: bg-move-mini-alt 5s ease infinite alternate;
-                }
-                .bg-anim-3 {
-                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
-                    background: repeating-linear-gradient(45deg, var(--anim-color-1), var(--anim-color-1) 10px, var(--anim-color-2) 10px, var(--anim-color-2) 20px);
-                    background-size: 200% 200%;
-                    animation: bg-move-mini 10s linear infinite;
-                }
-                .bg-anim-4 {
-                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
-                    background: var(--anim-color-1);
-                    background-image: conic-gradient(from 180deg at 50% 50%, var(--anim-color-2), var(--anim-color-1), var(--anim-color-2));
-                    animation: bg-rotate-mini 5s linear infinite;
-                }
-                .bg-anim-5 {
-                    --anim-color-1: #6366f1; --anim-color-2: #a855f7;
-                    background-color: var(--anim-color-1);
-                    background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%);
-                    background-position: 0 0; background-size: 20px 20px;
-                    animation: bg-move-mini 2s linear infinite;
-                }
-                @keyframes bg-move-mini { from { background-position: 0 0; } to { background-position: 0 20px; } }
-                @keyframes bg-move-mini-alt { from { background-position: 0% 0%; } to { background-position: 100% 100%; } }
-                @keyframes bg-rotate-mini { from { transform: scale(3) rotate(0deg); } to { transform: scale(3) rotate(360deg); } }
-            </style>
 
-            <!-- Animation Colors -->
-            <div class="space-y-4 pt-2">
-                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Animasyon Renkleri') }}</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                    <div class="flex gap-4">
-                        <template x-for="(color, index) in draftDesign.background.animation_colors">
-                            <div class="flex flex-col items-center gap-2">
-                                <input type="color" x-model="draftDesign.background.animation_colors[index]" 
-                                       class="h-10 w-10 rounded-full border-2 border-background cursor-pointer p-0 shadow-sm transition-transform hover:scale-110">
-                                <input type="text" x-model="draftDesign.background.animation_colors[index]" 
-                                       class="w-20 text-[10px] text-center rounded-md border-input bg-background font-mono px-1 py-1" placeholder="#ffffff">
-                            </div>
-                        </template>
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <template x-for="(color, index) in draftDesign.background.animation_colors" :key="index">
+                    <div class="space-y-2">
+                        <label class="text-[11px] font-medium text-muted-foreground" x-text="index === 0 ? '{{ __('Ana Renk') }}' : '{{ __('İkinci Renk') }}'"></label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" x-model="draftDesign.background.animation_colors[index]" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
+                            <input type="text" x-model="draftDesign.background.animation_colors[index]" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm">
+                        </div>
                     </div>
-                    <div class="flex items-end justify-end pb-1">
-                        <button type="button" @click="draftDesign.background.animation_colors.reverse()" class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/50 hover:bg-muted text-muted-foreground transition-colors text-[10px] font-medium border border-border/50">
-                            <i class="fas fa-sync-alt"></i>
-                            {{ __('Renkleri Değiştir') }}
-                        </button>
-                    </div>
-                </div>
+                </template>
             </div>
         </div>
-
-        <hr class="border-border opacity-50">
-
-        <!-- Overlay & Blur -->
-        <div class="space-y-5">
-            <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Efektler & Okunabilirlik') }}</h4>
-            <div class="space-y-4">
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-[11px] font-medium">Karartma Yoğunluğu</label>
-                        <span class="text-[10px] text-muted-foreground font-mono" x-text="draftDesign.background.overlay + '%'"></span>
-                    </div>
-                    <input type="range" x-model="draftDesign.background.overlay" min="0" max="100" class="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary">
-                </div>
-
-                <div class="space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="text-[11px] font-medium">Bulanıklık (Blur)</label>
-                        <span class="text-[10px] text-muted-foreground font-mono" x-text="draftDesign.background.blur + 'px'"></span>
-                    </div>
-                    <input type="range" x-model="draftDesign.background.blur" min="0" max="50" class="w-full h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-primary">
-                </div>
-            </div>
-        </div>
-        
     </div>
+
+    <div class="rounded-2xl border border-border bg-muted/10 p-5">
+        <div class="space-y-4">
+            <div>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Efektler') }}</h4>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Karartma ve bulanıklık değerleri görsel, video ve animasyon arka planlarında anında uygulanır.') }}</p>
+            </div>
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-medium text-muted-foreground">{{ __('Karartma Yoğunluğu') }}</label>
+                        <span class="text-[11px] font-mono text-muted-foreground" x-text="draftDesign.background.overlay + '%' "></span>
+                    </div>
+                    <input type="range" x-model.number="draftDesign.background.overlay" min="0" max="100" class="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary">
+                </div>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-medium text-muted-foreground">{{ __('Bulanıklık') }}</label>
+                        <span class="text-[11px] font-mono text-muted-foreground" x-text="draftDesign.background.blur + 'px' "></span>
+                    </div>
+                    <input type="range" x-model.number="draftDesign.background.blur" min="0" max="50" class="h-2 w-full cursor-pointer appearance-none rounded-full bg-muted accent-primary">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .bg-anim-1 {
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
+            background-color: var(--anim-color-1);
+            background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(45deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(315deg, var(--anim-color-2) 25%, var(--anim-color-1) 25%);
+            background-size: 24px 24px;
+            animation: de-preview-zigzag 4s linear infinite;
+        }
+        .bg-anim-2 {
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
+            background: var(--anim-color-1);
+            background-image: radial-gradient(circle at 20% 30%, var(--anim-color-2) 0%, transparent 22%), radial-gradient(circle at 80% 70%, var(--anim-color-2) 0%, transparent 28%);
+            background-size: 180% 180%;
+            animation: de-preview-float 5s ease infinite alternate;
+        }
+        .bg-anim-3 {
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
+            background: repeating-linear-gradient(45deg, var(--anim-color-1), var(--anim-color-1) 10px, var(--anim-color-2) 10px, var(--anim-color-2) 20px);
+            background-size: 200% 200%;
+            animation: de-preview-zigzag 6s linear infinite;
+        }
+        .bg-anim-4 {
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
+            background: conic-gradient(from 180deg at 50% 50%, var(--anim-color-2), var(--anim-color-1), var(--anim-color-2));
+            animation: de-preview-spin 4s linear infinite;
+        }
+        .bg-anim-5 {
+            --anim-color-1: #6366f1;
+            --anim-color-2: #a855f7;
+            background-color: var(--anim-color-1);
+            background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%);
+            background-size: 22px 22px;
+            animation: de-preview-zigzag 2s linear infinite;
+        }
+        @keyframes de-preview-zigzag {
+            from { background-position: 0 0; }
+            to { background-position: 0 24px; }
+        }
+        @keyframes de-preview-float {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+        @keyframes de-preview-spin {
+            from { transform: scale(1.8) rotate(0deg); }
+            to { transform: scale(1.8) rotate(360deg); }
+        }
+    </style>
 </div>

@@ -7,7 +7,6 @@
         <input type="hidden" name="username" value="{{ $user->username }}">
         <input type="hidden" name="email" value="{{ $user->email }}">
         <input type="hidden" name="bio" value="{{ $user->profile?->bio }}">
-        <input type="hidden" name="theme" value="{{ $user->profile?->theme }}">
 
         <div class="space-y-2">
             <x-input-label for="custom_domain" :value="__('Özel Alan Adı')" class="text-xs font-medium" />

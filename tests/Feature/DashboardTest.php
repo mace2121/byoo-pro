@@ -34,13 +34,13 @@ class DashboardTest extends TestCase
         $response = $this->actingAs($user)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Total Links');
+        $response->assertSee('Toplam Link');
         $response->assertSee('3'); // 3 links
         
-        $response->assertSee('Total Clicks');
+        $response->assertSee('Toplam Tıklanma');
         $response->assertSee('100'); // 50 + 25 + 25
         
-        $response->assertSee('Profile Views');
+        $response->assertSee('Profil Görüntülenme');
         $response->assertSee('150'); // profile views
     }
 }

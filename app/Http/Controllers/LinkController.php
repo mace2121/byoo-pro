@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Link;
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-use App\Services\ProfileService;
 
 class LinkController extends Controller
 {
@@ -20,12 +19,13 @@ class LinkController extends Controller
     public function index()
     {
         $links = Auth::user()->links()->orderBy('order')->get();
+
         return view('links.index', compact('links'));
     }
 
     public function store(Request $request)
     {
-        // Enforce plan link limit
+        // Enforce plan link limit.
         if (Auth::user()->hasReachedLinkLimit()) {
             return redirect()->route('dashboard')->with('error', 'Link limitinize ulaştınız. Daha fazla link eklemek için planınızı yükseltin.');
         }
@@ -43,9 +43,9 @@ class LinkController extends Controller
         Auth::user()->links()->create([
             'title' => $validated['title'],
             'url' => $validated['url'],
-            'starts_at' => $validated['starts_at'],
-            'expires_at' => $validated['expires_at'],
-            'password' => $validated['password'],
+            'starts_at' => $validated['starts_at'] ?? null,
+            'expires_at' => $validated['expires_at'] ?? null,
+            'password' => $validated['password'] ?? null,
             'order' => $maxOrder + 1,
             'is_active' => true,
         ]);
@@ -69,9 +69,10 @@ class LinkController extends Controller
         ]);
 
         if (isset($validated['is_active'])) {
-             $link->is_active = $request->has('is_active');
+            $link->is_active = $request->has('is_active');
+            $link->save();
         } else {
-             $link->update($validated);
+            $link->update($validated);
         }
 
         $this->profileService->clearProfileCache(Auth::user());
@@ -83,7 +84,7 @@ class LinkController extends Controller
     {
         Auth::user()->links()->findOrFail($link->id);
 
-        $link->update(['is_active' => !$link->is_active]);
+        $link->update(['is_active' => ! $link->is_active]);
 
         $this->profileService->clearProfileCache(Auth::user());
 
