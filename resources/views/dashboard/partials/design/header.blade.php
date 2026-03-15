@@ -100,42 +100,34 @@
 
             <div class="space-y-3">
                 <label class="text-[11px] font-medium text-muted-foreground">{{ __('Görsel Çerçevesi') }}</label>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2">
                     <button type="button"
                             @click="draftDesign.header.avatar_frame = 'circle'"
                             :class="draftDesign.header.avatar_frame === 'circle' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
-                            class="rounded-2xl border p-3 transition-all">
-                        <div class="flex h-14 items-center justify-center rounded-xl border border-border/60 bg-muted/20">
-                            <div class="h-9 w-9 rounded-full border-2 border-current"></div>
-                        </div>
-                        <span class="mt-2 block text-[11px] font-semibold">{{ __('Tam Yuvarlak') }}</span>
+                            class="flex items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition-all">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-full border-2 border-current"></div>
+                        <span class="text-left text-[13px] leading-none">{{ __('Tam Yuvarlak') }}</span>
                     </button>
                     <button type="button"
                             @click="draftDesign.header.avatar_frame = 'rounded-xl'"
                             :class="draftDesign.header.avatar_frame === 'rounded-xl' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
-                            class="rounded-2xl border p-3 transition-all">
-                        <div class="flex h-14 items-center justify-center rounded-xl border border-border/60 bg-muted/20">
-                            <div class="h-9 w-9 rounded-2xl border-2 border-current"></div>
-                        </div>
-                        <span class="mt-2 block text-[11px] font-semibold">{{ __('Yumuşak Kare') }}</span>
+                            class="flex items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition-all">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-xl border-2 border-current"></div>
+                        <span class="text-left text-[13px] leading-none">{{ __('Yumuşak Kare') }}</span>
                     </button>
                     <button type="button"
                             @click="draftDesign.header.avatar_frame = 'square'"
                             :class="draftDesign.header.avatar_frame === 'square' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
-                            class="rounded-2xl border p-3 transition-all">
-                        <div class="flex h-14 items-center justify-center rounded-xl border border-border/60 bg-muted/20">
-                            <div class="h-9 w-9 rounded-none border-2 border-current"></div>
-                        </div>
-                        <span class="mt-2 block text-[11px] font-semibold">{{ __('Keskin Kare') }}</span>
+                            class="flex items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition-all">
+                        <div class="flex h-7 w-7 items-center justify-center rounded-none border-2 border-current"></div>
+                        <span class="text-left text-[13px] leading-none">{{ __('Keskin Kare') }}</span>
                     </button>
                     <button type="button"
                             @click="draftDesign.header.avatar_frame = 'polygon'"
                             :class="draftDesign.header.avatar_frame === 'polygon' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
-                            class="rounded-2xl border p-3 transition-all">
-                        <div class="flex h-14 items-center justify-center rounded-xl border border-border/60 bg-muted/20">
-                            <div class="h-9 w-9 border-2 border-current" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
-                        </div>
-                        <span class="mt-2 block text-[11px] font-semibold">{{ __('Çokgen') }}</span>
+                            class="flex items-center gap-3 rounded-xl border px-3 py-2 text-sm font-semibold transition-all">
+                        <div class="h-7 w-7 border-2 border-current" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
+                        <span class="text-left text-[13px] leading-none">{{ __('Çokgen') }}</span>
                     </button>
                 </div>
             </div>

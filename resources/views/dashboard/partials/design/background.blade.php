@@ -42,10 +42,6 @@
                 <label class="design-color-swatch">
                     <input type="color" x-model="draftDesign.background.color" class="design-color-input">
                 </label>
-                <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                    <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                    <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.color.toUpperCase()"></span>
-                </div>
             </div>
         </div>
     </div>
@@ -64,10 +60,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.background.gradient_color_1" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.gradient_color_1.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-3">
@@ -76,10 +68,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.background.gradient_color_2" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.gradient_color_2.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="rounded-2xl border border-border/70" :style="`background:${buildGradientPreview(draftDesign.background)}`"></div>
@@ -190,10 +178,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.background.animation_colors[0]" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.animation_colors[0].toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -202,10 +186,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.background.animation_colors[1]" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.animation_colors[1].toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
             </div>

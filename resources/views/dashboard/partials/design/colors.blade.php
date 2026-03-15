@@ -14,10 +14,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.title" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.title.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -26,10 +22,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.username" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.username.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2 md:col-span-2">
@@ -38,10 +30,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.bio" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.bio.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -56,10 +44,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_bg" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_bg.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -68,10 +52,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_text" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_text.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -80,10 +60,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_border" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_border.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -92,10 +68,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_icon" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_icon.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -112,10 +84,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_bg_hover" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_bg_hover.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -124,10 +92,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_text_hover" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_text_hover.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -136,10 +100,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_border_hover" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_border_hover.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
                 <div class="space-y-2">
@@ -148,10 +108,6 @@
                         <label class="design-color-swatch">
                             <input type="color" x-model="draftDesign.colors.button_icon_hover" class="design-color-input">
                         </label>
-                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
-                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
-                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.colors.button_icon_hover.toUpperCase()"></span>
-                        </div>
                     </div>
                 </div>
             </div>
