@@ -253,7 +253,6 @@
 
     <script>
         (() => {
-            const shared = window.DesignEditorShared;
             const initialDesign = @js($design);
             const runtimeDefaults = {
                 profile: {
@@ -264,7 +263,7 @@
             };
             const defaultHeroImage = 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809';
 
-            const getFontStack = (fontKey) => {
+            const getFontStack = (shared, fontKey) => {
                 const option = shared.getFontOption(fontKey);
                 if (option.id === 'playfair-display') return `'${option.family}', serif`;
                 if (option.id === 'mono') return `'${option.family}', monospace`;
@@ -272,6 +271,12 @@
             };
 
             const applyDesign = (incomingDesign) => {
+                const shared = window.DesignEditorShared;
+                if (!shared || !document.body) {
+                    window.requestAnimationFrame(() => applyDesign(incomingDesign));
+                    return;
+                }
+
                 const design = shared.normalizeDesign(incomingDesign, runtimeDefaults);
                 const root = document.documentElement;
                 const body = document.body;
@@ -315,7 +320,7 @@
                 });
                 body.classList.add('theme-' + design.theme.preset);
 
-                setVar('--font-family', getFontStack(design.typography.font_family));
+                setVar('--font-family', getFontStack(shared, design.typography.font_family));
                 setVar('--font-title-size', fontVars.title);
                 setVar('--font-username-size', fontVars.username);
                 setVar('--font-bio-size', fontVars.bio);
