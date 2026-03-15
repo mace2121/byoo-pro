@@ -460,6 +460,7 @@
             };
 
             document.addEventListener('DOMContentLoaded', () => {
+                window.applyByooDesignPreview = applyDesign;
                 applyDesign(initialDesign);
             });
 

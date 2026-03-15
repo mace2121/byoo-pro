@@ -629,6 +629,14 @@
                     const iframe = this.$refs.previewIframe;
                     if (!iframe || !iframe.contentWindow || !this.pendingPreviewPayload) return;
 
+                    try {
+                        if (typeof iframe.contentWindow.applyByooDesignPreview === 'function') {
+                            iframe.contentWindow.applyByooDesignPreview(this.pendingPreviewPayload);
+                        }
+                    } catch (error) {
+                        console.warn('Direct preview sync failed:', error);
+                    }
+
                     iframe.contentWindow.postMessage({
                         type: 'DESIGN_UPDATE',
                         payload: this.pendingPreviewPayload,
