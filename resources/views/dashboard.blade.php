@@ -46,7 +46,7 @@
                                 :class="tab === 'design' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             <i class="fas fa-paint-brush w-4 text-center"></i>
-                            {{ __('TasarÄ±m') }}
+                            {{ __('Tasarım') }}
                         </button>
                         <button @click="tab = 'settings'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
@@ -58,7 +58,7 @@
 
                     @if(auth()->user()->is_admin)
                     <div class="px-4 mt-6 mb-2">
-                        <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('YÃ¶netim') }}</p>
+                        <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('Yönetim') }}</p>
                     </div>
                     <nav class="space-y-1 px-2">
                         <a href="{{ route('admin.dashboard') }}" 
@@ -80,7 +80,7 @@
                             </div>
                             <p class="text-xs font-medium text-foreground truncate">{{ $user->username }}</p>
                         </div>
-                        <button @click="navigator.clipboard.writeText('https://byoo.pro/{{ $user->username }}'); $el.textContent = '{{ __('KopyalandÄ±!') }}'; setTimeout(() => $el.textContent = '{{ __('Kopyala') }}', 2000)" 
+                        <button @click="navigator.clipboard.writeText('https://byoo.pro/{{ $user->username }}'); $el.textContent = '{{ __('Kopyalandı!') }}'; setTimeout(() => $el.textContent = '{{ __('Kopyala') }}', 2000)" 
                                 class="w-full py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold hover:bg-primary/90 transition-colors">
                             {{ __('Kopyala') }}
                         </button>
@@ -104,13 +104,13 @@
                             :class="previewOpen ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                             class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
                         <i class="fas fa-mobile-alt text-[10px]"></i>
-                        <span class="hidden sm:inline">{{ __('Ã–nizleme') }}</span>
+                        <span class="hidden sm:inline">{{ __('Önizleme') }}</span>
                     </button>
 
                     <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" 
                        class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm">
                         <i class="fas fa-external-link-alt text-[10px]"></i>
-                        {{ __('SayfamÄ± GÃ¶r') }}
+                        {{ __('Sayfamı Gör') }}
                     </a>
 
                     <div class="flex items-center gap-2 border-l border-border pl-3">
@@ -137,7 +137,7 @@
                                     <x-dropdown-link :href="route('logout')"
                                             onclick="event.preventDefault(); this.closest('form').submit();"
                                             class="flex items-center text-destructive hover:bg-destructive/10">
-                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> {{ __('Ã‡Ä±kÄ±ÅŸ Yap') }}
+                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> {{ __('Çıkış Yap') }}
                                     </x-dropdown-link>
                                 </form>
                             </x-slot>
@@ -268,10 +268,10 @@
                                 <div class="border-t border-border bg-muted/10 px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                     <div class="flex items-center gap-2 text-[11px] text-muted-foreground">
                                         <i class="fas fa-bolt text-[10px]"></i>
-                                        <span>{{ __('TasarÄ±m ayarlarÄ±nÄ±z canlÄ± Ã¶nizleme ile senkronize edilir') }}</span>
+                                        <span>{{ __('Tasarım ayarlarınız canlı önizleme ile senkronize edilir') }}</span>
                                     </div>
                                     <div class="flex items-center gap-3 text-[10px] font-medium">
-                                        <span class="text-muted-foreground">{{ __('KÄ±sayol:') }} <kbd class="rounded border border-border bg-background px-1.5 py-0.5 font-mono">Ctrl/Cmd + S</kbd></span>
+                                        <span class="text-muted-foreground">{{ __('Kısayol:') }} <kbd class="rounded border border-border bg-background px-1.5 py-0.5 font-mono">Ctrl/Cmd + S</kbd></span>
                                         <span x-show="saveFeedback.message" x-cloak :class="saveFeedback.type === 'error' ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400'" x-text="saveFeedback.message"></span>
                                     </div>
                                 </div>
@@ -285,15 +285,15 @@
                                     @include('profile.partials.update-profile-information-form')
                                 </div>
                                 <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
-                                    <h3 class="text-sm font-semibold mb-4">{{ __('Ã–zel Alan AdÄ±') }}</h3>
+                                    <h3 class="text-sm font-semibold mb-4">{{ __('Özel Alan Adı') }}</h3>
                                     @include('profile.partials.update-custom-domain-form')
                                 </div>
                                 <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
-                                    <h3 class="text-sm font-semibold mb-4">{{ __('Åifreyi GÃ¼ncelle') }}</h3>
+                                    <h3 class="text-sm font-semibold mb-4">{{ __('Şifreyi Güncelle') }}</h3>
                                     @include('profile.partials.update-password-form')
                                 </div>
                                 <div class="rounded-lg border border-destructive/20 bg-destructive/5 p-6 md:p-8 rounded-lg">
-                                    <h3 class="text-sm font-semibold text-destructive mb-4">{{ __('HesabÄ± Sil') }}</h3>
+                                    <h3 class="text-sm font-semibold text-destructive mb-4">{{ __('Hesabı Sil') }}</h3>
                                     @include('profile.partials.delete-user-form')
                                 </div>
                             </div>
@@ -307,7 +307,7 @@
                      style="min-width: 0;">
                     <div class="h-full flex flex-col p-5">
                         <header class="mb-4 flex items-center justify-between flex-shrink-0 border-b border-border/50 pb-2">
-                            <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('CanlÄ± Ã–nizleme') }}</h3>
+                            <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('Canlı Önizleme') }}</h3>
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent">
                                     <i class="fas fa-external-link-alt"></i>
@@ -404,10 +404,10 @@
             };
 
             const fontSizeLabels = {
-                sm: 'KÃ¼Ã§Ã¼k',
+                sm: 'Küçük',
                 md: 'Orta',
-                lg: 'BÃ¼yÃ¼k',
-                xl: 'Ã‡ok BÃ¼yÃ¼k',
+                lg: 'Büyük',
+                xl: 'Çok Büyük',
             };
 
             const themePresetOptions = Object.values(shared.themePresets).map((preset) => {
@@ -462,31 +462,31 @@
                 backgroundTypeOptions: [
                     { id: 'color', label: 'Renk' },
                     { id: 'gradient', label: 'Gradyan' },
-                    { id: 'image', label: 'GÃ¶rsel' },
+                    { id: 'image', label: 'Görsel' },
                     { id: 'video', label: 'Video' },
                     { id: 'animation', label: 'Animasyon' },
                 ],
                 buttonVariantOptions: [
                     { id: 'solid', label: 'Dolu', icon: 'fas fa-square' },
-                    { id: 'outline', label: 'Ã‡izgili', icon: 'far fa-square' },
+                    { id: 'outline', label: 'Çizgili', icon: 'far fa-square' },
                     { id: 'glass', label: 'Cam', icon: 'fas fa-layer-group' },
                     { id: 'offset', label: 'Ofset', icon: 'fas fa-clone' },
                 ],
                 avatarSizeOptions: [
-                    { id: 'sm', label: 'KÃ¼Ã§Ã¼k' },
+                    { id: 'sm', label: 'Küçük' },
                     { id: 'md', label: 'Orta' },
-                    { id: 'lg', label: 'BÃ¼yÃ¼k' },
+                    { id: 'lg', label: 'Büyük' },
                     { id: 'xl', label: 'Dev' },
                 ],
                 headerToggleOptions: [
-                    { key: 'show_name', label: 'Profil ismini gÃ¶ster' },
-                    { key: 'show_username', label: '@kullaniciadini gÃ¶ster' },
-                    { key: 'show_bio', label: 'Biyografiyi gÃ¶ster' },
+                    { key: 'show_name', label: 'Profil ismini göster' },
+                    { key: 'show_username', label: '@kullaniciadini göster' },
+                    { key: 'show_bio', label: 'Biyografiyi göster' },
                 ],
                 animationOptions: [
                     { id: 'anim-1', label: 'Zigzag', class: 'bg-anim-1' },
                     { id: 'anim-2', label: 'Daireler', class: 'bg-anim-2' },
-                    { id: 'anim-3', label: 'Ã‡izgiler', class: 'bg-anim-3' },
+                    { id: 'anim-3', label: 'Çizgiler', class: 'bg-anim-3' },
                     { id: 'anim-4', label: 'Mesh', class: 'bg-anim-4' },
                     { id: 'anim-5', label: 'Oklar', class: 'bg-anim-5' },
                 ],
@@ -866,5 +866,6 @@
 </script>
 @endpush
 </x-app-layout>
+
 
 
