@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -208,6 +209,40 @@ class ProfileTest extends TestCase
         $this->assertSame('#222222', data_get($profile->design_settings, 'colors.button_bg_hover'));
     }
 
+    public function test_background_video_can_be_uploaded_via_design_media_endpoint(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create([
+            'username' => 'video-upload-user',
+        ]);
+
+        Profile::create([
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'is_active' => true,
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->post(route('profile.design.media.upload'), [
+                'media_type' => 'bg_video',
+                'file' => UploadedFile::fake()->create('background.mp4', 3072, 'video/mp4'),
+            ], [
+                'Accept' => 'application/json',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('media_type', 'bg_video');
+
+        $storedPath = Str::after($response->json('url'), '/storage/');
+
+        Storage::disk('public')->assertExists($storedPath);
+    }
+
     public function test_background_video_larger_than_eight_megabytes_is_rejected(): void
     {
         Storage::fake('public');
@@ -224,19 +259,9 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->post(route('profile.design.update'), [
-                '_method' => 'PATCH',
-                'design_settings' => json_encode([
-                    'profile' => [
-                        'name' => $user->name,
-                        'username' => $user->username,
-                        'bio' => '',
-                    ],
-                    'background' => [
-                        'active_type' => 'video',
-                    ],
-                ]),
-                'bg_video' => UploadedFile::fake()->create('background.mp4', 9216, 'video/mp4'),
+            ->post(route('profile.design.media.upload'), [
+                'media_type' => 'bg_video',
+                'file' => UploadedFile::fake()->create('background.mp4', 9216, 'video/mp4'),
             ], [
                 'Accept' => 'application/json',
                 'X-Requested-With' => 'XMLHttpRequest',
@@ -244,7 +269,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertStatus(422)
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Video boyutu 8MB limitini asiyor.');
     }
 }
-

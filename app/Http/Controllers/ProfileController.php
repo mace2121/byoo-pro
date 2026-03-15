@@ -7,6 +7,7 @@ use App\Services\ProfileService;
 use App\Support\DesignEditor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -114,13 +115,7 @@ class ProfileController extends Controller
     public function updateDesign(Request $request)
     {
         $user = $request->user();
-        $profile = $user->profile;
-
-        if (! $profile) {
-            $profile = $user->profile()->create([
-                'username' => $user->username,
-            ]);
-        }
+        $profile = $this->ensureProfile($user);
 
         try {
             // If it's a standard JSON request (no files)
@@ -182,50 +177,26 @@ class ProfileController extends Controller
 
             // Hero Image
             if ($request->hasFile('hero_image')) {
-                $file = $request->file('hero_image');
-                $manager = new ImageManager(new Driver);
-                $image = $manager->read($file);
-                $image->scale(1200, null);
-                $encoded = $image->toWebp(80);
-                $filename = 'hero/'.Str::random(40).'.webp';
-
-                if (! Storage::disk('public')->exists('hero')) {
-                    Storage::disk('public')->makeDirectory('hero');
-                }
-
-                Storage::disk('public')->put($filename, (string) $encoded);
-                $designSettings['header']['hero_image_url'] = Storage::url($filename);
+                $designSettings['header']['hero_image_url'] = $this->storeDesignMedia(
+                    'hero_image',
+                    $request->file('hero_image'),
+                );
             }
 
             // Background Image
             if ($request->hasFile('bg_image')) {
-                $file = $request->file('bg_image');
-                $manager = new ImageManager(new Driver);
-                $image = $manager->read($file);
-                $image->scale(1920, null);
-                $encoded = $image->toWebp(70);
-                $filename = 'backgrounds/'.Str::random(40).'.webp';
-
-                if (! Storage::disk('public')->exists('backgrounds')) {
-                    Storage::disk('public')->makeDirectory('backgrounds');
-                }
-
-                Storage::disk('public')->put($filename, (string) $encoded);
-                $designSettings['background']['image_url'] = Storage::url($filename);
+                $designSettings['background']['image_url'] = $this->storeDesignMedia(
+                    'bg_image',
+                    $request->file('bg_image'),
+                );
             }
 
             // Background Video
             if ($request->hasFile('bg_video')) {
-                $file = $request->file('bg_video');
-                if ($file->getSize() <= 8 * 1024 * 1024) { // Increased to 8MB
-                    $filename = $file->store('videos', 'public');
-                    $designSettings['background']['video_url'] = Storage::url($filename);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Video boyutu 8MB limitini asiyor.',
-                    ], 422);
-                }
+                $designSettings['background']['video_url'] = $this->storeDesignMedia(
+                    'bg_video',
+                    $request->file('bg_video'),
+                );
             }
 
             $profile->design_settings = $designSettings;
@@ -252,6 +223,41 @@ class ProfileController extends Controller
         }
     }
 
+    public function uploadDesignMedia(Request $request)
+    {
+        $request->validate([
+            'media_type' => ['required', 'in:hero_image,bg_image,bg_video'],
+            'file' => ['required', 'file'],
+        ]);
+
+        try {
+            $url = $this->storeDesignMedia(
+                (string) $request->input('media_type'),
+                $request->file('file'),
+            );
+
+            return response()->json([
+                'success' => true,
+                'media_type' => $request->input('media_type'),
+                'url' => $url,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            Log::error('Design media upload failed: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Medya yuklemesi sirasinda bir hata olustu.',
+            ], 500);
+        }
+    }
+
     /**
      * Delete the user's account.
      */
@@ -272,6 +278,66 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    private function ensureProfile($user)
+    {
+        return $user->profile ?: $user->profile()->create([
+            'username' => $user->username,
+        ]);
+    }
+
+    private function storeDesignMedia(string $mediaType, UploadedFile $file): string
+    {
+        return match ($mediaType) {
+            'hero_image' => $this->storeHeroImage($file),
+            'bg_image' => $this->storeBackgroundImage($file),
+            'bg_video' => $this->storeBackgroundVideo($file),
+            default => throw new \InvalidArgumentException('Unsupported design media type.'),
+        };
+    }
+
+    private function storeHeroImage(UploadedFile $file): string
+    {
+        $manager = new ImageManager(new Driver);
+        $image = $manager->read($file);
+        $image->scale(1200, null);
+        $encoded = $image->toWebp(80);
+        $filename = 'hero/'.Str::random(40).'.webp';
+
+        if (! Storage::disk('public')->exists('hero')) {
+            Storage::disk('public')->makeDirectory('hero');
+        }
+
+        Storage::disk('public')->put($filename, (string) $encoded);
+
+        return Storage::url($filename);
+    }
+
+    private function storeBackgroundImage(UploadedFile $file): string
+    {
+        $manager = new ImageManager(new Driver);
+        $image = $manager->read($file);
+        $image->scale(1920, null);
+        $encoded = $image->toWebp(70);
+        $filename = 'backgrounds/'.Str::random(40).'.webp';
+
+        if (! Storage::disk('public')->exists('backgrounds')) {
+            Storage::disk('public')->makeDirectory('backgrounds');
+        }
+
+        Storage::disk('public')->put($filename, (string) $encoded);
+
+        return Storage::url($filename);
+    }
+
+    private function storeBackgroundVideo(UploadedFile $file): string
+    {
+        if ($file->getSize() > 8 * 1024 * 1024) {
+            throw new \RuntimeException('Video boyutu 8MB limitini asiyor.');
+        }
+
+        $filename = $file->store('videos', 'public');
+
+        return Storage::url($filename);
+    }
 }
-
-

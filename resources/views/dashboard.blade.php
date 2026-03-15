@@ -766,12 +766,122 @@
                     this.pushPreview(true, settings);
                 },
 
+                getMediaTargetPath(type) {
+                    return {
+                        hero_image: 'header.hero_image_url',
+                        bg_image: 'background.image_url',
+                        bg_video: 'background.video_url',
+                    }[type] || '';
+                },
+
+                setNestedValue(target, path, value) {
+                    const keys = String(path).split('.');
+                    let current = target;
+
+                    for (let i = 0; i < keys.length - 1; i += 1) {
+                        const key = keys[i];
+                        if (!current[key] || typeof current[key] !== 'object') {
+                            current[key] = {};
+                        }
+                        current = current[key];
+                    }
+
+                    current[keys[keys.length - 1]] = value;
+                },
+
+                applyUploadedMedia(payload, type, url) {
+                    const nextPayload = JSON.parse(JSON.stringify(payload));
+                    const targetPath = this.getMediaTargetPath(type);
+
+                    if (!targetPath) {
+                        return nextPayload;
+                    }
+
+                    this.setNestedValue(nextPayload, targetPath, url);
+
+                    if (type === 'bg_image') {
+                        nextPayload.background.active_type = 'image';
+                    }
+
+                    if (type === 'bg_video') {
+                        nextPayload.background.active_type = 'video';
+                    }
+
+                    return nextPayload;
+                },
+
+                async parseApiResponse(response, tooLargeMessage) {
+                    const contentType = response.headers.get('content-type') || '';
+                    const rawText = await response.text();
+                    let data = {};
+
+                    if (response.status === 413) {
+                        throw new Error(tooLargeMessage);
+                    }
+
+                    if (rawText && contentType.includes('application/json')) {
+                        try {
+                            data = JSON.parse(rawText);
+                        } catch (parseError) {
+                            if (!response.ok) {
+                                throw new Error(`HTTP ${response.status}`);
+                            }
+
+                            throw new Error('{{ __('Sunucu geçersiz bir cevap döndürdü.') }}');
+                        }
+                    }
+
+                    if (!response.ok || data.success === false) {
+                        if (response.status === 422) {
+                            throw new Error(data.message || '{{ __('Gönderilen tasarım verileri doğrulanamadı.') }}');
+                        }
+
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
+
+                    return data;
+                },
+
+                async uploadDesignMedia(type, file, baseHeaders) {
+                    const formData = new FormData();
+                    formData.append('media_type', type);
+                    formData.append('file', file);
+
+                    const response = await fetch("{{ route('profile.design.media.upload') }}", {
+                        method: 'POST',
+                        headers: baseHeaders,
+                        body: formData,
+                        credentials: 'same-origin',
+                    });
+
+                    return this.parseApiResponse(
+                        response,
+                        '{{ __('Medya yükleme isteği sunucu limitini aşıyor. Sunucuda post_max_size veya upload_max_filesize değeri düşük olabilir.') }}',
+                    );
+                },
+
+                async publishDesignPayload(payload, baseHeaders) {
+                    const response = await fetch("{{ route('profile.design.update') }}", {
+                        method: 'PATCH',
+                        headers: {
+                            ...baseHeaders,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ design_settings: payload }),
+                        credentials: 'same-origin',
+                    });
+
+                    return this.parseApiResponse(
+                        response,
+                        '{{ __('Yayınlama isteği sunucu limitini aşıyor. Çok sayıda medya seçtiysen önce tek tek yükleyin.') }}',
+                    );
+                },
+
                 async saveDesign() {
                     if (this.isSaving) return;
 
                     this.isSaving = true;
-                    const payload = this.preparePayload(this.draftDesign);
-                    const hasFileUpload = Object.values(this.files).some((file) => file instanceof File);
+                    let payload = this.preparePayload(this.draftDesign);
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
                     const baseHeaders = {
@@ -784,62 +894,14 @@
                     }
 
                     try {
-                        let response;
+                        const pendingFiles = Object.entries(this.files).filter(([, file]) => file instanceof File);
 
-                        if (hasFileUpload) {
-                            const formData = new FormData();
-                            formData.append('_method', 'PATCH');
-                            formData.append('design_settings', JSON.stringify(payload));
-
-                            if (this.files.hero_image) formData.append('hero_image', this.files.hero_image);
-                            if (this.files.bg_image) formData.append('bg_image', this.files.bg_image);
-                            if (this.files.bg_video) formData.append('bg_video', this.files.bg_video);
-
-                            response = await fetch("{{ route('profile.design.update') }}", {
-                                method: 'POST',
-                                headers: baseHeaders,
-                                body: formData,
-                                credentials: 'same-origin',
-                            });
-                        } else {
-                            response = await fetch("{{ route('profile.design.update') }}", {
-                                method: 'PATCH',
-                                headers: {
-                                    ...baseHeaders,
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ design_settings: payload }),
-                                credentials: 'same-origin',
-                            });
+                        for (const [type, file] of pendingFiles) {
+                            const uploadResult = await this.uploadDesignMedia(type, file, baseHeaders);
+                            payload = this.applyUploadedMedia(payload, type, uploadResult.url);
                         }
 
-                        const contentType = response.headers.get('content-type') || '';
-                        const rawText = await response.text();
-                        let data = {};
-
-                        if (response.status === 413) {
-                            throw new Error('{{ __('Video dosyası 8MB limitini aşıyor veya sunucu yükleme limiti düşük.') }}');
-                        }
-
-                        if (rawText && contentType.includes('application/json')) {
-                            try {
-                                data = JSON.parse(rawText);
-                            } catch (parseError) {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP ${response.status}`);
-                                }
-                                throw new Error('{{ __('Sunucu geçersiz bir cevap döndürdü.') }}');
-                            }
-                        }
-
-                        if (!response.ok || data.success === false) {
-                            if (response.status === 422) {
-                                throw new Error(data.message || '{{ __('Gönderilen tasarım verileri doğrulanamadı.') }}');
-                            }
-
-                            throw new Error(data.message || `HTTP ${response.status}`);
-                        }
-
+                        const data = await this.publishDesignPayload(payload, baseHeaders);
                         const savedDesign = this.normalizeDesignSettings(data.design_settings || payload);
                         this.draftDesign = savedDesign;
                         this.lastSavedSnapshot = this.serializeDesign(savedDesign);
