@@ -843,6 +843,10 @@
                 },
 
                 async uploadDesignMedia(type, file, baseHeaders) {
+                    if (type === 'bg_video') {
+                        return this.uploadVideoInChunks(file, baseHeaders);
+                    }
+
                     const formData = new FormData();
                     formData.append('media_type', type);
                     formData.append('file', file);
@@ -857,6 +861,86 @@
                     return this.parseApiResponse(
                         response,
                         '{{ __('Medya yükleme isteği sunucu limitini aşıyor. Sunucuda post_max_size veya upload_max_filesize değeri düşük olabilir.') }}',
+                    );
+                },
+
+                buildUploadId() {
+                    if (window.crypto?.randomUUID) {
+                        return window.crypto.randomUUID();
+                    }
+
+                    return ['upload', Date.now(), Math.random().toString(36).slice(2)].join('-');
+                },
+
+                async uploadVideoChunk(uploadId, chunkIndex, totalChunks, chunk, fileName, baseHeaders) {
+                    const formData = new FormData();
+                    formData.append('media_type', 'bg_video');
+                    formData.append('upload_id', uploadId);
+                    formData.append('chunk_index', String(chunkIndex));
+                    formData.append('total_chunks', String(totalChunks));
+                    formData.append('original_name', fileName);
+                    formData.append('chunk', chunk, `${fileName}.part${chunkIndex}`);
+
+                    const response = await fetch("{{ route('profile.design.media.chunk') }}", {
+                        method: 'POST',
+                        headers: baseHeaders,
+                        body: formData,
+                        credentials: 'same-origin',
+                    });
+
+                    return this.parseApiResponse(
+                        response,
+                        '{{ __('Video parcasi sunucu limitini aşıyor. Sunucu proxy ayarlarını tekrar kontrol edin.') }}',
+                    );
+                },
+
+                async finalizeVideoUpload(uploadId, totalChunks, fileName, baseHeaders) {
+                    const response = await fetch("{{ route('profile.design.media.finalize') }}", {
+                        method: 'POST',
+                        headers: {
+                            ...baseHeaders,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            media_type: 'bg_video',
+                            upload_id: uploadId,
+                            total_chunks: totalChunks,
+                            original_name: fileName,
+                        }),
+                        credentials: 'same-origin',
+                    });
+
+                    return this.parseApiResponse(
+                        response,
+                        '{{ __('Video birlestirme istegi sunucu limitini aşıyor.') }}',
+                    );
+                },
+
+                async uploadVideoInChunks(file, baseHeaders) {
+                    const chunkSize = 512 * 1024;
+                    const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
+                    const uploadId = this.buildUploadId();
+
+                    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex += 1) {
+                        const start = chunkIndex * chunkSize;
+                        const end = Math.min(file.size, start + chunkSize);
+                        const chunk = file.slice(start, end, file.type || 'video/mp4');
+
+                        await this.uploadVideoChunk(
+                            uploadId,
+                            chunkIndex,
+                            totalChunks,
+                            chunk,
+                            file.name || 'background.mp4',
+                            baseHeaders,
+                        );
+                    }
+
+                    return this.finalizeVideoUpload(
+                        uploadId,
+                        totalChunks,
+                        file.name || 'background.mp4',
+                        baseHeaders,
                     );
                 },
 

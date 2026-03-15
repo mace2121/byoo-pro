@@ -243,6 +243,65 @@ class ProfileTest extends TestCase
         Storage::disk('public')->assertExists($storedPath);
     }
 
+    public function test_background_video_can_be_uploaded_in_chunks(): void
+    {
+        Storage::fake('public');
+        Storage::fake('local');
+
+        $user = User::factory()->create([
+            'username' => 'chunk-video-user',
+        ]);
+
+        Profile::create([
+            'user_id' => $user->id,
+            'username' => $user->username,
+            'is_active' => true,
+        ]);
+
+        $uploadId = 'chunkupload123';
+        $videoContent = str_repeat('A', 1024 * 1024).str_repeat('B', 256 * 1024);
+        $chunkSize = 512 * 1024;
+        $totalChunks = (int) ceil(strlen($videoContent) / $chunkSize);
+
+        for ($chunkIndex = 0; $chunkIndex < $totalChunks; $chunkIndex++) {
+            $chunkContent = substr($videoContent, $chunkIndex * $chunkSize, $chunkSize);
+
+            $this->actingAs($user)
+                ->post(route('profile.design.media.chunk'), [
+                    'media_type' => 'bg_video',
+                    'upload_id' => $uploadId,
+                    'chunk_index' => $chunkIndex,
+                    'total_chunks' => $totalChunks,
+                    'chunk' => UploadedFile::fake()->createWithContent("chunk-{$chunkIndex}.part", $chunkContent),
+                ], [
+                    'Accept' => 'application/json',
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ])
+                ->assertOk()
+                ->assertJsonPath('success', true)
+                ->assertJsonPath('chunk_index', $chunkIndex);
+        }
+
+        $response = $this
+            ->actingAs($user)
+            ->postJson(route('profile.design.media.finalize'), [
+                'media_type' => 'bg_video',
+                'upload_id' => $uploadId,
+                'total_chunks' => $totalChunks,
+                'original_name' => 'background.mp4',
+            ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('media_type', 'bg_video');
+
+        $storedPath = Str::after($response->json('url'), '/storage/');
+
+        Storage::disk('public')->assertExists($storedPath);
+        Storage::disk('local')->assertMissing('design-media/'.$user->id.'/'.$uploadId.'/00000.part');
+    }
+
     public function test_background_video_larger_than_eight_megabytes_is_rejected(): void
     {
         Storage::fake('public');

@@ -258,6 +258,138 @@ class ProfileController extends Controller
         }
     }
 
+    public function uploadDesignMediaChunk(Request $request)
+    {
+        $request->validate([
+            'media_type' => ['required', 'in:bg_video'],
+            'upload_id' => ['required', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'chunk_index' => ['required', 'integer', 'min:0'],
+            'total_chunks' => ['required', 'integer', 'min:1', 'max:64'],
+            'chunk' => ['required', 'file'],
+        ]);
+
+        try {
+            $uploadId = $this->sanitizeUploadId((string) $request->input('upload_id'));
+            $chunkIndex = (int) $request->input('chunk_index');
+            $directory = $this->chunkDirectory($request->user()->id, $uploadId);
+
+            Storage::disk('local')->putFileAs(
+                $directory,
+                $request->file('chunk'),
+                sprintf('%05d.part', $chunkIndex),
+            );
+
+            return response()->json([
+                'success' => true,
+                'upload_id' => $uploadId,
+                'chunk_index' => $chunkIndex,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Design media chunk upload failed: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Video parcasi yuklenemedi.',
+            ], 500);
+        }
+    }
+
+    public function finalizeDesignMediaUpload(Request $request)
+    {
+        $request->validate([
+            'media_type' => ['required', 'in:bg_video'],
+            'upload_id' => ['required', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'total_chunks' => ['required', 'integer', 'min:1', 'max:64'],
+            'original_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $directory = null;
+        $tempPath = null;
+
+        try {
+            $uploadId = $this->sanitizeUploadId((string) $request->input('upload_id'));
+            $totalChunks = (int) $request->input('total_chunks');
+            $directory = $this->chunkDirectory($request->user()->id, $uploadId);
+            $tempDir = storage_path('app/tmp');
+            $originalName = basename((string) ($request->input('original_name') ?: 'background.mp4'));
+            $tempPath = $tempDir.'/'.Str::random(40).'-'.$originalName;
+
+            if (! Storage::disk('local')->exists($directory)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Yukleme parcasi bulunamadi.',
+                ], 422);
+            }
+
+            if (! is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $handle = fopen($tempPath, 'wb');
+
+            if ($handle === false) {
+                throw new \RuntimeException('Gecici video dosyasi olusturulamadi.');
+            }
+
+            for ($index = 0; $index < $totalChunks; $index++) {
+                $chunkPath = $directory.'/'.sprintf('%05d.part', $index);
+
+                if (! Storage::disk('local')->exists($chunkPath)) {
+                    fclose($handle);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Video parcalarinin bir kismi eksik.',
+                    ], 422);
+                }
+
+                fwrite($handle, Storage::disk('local')->get($chunkPath));
+            }
+
+            fclose($handle);
+
+            $uploadedFile = new UploadedFile(
+                $tempPath,
+                $originalName,
+                null,
+                null,
+                true,
+            );
+
+            $url = $this->storeDesignMedia('bg_video', $uploadedFile);
+
+            return response()->json([
+                'success' => true,
+                'media_type' => 'bg_video',
+                'url' => $url,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (\Throwable $e) {
+            Log::error('Design media finalize failed: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Video birlestirilirken bir hata olustu.',
+            ], 500);
+        } finally {
+            if (is_file($tempPath)) {
+                @unlink($tempPath);
+            }
+
+            if ($directory) {
+                Storage::disk('local')->deleteDirectory($directory);
+            }
+        }
+    }
+
     /**
      * Delete the user's account.
      */
@@ -284,6 +416,22 @@ class ProfileController extends Controller
         return $user->profile ?: $user->profile()->create([
             'username' => $user->username,
         ]);
+    }
+
+    private function chunkDirectory(int $userId, string $uploadId): string
+    {
+        return 'design-media/'.$userId.'/'.$uploadId;
+    }
+
+    private function sanitizeUploadId(string $uploadId): string
+    {
+        $sanitized = preg_replace('/[^A-Za-z0-9_-]/', '', $uploadId) ?: '';
+
+        if ($sanitized === '') {
+            throw new \InvalidArgumentException('Gecersiz yukleme kimligi.');
+        }
+
+        return $sanitized;
     }
 
     private function storeDesignMedia(string $mediaType, UploadedFile $file): string

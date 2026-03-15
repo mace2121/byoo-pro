@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/design', [ProfileController::class, 'updateDesign'])->name('profile.design.update');
     Route::post('/profile/design/media', [ProfileController::class, 'uploadDesignMedia'])->name('profile.design.media.upload');
+    Route::post('/profile/design/media/chunk', [ProfileController::class, 'uploadDesignMediaChunk'])->name('profile.design.media.chunk');
+    Route::post('/profile/design/media/finalize', [ProfileController::class, 'finalizeDesignMediaUpload'])->name('profile.design.media.finalize');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Links
