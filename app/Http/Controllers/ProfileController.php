@@ -217,13 +217,13 @@ class ProfileController extends Controller
             // Background Video
             if ($request->hasFile('bg_video')) {
                 $file = $request->file('bg_video');
-                if ($file->getSize() <= 10 * 1024 * 1024) { // Increased to 10MB
+                if ($file->getSize() <= 8 * 1024 * 1024) { // Increased to 8MB
                     $filename = $file->store('videos', 'public');
                     $designSettings['background']['video_url'] = Storage::url($filename);
                 } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Video boyutu 10MB limitini aşıyor.',
+                        'message' => 'Video boyutu 8MB limitini asiyor.',
                     ], 422);
                 }
             }
@@ -273,3 +273,5 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 }
+
+

@@ -718,8 +718,8 @@
                     const file = event?.target?.files?.[0];
                     if (!file) return;
 
-                    if (type === 'bg_video' && file.size > (10 * 1024 * 1024)) {
-                        this.flashSaveFeedback('{{ __('Video dosyası 10MB limitini aşıyor.') }}', 'error');
+                    if (type === 'bg_video' && file.size > (8 * 1024 * 1024)) {
+                        this.flashSaveFeedback('{{ __('Video dosyası 8MB limitini aşıyor.') }}', 'error');
                         if (event?.target) {
                             event.target.value = '';
                         }
@@ -818,7 +818,7 @@
                         let data = {};
 
                         if (response.status === 413) {
-                            throw new Error('{{ __('Video dosyası 10MB limitini aşıyor veya sunucu yükleme limiti düşük.') }}');
+                            throw new Error('{{ __('Video dosyası 8MB limitini aşıyor veya sunucu yükleme limiti düşük.') }}');
                         }
 
                         if (rawText && contentType.includes('application/json')) {
@@ -866,6 +866,7 @@
 </script>
 @endpush
 </x-app-layout>
+
 
 
 

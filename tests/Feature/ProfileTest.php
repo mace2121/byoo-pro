@@ -208,7 +208,7 @@ class ProfileTest extends TestCase
         $this->assertSame('#222222', data_get($profile->design_settings, 'colors.button_bg_hover'));
     }
 
-    public function test_background_video_larger_than_ten_megabytes_is_rejected(): void
+    public function test_background_video_larger_than_eight_megabytes_is_rejected(): void
     {
         Storage::fake('public');
 
@@ -236,7 +236,7 @@ class ProfileTest extends TestCase
                         'active_type' => 'video',
                     ],
                 ]),
-                'bg_video' => UploadedFile::fake()->create('background.mp4', 11264, 'video/mp4'),
+                'bg_video' => UploadedFile::fake()->create('background.mp4', 9216, 'video/mp4'),
             ], [
                 'Accept' => 'application/json',
                 'X-Requested-With' => 'XMLHttpRequest',
@@ -247,3 +247,4 @@ class ProfileTest extends TestCase
             ->assertJsonPath('success', false);
     }
 }
+

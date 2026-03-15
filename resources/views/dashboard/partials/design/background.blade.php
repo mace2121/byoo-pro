@@ -146,7 +146,7 @@
                 {{ __('Video Seç') }}
                 <input type="file" class="hidden" accept="video/mp4,video/webm" @change="handleFileChange($event, 'bg_video')">
             </label>
-            <p class="text-[11px] text-muted-foreground">{{ __('Önerilen maksimum video boyutu 10MB ve formatlar MP4/WebM.') }}</p>
+            <p class="text-[11px] text-muted-foreground">{{ __('Önerilen maksimum video boyutu 8MB ve formatlar MP4/WebM.') }}</p>
         </div>
     </div>
 
@@ -269,3 +269,4 @@
         }
     </style>
 </div>
+
