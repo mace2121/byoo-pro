@@ -754,11 +754,6 @@ const normalizeDesign = (input, runtimeDefaults = {}) => {
     design.buttons.border_width = clamp(Number(design.buttons.border_width) || 1, 0, 8);
     design.buttons.shadow = !!design.buttons.shadow;
 
-    if (design.buttons.variant === 'glass') {
-        design.colors.button_bg = 'rgba(255,255,255,0.12)';
-        design.colors.button_bg_hover = 'rgba(255,255,255,0.2)';
-    }
-
     if (design.buttons.variant === 'offset') {
         design.buttons.border_style = 'solid';
     }

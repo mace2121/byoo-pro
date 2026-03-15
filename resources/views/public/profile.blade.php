@@ -141,7 +141,7 @@
 
         body { font-family: var(--font-family); }
         .theme-page { min-height: 100vh; display: flex; justify-content: center; padding: 3rem 1rem; position: relative; z-index: 10; }
-        .bg-layer-wrapper { position: fixed; inset: 0; z-index: -10; pointer-events: none; background-color: var(--bg-color, #f9fafb); }
+        .bg-layer-wrapper { position: fixed; inset: 0; z-index: -10; pointer-events: none; background-color: var(--bg-color, var(--bg, #f9fafb)); }
         .bg-image-layer { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; background-attachment: fixed; display: none; }
         .bg-video-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
         .bg-video-container video { min-width: 100%; min-height: 100%; width: auto; height: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); object-fit: cover; }
@@ -153,11 +153,13 @@
         .theme-bio { color: var(--text-page, var(--text)); font-size: var(--font-bio-size); }
         .theme-card { background: var(--btn-bg, var(--card-bg)); border: var(--btn-border-width, 1px) var(--btn-border-style, solid) var(--btn-border, var(--card-border)); color: var(--btn-text, var(--link-color)); border-radius: var(--btn-radius); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: var(--btn-align, center); text-align: var(--btn-text-align, center); font-size: var(--font-button-size); }
         .theme-card:hover { background: var(--btn-bg-hover, var(--card-hover)); border-color: var(--btn-border-hover, var(--btn-border, var(--card-border))); color: var(--btn-text-hover, var(--btn-text, var(--link-color))); box-shadow: var(--card-shadow, none); transform: translateY(-2px); }
+        .theme-card-icon-wrap { color: var(--btn-icon, var(--link-color)); transition: transform 0.3s ease, color 0.3s ease, background-color 0.3s ease; }
         .theme-card-icon { color: var(--btn-icon, var(--link-color)); transition: color 0.3s ease; }
         .theme-card:hover .theme-card-icon,
         .theme-card:hover .theme-card-icon-wrap { color: var(--btn-icon-hover, var(--btn-icon, var(--link-color))); }
         .variant-offset { box-shadow: 4px 4px 0 0 var(--btn-border, var(--link-color)); }
         .variant-offset:hover { box-shadow: 2px 2px 0 0 var(--btn-border-hover, var(--btn-border, var(--link-color))); transform: translate(2px, 2px); }
+        .variant-glass .theme-card-icon-wrap { width: auto; height: auto; margin-right: 0.75rem; border-radius: 0; background: transparent !important; transform: none !important; }
         .theme-avatar-ring { box-shadow: 0 0 0 3px var(--avatar-ring, rgba(255,255,255,0.2)); }
         .avatar-polygon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
         .theme-footer { color: var(--footer-color); }
@@ -176,7 +178,7 @@
             </div>
         @endif
 
-        <div class="bg-layer-wrapper" style="{{ $activeBackgroundType === 'gradient' ? 'background-image: ' . ($design['background']['gradient'] ?? '') . ';' : '' }}">
+        <div class="bg-layer-wrapper" style="{{ $activeBackgroundType === 'gradient' ? 'background-image: ' . ($design['background']['gradient'] ?? '') . ';' : 'background-color: ' . ($design['background']['color'] ?? '#f8fafc') . ';' }}">
             <div class="bg-image-layer" style="{{ $activeBackgroundType === 'image' ? 'display:block;background-image:url(\'' . ($design['background']['image_url'] ?? '') . '\')' : '' }}"></div>
             <div class="bg-video-container" style="display: {{ $activeBackgroundType === 'video' ? 'block' : 'none' }}">
                 @if($activeBackgroundType === 'video' && !empty($design['background']['video_url']))
@@ -216,17 +218,13 @@
                         if (($design['buttons']['variant'] ?? '') === 'offset') {
                             $variantClass = 'variant-offset';
                         } elseif (($design['buttons']['variant'] ?? '') === 'glass') {
-                            $variantClass = 'backdrop-blur-md';
+                            $variantClass = 'backdrop-blur-md variant-glass';
                         }
                     @endphp
                     <a href="{{ route('public.redirect', $link->id) }}" target="_blank" rel="noopener noreferrer" class="flex items-center p-3 transition-all duration-300 theme-card group relative {{ $variantClass }}">
-                        @if(($design['buttons']['variant'] ?? '') !== 'glass')
-                            <div class="theme-card-icon-wrap flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 group-hover:scale-110 transition-transform" style="color: var(--btn-icon, var(--link-color))">
-                                <i class="{{ $link->icon_class }} theme-card-icon text-xl"></i>
-                            </div>
-                        @else
-                            <i class="{{ $link->icon_class }} theme-card-icon text-xl mr-3" style="color: var(--btn-icon, var(--link-color))"></i>
-                        @endif
+                        <div class="theme-card-icon-wrap flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 group-hover:scale-110 transition-transform" style="color: var(--btn-icon, var(--link-color))">
+                            <i class="{{ $link->icon_class }} theme-card-icon text-xl"></i>
+                        </div>
 
                         <div class="theme-card-label flex-1 font-bold {{ ($design['buttons']['align'] ?? 'center') === 'center' ? 'pr-10' : '' }}">
                             {{ $link->title }}
@@ -347,9 +345,9 @@
                 setVar('--btn-text-align', design.buttons.align || 'center');
 
                 document.querySelectorAll('.theme-card').forEach((card) => {
-                    card.classList.remove('variant-offset', 'backdrop-blur-md');
+                    card.classList.remove('variant-offset', 'backdrop-blur-md', 'variant-glass');
                     if (design.buttons.variant === 'offset') card.classList.add('variant-offset');
-                    if (design.buttons.variant === 'glass') card.classList.add('backdrop-blur-md');
+                    if (design.buttons.variant === 'glass') card.classList.add('backdrop-blur-md', 'variant-glass');
                 });
 
                 document.querySelectorAll('.theme-card-label').forEach((titleEl) => {
@@ -357,6 +355,7 @@
                 });
 
                 if (bgWrapper) {
+                    bgWrapper.style.backgroundColor = design.background.color || '#f8fafc';
                     bgWrapper.style.backgroundImage = 'none';
 
                     if (bgImageLayer) {

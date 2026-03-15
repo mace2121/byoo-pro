@@ -52,12 +52,36 @@
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Kenarlık Stili') }}</h4>
                 <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Offset varyantında bu alan pasif kalır.') }}</p>
             </div>
-            <select x-model="draftDesign.buttons.border_style" :disabled="draftDesign.buttons.variant === 'offset'" class="h-11 w-full rounded-xl border-input bg-background text-sm shadow-sm disabled:cursor-not-allowed disabled:opacity-70">
-                <option value="solid">{{ __('Düz') }}</option>
-                <option value="dashed">{{ __('Kesik') }}</option>
-                <option value="dotted">{{ __('Noktalı') }}</option>
-                <option value="double">{{ __('Çift') }}</option>
-            </select>
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button"
+                        @click="if (draftDesign.buttons.variant !== 'offset') draftDesign.buttons.border_style = 'solid'"
+                        :disabled="draftDesign.buttons.variant === 'offset'"
+                        :class="draftDesign.buttons.border_style === 'solid' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                        class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70">
+                    {{ __('Düz') }}
+                </button>
+                <button type="button"
+                        @click="if (draftDesign.buttons.variant !== 'offset') draftDesign.buttons.border_style = 'dashed'"
+                        :disabled="draftDesign.buttons.variant === 'offset'"
+                        :class="draftDesign.buttons.border_style === 'dashed' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                        class="rounded-2xl border border-dashed px-4 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70">
+                    {{ __('Kesik') }}
+                </button>
+                <button type="button"
+                        @click="if (draftDesign.buttons.variant !== 'offset') draftDesign.buttons.border_style = 'dotted'"
+                        :disabled="draftDesign.buttons.variant === 'offset'"
+                        :class="draftDesign.buttons.border_style === 'dotted' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                        class="rounded-2xl border border-dotted px-4 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70">
+                    {{ __('Noktalı') }}
+                </button>
+                <button type="button"
+                        @click="if (draftDesign.buttons.variant !== 'offset') draftDesign.buttons.border_style = 'double'"
+                        :disabled="draftDesign.buttons.variant === 'offset'"
+                        :class="draftDesign.buttons.border_style === 'double' ? 'border-primary bg-primary/5 text-primary' : 'border-input bg-background text-muted-foreground hover:text-foreground'"
+                        class="rounded-2xl border-4 border-double px-4 py-3 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-70">
+                    {{ __('Çift') }}
+                </button>
+            </div>
         </div>
 
         <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5" :class="draftDesign.buttons.variant === 'offset' ? 'opacity-60' : ''">

@@ -3,7 +3,7 @@
         <div class="space-y-4 rounded-2xl border border-border bg-muted/10 p-5">
             <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Font Ailesi') }}</h4>
-                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Seçtiğiniz yazı tipi profil adı, kullanıcı adı, biyografi ve buton metinlerine anında uygulanır.') }}</p>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Seçtiğiniz yazı tipi profil adı, kullanıcı adı, biyografi ve buton metinlerinde birlikte kullanılır.') }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -13,7 +13,6 @@
                             :class="draftDesign.typography.font_family === font.id ? 'border-primary bg-primary/5 shadow-sm' : 'border-input bg-background hover:bg-muted/40'"
                             class="rounded-2xl border p-4 text-left transition-all">
                         <span class="block text-sm font-semibold text-foreground" :style="`font-family: '${font.family}', sans-serif`" x-text="font.label"></span>
-                        <span class="mt-1 block text-[11px] text-muted-foreground">{{ __('Canlı önizlemeye anında uygulanır') }}</span>
                     </button>
                 </template>
             </div>

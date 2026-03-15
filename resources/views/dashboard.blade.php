@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     @php
         $initialSettings = \App\Support\DesignEditor::resolve(auth()->user()->profile, [
             'profile' => [
@@ -46,7 +46,7 @@
                                 :class="tab === 'design' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             <i class="fas fa-paint-brush w-4 text-center"></i>
-                            {{ __('Tasarım') }}
+                            {{ __('TasarÄ±m') }}
                         </button>
                         <button @click="tab = 'settings'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
@@ -58,7 +58,7 @@
 
                     @if(auth()->user()->is_admin)
                     <div class="px-4 mt-6 mb-2">
-                        <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('Yönetim') }}</p>
+                        <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('YÃ¶netim') }}</p>
                     </div>
                     <nav class="space-y-1 px-2">
                         <a href="{{ route('admin.dashboard') }}" 
@@ -80,7 +80,7 @@
                             </div>
                             <p class="text-xs font-medium text-foreground truncate">{{ $user->username }}</p>
                         </div>
-                        <button @click="navigator.clipboard.writeText('https://byoo.pro/{{ $user->username }}'); $el.textContent = '{{ __('Kopyalandı!') }}'; setTimeout(() => $el.textContent = '{{ __('Kopyala') }}', 2000)" 
+                        <button @click="navigator.clipboard.writeText('https://byoo.pro/{{ $user->username }}'); $el.textContent = '{{ __('KopyalandÄ±!') }}'; setTimeout(() => $el.textContent = '{{ __('Kopyala') }}', 2000)" 
                                 class="w-full py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-semibold hover:bg-primary/90 transition-colors">
                             {{ __('Kopyala') }}
                         </button>
@@ -104,13 +104,13 @@
                             :class="previewOpen ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                             class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
                         <i class="fas fa-mobile-alt text-[10px]"></i>
-                        <span class="hidden sm:inline">{{ __('Önizleme') }}</span>
+                        <span class="hidden sm:inline">{{ __('Ã–nizleme') }}</span>
                     </button>
 
                     <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" 
                        class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm">
                         <i class="fas fa-external-link-alt text-[10px]"></i>
-                        {{ __('Sayfamı Gör') }}
+                        {{ __('SayfamÄ± GÃ¶r') }}
                     </a>
 
                     <div class="flex items-center gap-2 border-l border-border pl-3">
@@ -137,7 +137,7 @@
                                     <x-dropdown-link :href="route('logout')"
                                             onclick="event.preventDefault(); this.closest('form').submit();"
                                             class="flex items-center text-destructive hover:bg-destructive/10">
-                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> {{ __('Çıkış Yap') }}
+                                        <i class="fas fa-sign-out-alt mr-2 w-4"></i> {{ __('Ã‡Ä±kÄ±ÅŸ Yap') }}
                                     </x-dropdown-link>
                                 </form>
                             </x-slot>
@@ -206,7 +206,7 @@
                                     <div class="flex items-center gap-2 pl-3">
                                         <div class="hidden md:flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1.5 text-[11px] font-medium text-muted-foreground">
                                             <span class="inline-flex h-2 w-2 rounded-full" :class="isSaving ? 'bg-amber-500 animate-pulse' : (isDirty ? 'bg-orange-500' : 'bg-emerald-500')"></span>
-                                            <span x-text="isSaving ? '{{ __('Kaydediliyor') }}' : (isDirty ? '{{ __('Kaydedilmemiş değişiklikler') }}' : '{{ __('Tüm değişiklikler kaydedildi') }}')"></span>
+                                            <span x-text="isSaving ? '{{ __('Yayınlanıyor') }}' : (isDirty ? '{{ __('Yayınlanmamış değişiklikler') }}' : '{{ __('Tüm değişiklikler yayınlandı') }}')"></span>
                                         </div>
                                         <button x-show="isDirty && !isSaving" x-cloak @click="restoreLastSaved" class="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted">
                                             <i class="fas fa-rotate-left text-[10px]"></i>
@@ -214,7 +214,7 @@
                                         </button>
                                         <button @click="saveDesign" :disabled="isSaving" :class="isSaving ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'" class="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition-all">
                                             <i class="fas fa-save text-xs"></i>
-                                            <span x-text="isSaving ? '{{ __('Kaydediliyor...') }}' : '{{ __('Kaydet') }}'"></span>
+                                            <span x-text="isSaving ? '{{ __('Yayınlanıyor...') }}' : '{{ __('Yayınla') }}'"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -268,10 +268,10 @@
                                 <div class="border-t border-border bg-muted/10 px-4 py-3 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                                     <div class="flex items-center gap-2 text-[11px] text-muted-foreground">
                                         <i class="fas fa-bolt text-[10px]"></i>
-                                        <span>{{ __('Tasarım ayarlarınız canlı önizleme ile senkronize edilir') }}</span>
+                                        <span>{{ __('TasarÄ±m ayarlarÄ±nÄ±z canlÄ± Ã¶nizleme ile senkronize edilir') }}</span>
                                     </div>
                                     <div class="flex items-center gap-3 text-[10px] font-medium">
-                                        <span class="text-muted-foreground">{{ __('Kısayol:') }} <kbd class="rounded border border-border bg-background px-1.5 py-0.5 font-mono">Ctrl/Cmd + S</kbd></span>
+                                        <span class="text-muted-foreground">{{ __('KÄ±sayol:') }} <kbd class="rounded border border-border bg-background px-1.5 py-0.5 font-mono">Ctrl/Cmd + S</kbd></span>
                                         <span x-show="saveFeedback.message" x-cloak :class="saveFeedback.type === 'error' ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400'" x-text="saveFeedback.message"></span>
                                     </div>
                                 </div>
@@ -285,15 +285,15 @@
                                     @include('profile.partials.update-profile-information-form')
                                 </div>
                                 <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
-                                    <h3 class="text-sm font-semibold mb-4">{{ __('Özel Alan Adı') }}</h3>
+                                    <h3 class="text-sm font-semibold mb-4">{{ __('Ã–zel Alan AdÄ±') }}</h3>
                                     @include('profile.partials.update-custom-domain-form')
                                 </div>
                                 <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
-                                    <h3 class="text-sm font-semibold mb-4">{{ __('Şifreyi Güncelle') }}</h3>
+                                    <h3 class="text-sm font-semibold mb-4">{{ __('Åifreyi GÃ¼ncelle') }}</h3>
                                     @include('profile.partials.update-password-form')
                                 </div>
                                 <div class="rounded-lg border border-destructive/20 bg-destructive/5 p-6 md:p-8 rounded-lg">
-                                    <h3 class="text-sm font-semibold text-destructive mb-4">{{ __('Hesabı Sil') }}</h3>
+                                    <h3 class="text-sm font-semibold text-destructive mb-4">{{ __('HesabÄ± Sil') }}</h3>
                                     @include('profile.partials.delete-user-form')
                                 </div>
                             </div>
@@ -307,7 +307,7 @@
                      style="min-width: 0;">
                     <div class="h-full flex flex-col p-5">
                         <header class="mb-4 flex items-center justify-between flex-shrink-0 border-b border-border/50 pb-2">
-                            <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('Canlı Önizleme') }}</h3>
+                            <h3 class="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{{ __('CanlÄ± Ã–nizleme') }}</h3>
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent">
                                     <i class="fas fa-external-link-alt"></i>
@@ -336,13 +336,59 @@
                             </div>
                         </div>
                         <div class="mt-3 text-center flex-shrink-0">
-                            <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-40">{{ __('Görünüm anlık olarak güncellenir') }}</p>
+                            <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-40">{{ __('Taslak görünüm anlık olarak güncellenir') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .design-color-control {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+        }
+
+        .design-color-swatch {
+            position: relative;
+            display: inline-flex;
+            width: 3rem;
+            height: 3rem;
+            flex-shrink: 0;
+            overflow: hidden;
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            background: hsl(var(--background));
+            box-shadow: 0 8px 24px -18px rgba(15, 23, 42, 0.7);
+        }
+
+        .design-color-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            padding: 0;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .design-color-input::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .design-color-input::-webkit-color-swatch {
+            border: 0;
+            border-radius: 9999px;
+        }
+
+        .design-color-input::-moz-color-swatch {
+            border: 0;
+            border-radius: 9999px;
+        }
+    </style>
 
     @push('scripts')
 <script>
@@ -358,10 +404,10 @@
             };
 
             const fontSizeLabels = {
-                sm: 'Küçük',
+                sm: 'KÃ¼Ã§Ã¼k',
                 md: 'Orta',
-                lg: 'Büyük',
-                xl: 'Çok Büyük',
+                lg: 'BÃ¼yÃ¼k',
+                xl: 'Ã‡ok BÃ¼yÃ¼k',
             };
 
             const themePresetOptions = Object.values(shared.themePresets).map((preset) => {
@@ -388,7 +434,10 @@
                 activeDesignSection: 'header',
                 sidebarOpen: window.innerWidth >= 768,
                 previewOpen: window.innerWidth >= 1280,
+                previewReady: false,
                 previewSyncTimer: null,
+                pendingPreviewPayload: null,
+                previewSnapshot: '',
                 beforeUnloadHandler: null,
                 shortcutHandler: null,
                 feedbackTimer: null,
@@ -413,31 +462,31 @@
                 backgroundTypeOptions: [
                     { id: 'color', label: 'Renk' },
                     { id: 'gradient', label: 'Gradyan' },
-                    { id: 'image', label: 'Görsel' },
+                    { id: 'image', label: 'GÃ¶rsel' },
                     { id: 'video', label: 'Video' },
                     { id: 'animation', label: 'Animasyon' },
                 ],
                 buttonVariantOptions: [
                     { id: 'solid', label: 'Dolu', icon: 'fas fa-square' },
-                    { id: 'outline', label: 'Çizgili', icon: 'far fa-square' },
+                    { id: 'outline', label: 'Ã‡izgili', icon: 'far fa-square' },
                     { id: 'glass', label: 'Cam', icon: 'fas fa-layer-group' },
                     { id: 'offset', label: 'Ofset', icon: 'fas fa-clone' },
                 ],
                 avatarSizeOptions: [
-                    { id: 'sm', label: 'Küçük' },
+                    { id: 'sm', label: 'KÃ¼Ã§Ã¼k' },
                     { id: 'md', label: 'Orta' },
-                    { id: 'lg', label: 'Büyük' },
+                    { id: 'lg', label: 'BÃ¼yÃ¼k' },
                     { id: 'xl', label: 'Dev' },
                 ],
                 headerToggleOptions: [
-                    { key: 'show_name', label: 'Profil ismini göster' },
-                    { key: 'show_username', label: '@kullaniciadini göster' },
-                    { key: 'show_bio', label: 'Biyografiyi göster' },
+                    { key: 'show_name', label: 'Profil ismini gÃ¶ster' },
+                    { key: 'show_username', label: '@kullaniciadini gÃ¶ster' },
+                    { key: 'show_bio', label: 'Biyografiyi gÃ¶ster' },
                 ],
                 animationOptions: [
                     { id: 'anim-1', label: 'Zigzag', class: 'bg-anim-1' },
                     { id: 'anim-2', label: 'Daireler', class: 'bg-anim-2' },
-                    { id: 'anim-3', label: 'Çizgiler', class: 'bg-anim-3' },
+                    { id: 'anim-3', label: 'Ã‡izgiler', class: 'bg-anim-3' },
                     { id: 'anim-4', label: 'Mesh', class: 'bg-anim-4' },
                     { id: 'anim-5', label: 'Oklar', class: 'bg-anim-5' },
                 ],
@@ -456,6 +505,7 @@
                 init() {
                     this.draftDesign = this.normalizeDesignSettings(initialSettings);
                     this.lastSavedSnapshot = this.serializeDesign(this.draftDesign);
+                    this.previewSnapshot = this.lastSavedSnapshot;
                     this.isDirty = false;
                     this.loadTypographyFont();
                     this.shortcutHandler = (event) => {
@@ -474,11 +524,6 @@
                     window.addEventListener('beforeunload', this.beforeUnloadHandler);
                     window.addEventListener('keydown', this.shortcutHandler);
 
-                    this.$watch('draftDesign', () => {
-                        this.isDirty = this.serializeDesign(this.draftDesign) !== this.lastSavedSnapshot;
-                        this.pushPreview(false);
-                    }, { deep: true });
-
                     this.$watch('draftDesign.typography.font_family', () => {
                         this.loadTypographyFont();
                     });
@@ -489,8 +534,20 @@
                         }
                     });
 
+                    Alpine.effect(() => {
+                        const snapshot = this.serializeDesign(this.draftDesign);
+                        this.isDirty = snapshot !== this.lastSavedSnapshot;
+
+                        if (snapshot === this.previewSnapshot) {
+                            return;
+                        }
+
+                        this.previewSnapshot = snapshot;
+                        this.pushPreview(false, JSON.parse(snapshot));
+                    });
+
                     this.$nextTick(() => {
-                        this.pushPreview(true);
+                        this.pushPreview(true, this.draftDesign);
                     });
                 },
 
@@ -507,7 +564,8 @@
                 },
 
                 handlePreviewLoad() {
-                    this.pushPreview(true);
+                    this.previewReady = true;
+                    this.flushPreviewPayload(true);
                 },
 
                 loadTypographyFont() {
@@ -542,15 +600,31 @@
                 pushPreview(force = false, settings = null) {
                     clearTimeout(this.previewSyncTimer);
                     const payload = this.preparePayload(settings || this.draftDesign);
-                    this.previewSyncTimer = setTimeout(() => {
-                        const iframe = this.$refs.previewIframe;
-                        if (!iframe || !iframe.contentWindow) return;
+                    this.pendingPreviewPayload = payload;
 
-                        iframe.contentWindow.postMessage({
-                            type: 'DESIGN_UPDATE',
-                            payload,
-                        }, '*');
+                    if (!this.previewReady) {
+                        return;
+                    }
+
+                    this.previewSyncTimer = setTimeout(() => {
+                        this.flushPreviewPayload(force);
                     }, force ? 0 : 90);
+                },
+
+                flushPreviewPayload(force = false) {
+                    clearTimeout(this.previewSyncTimer);
+
+                    const iframe = this.$refs.previewIframe;
+                    if (!iframe || !iframe.contentWindow || !this.pendingPreviewPayload) return;
+
+                    iframe.contentWindow.postMessage({
+                        type: 'DESIGN_UPDATE',
+                        payload: this.pendingPreviewPayload,
+                    }, '*');
+
+                    if (force) {
+                        this.previewSyncTimer = null;
+                    }
                 },
 
                 serializeDesign(settings) {
@@ -602,7 +676,7 @@
                     this.isDirty = false;
                     this.resetTransientFiles();
                     this.pushPreview(true, this.draftDesign);
-                    this.flashSaveFeedback('{{ __('Son kaydedilen sürüm geri yüklendi.') }}');
+                    this.flashSaveFeedback('{{ __('Son yayınlanan sürüm geri yüklendi.') }}');
                 },
 
                 clearAllObjectUrls() {
@@ -643,6 +717,14 @@
                 handleFileChange(event, type) {
                     const file = event?.target?.files?.[0];
                     if (!file) return;
+
+                    if (type === 'bg_video' && file.size > (10 * 1024 * 1024)) {
+                        this.flashSaveFeedback('{{ __('Video dosyası 10MB limitini aşıyor.') }}', 'error');
+                        if (event?.target) {
+                            event.target.value = '';
+                        }
+                        return;
+                    }
 
                     this.files[type] = file;
 
@@ -731,18 +813,30 @@
                             });
                         }
 
+                        const contentType = response.headers.get('content-type') || '';
                         const rawText = await response.text();
                         let data = {};
 
-                        if (rawText) {
+                        if (response.status === 413) {
+                            throw new Error('{{ __('Video dosyası 10MB limitini aşıyor veya sunucu yükleme limiti düşük.') }}');
+                        }
+
+                        if (rawText && contentType.includes('application/json')) {
                             try {
                                 data = JSON.parse(rawText);
                             } catch (parseError) {
-                                throw new Error('Sunucu geçersiz bir cevap döndürdü.');
+                                if (!response.ok) {
+                                    throw new Error(`HTTP ${response.status}`);
+                                }
+                                throw new Error('{{ __('Sunucu geçersiz bir cevap döndürdü.') }}');
                             }
                         }
 
                         if (!response.ok || data.success === false) {
+                            if (response.status === 422) {
+                                throw new Error(data.message || '{{ __('Gönderilen tasarım verileri doğrulanamadı.') }}');
+                            }
+
                             throw new Error(data.message || `HTTP ${response.status}`);
                         }
 
@@ -753,10 +847,10 @@
                         this.resetTransientFiles();
                         this.pushPreview(true, savedDesign);
 
-                        this.flashSaveFeedback('{{ __('Tasarım kaydedildi.') }}');
+                        this.flashSaveFeedback('{{ __('Tasarım yayınlandı.') }}');
                     } catch (error) {
                         console.error('Design save error:', error);
-                        this.flashSaveFeedback(error?.message || '{{ __('Kaydetme sırasında bir hata oluştu.') }}', 'error');
+                        this.flashSaveFeedback(error?.message || '{{ __('Yayınlama sırasında bir hata oluştu.') }}', 'error');
                     } finally {
                         this.isSaving = false;
                     }
@@ -772,3 +866,5 @@
 </script>
 @endpush
 </x-app-layout>
+
+

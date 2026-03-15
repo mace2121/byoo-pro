@@ -38,9 +38,14 @@
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Düz Renk') }}</h4>
                 <p class="mt-1 text-[11px] text-muted-foreground">{{ __('Tek renk arka plan canlı önizlemeye anında uygulanır.') }}</p>
             </div>
-            <div class="flex items-center gap-4">
-                <input type="color" x-model="draftDesign.background.color" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
-                <input type="text" x-model="draftDesign.background.color" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#f8fafc">
+            <div class="design-color-control">
+                <label class="design-color-swatch">
+                    <input type="color" x-model="draftDesign.background.color" class="design-color-input">
+                </label>
+                <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
+                    <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
+                    <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.color.toUpperCase()"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -49,22 +54,32 @@
         <div class="space-y-5">
             <div>
                 <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{{ __('Gradyan') }}</h4>
-                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('İki renk seçin, açı ve yön belirleyin. Sistem gradyanı otomatik üretir.') }}</p>
+                <p class="mt-1 text-[11px] text-muted-foreground">{{ __('İki renk seçin, ardından yön ve açı ile görünümü netleştirin.') }}</p>
             </div>
 
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr_0.9fr]">
                 <div class="space-y-3">
                     <label class="text-[11px] font-medium text-muted-foreground">{{ __('Renk 1') }}</label>
-                    <div class="flex items-center gap-3">
-                        <input type="color" x-model="draftDesign.background.gradient_color_1" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
-                        <input type="text" x-model="draftDesign.background.gradient_color_1" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#667eea">
+                    <div class="design-color-control">
+                        <label class="design-color-swatch">
+                            <input type="color" x-model="draftDesign.background.gradient_color_1" class="design-color-input">
+                        </label>
+                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
+                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
+                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.gradient_color_1.toUpperCase()"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="space-y-3">
                     <label class="text-[11px] font-medium text-muted-foreground">{{ __('Renk 2') }}</label>
-                    <div class="flex items-center gap-3">
-                        <input type="color" x-model="draftDesign.background.gradient_color_2" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
-                        <input type="text" x-model="draftDesign.background.gradient_color_2" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm" placeholder="#764ba2">
+                    <div class="design-color-control">
+                        <label class="design-color-swatch">
+                            <input type="color" x-model="draftDesign.background.gradient_color_2" class="design-color-input">
+                        </label>
+                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
+                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
+                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.gradient_color_2.toUpperCase()"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="rounded-2xl border border-border/70" :style="`background:${buildGradientPreview(draftDesign.background)}`"></div>
@@ -73,10 +88,20 @@
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div class="space-y-2">
                     <label class="text-[11px] font-medium text-muted-foreground">{{ __('Yön') }}</label>
-                    <select x-model="draftDesign.background.gradient_direction" class="h-11 w-full rounded-xl border-input bg-background text-sm shadow-sm">
-                        <option value="linear">{{ __('Doğrusal') }}</option>
-                        <option value="radial">{{ __('Radyal') }}</option>
-                    </select>
+                    <div class="inline-flex rounded-2xl border border-border bg-background p-1">
+                        <button type="button"
+                                @click="draftDesign.background.gradient_direction = 'linear'"
+                                :class="draftDesign.background.gradient_direction === 'linear' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'"
+                                class="rounded-xl px-4 py-2 text-sm font-semibold transition-all">
+                            {{ __('Doğrusal') }}
+                        </button>
+                        <button type="button"
+                                @click="draftDesign.background.gradient_direction = 'radial'"
+                                :class="draftDesign.background.gradient_direction === 'radial' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'"
+                                class="rounded-xl px-4 py-2 text-sm font-semibold transition-all">
+                            {{ __('Radyal') }}
+                        </button>
+                    </div>
                 </div>
                 <div class="space-y-2" x-show="draftDesign.background.gradient_direction === 'linear'" x-cloak>
                     <div class="flex items-center justify-between">
@@ -133,6 +158,7 @@
                 {{ __('Video Seç') }}
                 <input type="file" class="hidden" accept="video/mp4,video/webm" @change="handleFileChange($event, 'bg_video')">
             </label>
+            <p class="text-[11px] text-muted-foreground">{{ __('Önerilen maksimum video boyutu 10MB ve formatlar MP4/WebM.') }}</p>
         </div>
     </div>
 
@@ -158,15 +184,30 @@
             </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <template x-for="(color, index) in draftDesign.background.animation_colors" :key="index">
-                    <div class="space-y-2">
-                        <label class="text-[11px] font-medium text-muted-foreground" x-text="index === 0 ? '{{ __('Ana Renk') }}' : '{{ __('İkinci Renk') }}'"></label>
-                        <div class="flex items-center gap-3">
-                            <input type="color" x-model="draftDesign.background.animation_colors[index]" class="h-12 w-12 overflow-hidden rounded-full border border-border bg-transparent p-0 shadow-sm">
-                            <input type="text" x-model="draftDesign.background.animation_colors[index]" class="h-11 flex-1 rounded-xl border-input bg-background font-mono text-sm">
+                <div class="space-y-2">
+                    <label class="text-[11px] font-medium text-muted-foreground">{{ __('Ana Renk') }}</label>
+                    <div class="design-color-control">
+                        <label class="design-color-swatch">
+                            <input type="color" x-model="draftDesign.background.animation_colors[0]" class="design-color-input">
+                        </label>
+                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
+                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
+                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.animation_colors[0].toUpperCase()"></span>
                         </div>
                     </div>
-                </template>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[11px] font-medium text-muted-foreground">{{ __('İkinci Renk') }}</label>
+                    <div class="design-color-control">
+                        <label class="design-color-swatch">
+                            <input type="color" x-model="draftDesign.background.animation_colors[1]" class="design-color-input">
+                        </label>
+                        <div class="min-w-0 flex-1 rounded-2xl border border-border/70 bg-background px-4 py-3">
+                            <span class="block text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">HEX</span>
+                            <span class="mt-1 block font-mono text-sm text-foreground" x-text="draftDesign.background.animation_colors[1].toUpperCase()"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

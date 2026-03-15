@@ -157,6 +157,7 @@ class DesignEditor
             : 'none';
 
         return implode('; ', [
+            '--bg-color: '.($design['background']['color'] ?? '#f8fafc'),
             '--font-family: '.self::getFontStack($design['typography']['font_family'] ?? 'inter'),
             '--font-title-size: '.$fontVars['title'],
             '--font-username-size: '.$fontVars['username'],
