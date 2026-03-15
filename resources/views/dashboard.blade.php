@@ -440,6 +440,8 @@
                 previewSnapshot: '',
                 beforeUnloadHandler: null,
                 shortcutHandler: null,
+                previewEventHandler: null,
+                previewEventTarget: null,
                 feedbackTimer: null,
                 isSaving: false,
                 isDirty: false,
@@ -528,26 +530,31 @@
                         this.loadTypographyFont();
                     });
 
+                    this.$watch('draftDesign', () => {
+                        this.syncPreviewState(false);
+                    });
+
                     this.$watch('tab', (nextTab) => {
                         if (nextTab === 'design') {
                             this.pushPreview(true);
                         }
                     });
 
-                    Alpine.effect(() => {
-                        const snapshot = this.serializeDesign(this.draftDesign);
-                        this.isDirty = snapshot !== this.lastSavedSnapshot;
+                    this.$nextTick(() => {
+                        this.previewEventTarget = this.$refs.designScrollArea || this.$root;
+                        this.previewEventHandler = () => {
+                            window.requestAnimationFrame(() => {
+                                this.syncPreviewState(false);
+                            });
+                        };
 
-                        if (snapshot === this.previewSnapshot) {
-                            return;
+                        if (this.previewEventTarget && this.previewEventHandler) {
+                            this.previewEventTarget.addEventListener('input', this.previewEventHandler);
+                            this.previewEventTarget.addEventListener('change', this.previewEventHandler);
+                            this.previewEventTarget.addEventListener('click', this.previewEventHandler);
                         }
 
-                        this.previewSnapshot = snapshot;
-                        this.pushPreview(false, JSON.parse(snapshot));
-                    });
-
-                    this.$nextTick(() => {
-                        this.pushPreview(true, this.draftDesign);
+                        this.syncPreviewState(true, this.draftDesign);
                     });
                 },
 
@@ -559,6 +566,11 @@
                     }
                     if (this.shortcutHandler) {
                         window.removeEventListener('keydown', this.shortcutHandler);
+                    }
+                    if (this.previewEventTarget && this.previewEventHandler) {
+                        this.previewEventTarget.removeEventListener('input', this.previewEventHandler);
+                        this.previewEventTarget.removeEventListener('change', this.previewEventHandler);
+                        this.previewEventTarget.removeEventListener('click', this.previewEventHandler);
                     }
                     this.clearAllObjectUrls();
                 },
@@ -764,6 +776,18 @@
 
                 updatePreview(settings) {
                     this.pushPreview(true, settings);
+                },
+
+                syncPreviewState(force = false, settings = null) {
+                    const snapshot = this.serializeDesign(settings || this.draftDesign);
+                    this.isDirty = snapshot !== this.lastSavedSnapshot;
+
+                    if (!force && snapshot === this.previewSnapshot) {
+                        return;
+                    }
+
+                    this.previewSnapshot = snapshot;
+                    this.pushPreview(force, JSON.parse(snapshot));
                 },
 
                 getMediaTargetPath(type) {
