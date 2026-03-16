@@ -47,6 +47,7 @@ class PublicProfileController extends Controller
 
         $profile = $data['profile'];
         $links = $data['links'];
+        $blocks = $data['blocks'];
 
         // Analytics logging
         $request = request();
@@ -62,7 +63,7 @@ class PublicProfileController extends Controller
             'referer' => $request->headers->get('referer'),
         ]);
 
-        return view('public.profile', compact('user', 'profile', 'links'));
+        return view('public.profile', compact('user', 'profile', 'links', 'blocks'));
     }
 
     public function redirect(Link $link, Request $request)

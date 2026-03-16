@@ -33,8 +33,8 @@
                         <button @click="tab = 'links'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'links' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                            <i class="fas fa-link w-4 text-center"></i>
-                            {{ __('Linklerim') }}
+                            <i class="fas fa-layer-group w-4 text-center"></i>
+                            {{ __('Bloklar') }}
                         </button>
                         <button @click="tab = 'stats'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'stats' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
@@ -442,6 +442,7 @@
                 shortcutHandler: null,
                 previewEventHandler: null,
                 previewEventTarget: null,
+                blocksEventHandler: null,
                 feedbackTimer: null,
                 isSaving: false,
                 isDirty: false,
@@ -525,6 +526,16 @@
 
                     window.addEventListener('beforeunload', this.beforeUnloadHandler);
                     window.addEventListener('keydown', this.shortcutHandler);
+                    this.blocksEventHandler = () => {
+                        const iframe = this.$refs.previewIframe;
+                        if (!iframe) return;
+
+                        this.previewReady = false;
+                        iframe.src = `{{ route('public.profile', auth()->user()->username) }}?preview=${Date.now()}`;
+                    };
+
+                    window.addEventListener('blocks-updated', this.blocksEventHandler);
+                    window.addEventListener('links-updated', this.blocksEventHandler);
 
                     this.$watch('draftDesign.typography.font_family', () => {
                         this.loadTypographyFont();
@@ -566,6 +577,10 @@
                     }
                     if (this.shortcutHandler) {
                         window.removeEventListener('keydown', this.shortcutHandler);
+                    }
+                    if (this.blocksEventHandler) {
+                        window.removeEventListener('blocks-updated', this.blocksEventHandler);
+                        window.removeEventListener('links-updated', this.blocksEventHandler);
                     }
                     if (this.previewEventTarget && this.previewEventHandler) {
                         this.previewEventTarget.removeEventListener('input', this.previewEventHandler);

@@ -7,7 +7,7 @@
 
 <div class="col-span-full grid grid-cols-1 md:grid-cols-3 gap-6">
     <x-stats-card 
-        :title="__('Toplam Link')" 
+        :title="__('Toplam Blok')" 
         :value="number_format($total_links)" 
         icon="fas fa-link" 
     />

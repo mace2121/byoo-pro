@@ -66,4 +66,9 @@ class Link extends Model
     {
         return $this->hasMany(ClickLog::class);
     }
+
+    public function preview()
+    {
+        return $this->hasOne(LinkPreview::class, 'url', 'url');
+    }
 }

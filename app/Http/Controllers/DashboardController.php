@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
+use App\Services\BlockService;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    public function __construct(protected BlockService $blockService)
+    {
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -15,8 +18,9 @@ class DashboardController extends Controller
             $query->orderBy('order');
         }]);
         $profile = $user->profile;
+        $blocks = $this->blockService->getDashboardBlocks($user);
         
-        $total_links = $user->links->count();
+        $total_links = $blocks->isNotEmpty() ? $blocks->count() : $user->links->count();
         $total_clicks = $user->links->sum('clicks');
         $profile_views = $profile?->views ?? 0;
 
@@ -47,6 +51,8 @@ class DashboardController extends Controller
             'user' => $user,
             'profile' => $profile,
             'links' => $user->links,
+            'blocks' => $blocks,
+            'blocks_ready' => $this->blockService->blocksTableExists(),
             'total_links' => $total_links,
             'total_clicks' => $total_clicks,
             'profile_views' => $profile_views,

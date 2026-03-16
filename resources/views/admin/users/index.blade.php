@@ -1,18 +1,15 @@
 <x-app-layout>
     <div class="h-full flex">
-        <!-- Admin Sidebar -->
         @include('admin.partials.sidebar')
 
-        <!-- Right Column: Navbar + Content -->
         <div class="flex-1 min-w-0 flex flex-col">
             @include('admin.partials.navbar')
 
-            <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto bg-background">
                 <div class="max-w-6xl mx-auto p-6 md:p-10 space-y-6">
                     <div>
-                        <h1 class="text-2xl font-bold tracking-tight">{{ __('Kullanıcı Yönetimi') }}</h1>
-                        <p class="text-sm text-muted-foreground mt-1">{{ __('Platformdaki tüm kullanıcıları inceleyin, durumlarını yönetin ve erişimlerini kontrol edin.') }}</p>
+                        <h1 class="text-2xl font-bold tracking-tight">Kullanici Yonetimi</h1>
+                        <p class="mt-1 text-sm text-muted-foreground">Platformdaki tum kullanicilari inceleyin, durumlarini yonetin ve rozetlerini guncelleyin.</p>
                     </div>
 
                     @if(session('success'))
@@ -29,38 +26,41 @@
                         </div>
                     @endif
 
-                    <!-- Search -->
                     <div class="rounded-lg border border-border bg-card shadow-sm p-4">
                         <form action="{{ route('admin.users.index') }}" method="GET" class="flex gap-3">
                             <div class="relative flex-1">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
-                                <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="İsim, kullanıcı adı veya e-posta ile ara..." 
-                                       class="w-full pl-9 h-9 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+                                <input
+                                    type="text"
+                                    name="search"
+                                    value="{{ $search ?? '' }}"
+                                    placeholder="Isim, kullanici adi veya e-posta ile ara..."
+                                    class="w-full pl-9 h-9 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                />
                             </div>
                             <button type="submit" class="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                                {{ __('Ara') }}
+                                Ara
                             </button>
                             @if($search)
                                 <a href="{{ route('admin.users.index') }}" class="inline-flex items-center h-9 px-4 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors">
-                                    {{ __('Temizle') }}
+                                    Temizle
                                 </a>
                             @endif
                         </form>
                     </div>
 
-                    <!-- Users Table -->
                     <div class="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full">
                                 <thead class="bg-muted/50">
                                     <tr>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">ID</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('Kullanıcı') }}</th>
-                                        <th class="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('Link') }}</th>
-                                        <th class="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('Görüntülenme / Tık') }}</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('Durum') }}</th>
-                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('Tarih') }}</th>
-                                        <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">{{ __('İşlemler') }}</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Kullanici</th>
+                                        <th class="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Blok</th>
+                                        <th class="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">Goruntulenme / Tik</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Durum</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tarih</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Islemler</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-border">
@@ -75,6 +75,9 @@
                                                     <div class="min-w-0">
                                                         <div class="flex items-center gap-1.5">
                                                             <p class="text-sm font-semibold truncate">{{ $user->name }}</p>
+                                                            @if($user->verified)
+                                                                <x-verified-badge size="sm" />
+                                                            @endif
                                                             @if($user->is_admin)
                                                                 <span class="px-1.5 py-0.5 text-[9px] font-semibold rounded bg-foreground text-background uppercase">Admin</span>
                                                             @endif
@@ -94,27 +97,43 @@
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3">
-                                                @if($user->is_active)
-                                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">{{ __('Aktif') }}</span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">{{ __('Askıda') }}</span>
-                                                @endif
+                                                <div class="flex items-center gap-2 flex-wrap">
+                                                    @if($user->is_active)
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Aktif</span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Askida</span>
+                                                    @endif
+
+                                                    @if($user->verified)
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-medium text-sky-700">
+                                                            <x-verified-badge size="sm" class="!h-3.5 !w-3.5 !text-[8px]" />
+                                                            Dogrulanmis
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 text-xs text-muted-foreground">{{ $user->created_at->format('d M Y') }}</td>
                                             <td class="px-4 py-3 text-right">
                                                 @if($user->id !== auth()->id())
                                                     <div class="flex justify-end gap-1">
-                                                        <a href="{{ route('public.profile', $user->username) }}" target="_blank" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="{{ __('Profili Gör') }}">
+                                                        <a href="{{ route('public.profile', $user->username) }}" target="_blank" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Profili Gor">
                                                             <i class="fas fa-external-link-alt text-xs"></i>
                                                         </a>
-                                                        <a href="{{ route('admin.users.impersonate', $user) }}" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="{{ __('Kullanıcı Olarak Giriş') }}">
+                                                        <a href="{{ route('admin.users.impersonate', $user) }}" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Kullanici Olarak Giris">
                                                             <i class="fas fa-user-secret text-xs"></i>
                                                         </a>
                                                         <form action="{{ route('admin.users.toggle', $user) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-green-500 hover:text-green-700 hover:bg-green-50' }}" title="{{ $user->is_active ? __('Askıya Al') : __('Aktifleştir') }}">
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-green-500 hover:text-green-700 hover:bg-green-50' }}" title="{{ $user->is_active ? 'Askıya Al' : 'Aktiflestir' }}">
                                                                 <i class="fas {{ $user->is_active ? 'fa-ban' : 'fa-check-circle' }} text-xs"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.users.verified', $user) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:text-sky-700 hover:bg-sky-50' : 'text-muted-foreground hover:text-sky-600 hover:bg-sky-50' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
+                                                                <i class="fas fa-circle-check text-xs"></i>
                                                             </button>
                                                         </form>
                                                     </div>
@@ -125,7 +144,7 @@
                                         <tr>
                                             <td colspan="7" class="px-4 py-12 text-center text-sm text-muted-foreground">
                                                 <i class="fas fa-users-slash text-2xl opacity-20 mb-2 block"></i>
-                                                {{ __('Kullanıcı bulunamadı.') }}
+                                                Kullanici bulunamadi.
                                             </td>
                                         </tr>
                                     @endforelse

@@ -185,6 +185,7 @@
         .theme-bio { color: var(--text-page, var(--text)); font-size: var(--font-bio-size); }
         .theme-card { background: var(--btn-bg, var(--card-bg)); border: var(--btn-border-width, 1px) var(--btn-border-style, solid) var(--btn-border, var(--card-border)); color: var(--btn-text, var(--link-color)); border-radius: var(--btn-radius); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: var(--btn-align, center); text-align: var(--btn-text-align, center); font-size: var(--font-button-size); }
         .theme-card:hover { background: var(--btn-bg-hover, var(--card-hover)); border-color: var(--btn-border-hover, var(--btn-border, var(--card-border))); color: var(--btn-text-hover, var(--btn-text, var(--link-color))); box-shadow: var(--card-shadow, none); transform: translateY(-2px); }
+        .theme-card-stacked { display: block; text-align: left; }
         .theme-card-icon-wrap { color: var(--btn-icon, var(--link-color)); transition: transform 0.3s ease, color 0.3s ease, background-color 0.3s ease; }
         .theme-card-icon { color: var(--btn-icon, var(--link-color)); transition: color 0.3s ease; }
         .theme-card:hover .theme-card-icon,
@@ -196,6 +197,8 @@
         .avatar-polygon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
         .theme-footer { color: var(--footer-color); }
         .theme-empty { color: var(--text-secondary); background: var(--card-bg); border-color: var(--card-border); }
+        .theme-title-row { display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+        .theme-title-row.theme-title-left { justify-content: flex-start; }
 
         .theme-content {
             position: relative;
@@ -246,7 +249,12 @@
 
                     <div class="{{ $headerLayout === 'left-aligned' ? 'flex-1 pt-1' : 'w-full' }}">
                         <h2 class="{{ $headerLayout === 'hero-cover' ? 'mt-6 text-4xl' : 'mt-4 text-3xl' }} font-extrabold tracking-tight theme-name break-words" style="display: {{ $showName ? 'block' : 'none' }};">
-                            {{ $design['profile']['name'] ?? $user->name }}
+                            <span class="theme-title-row {{ $headerLayout === 'left-aligned' ? 'theme-title-left' : '' }}">
+                                <span class="theme-name-text">{{ $design['profile']['name'] ?? $user->name }}</span>
+                                @if($user->verified)
+                                    <x-verified-badge class="theme-verified-badge" size="md" />
+                                @endif
+                            </span>
                         </h2>
                         <p class="{{ $headerLayout === 'left-aligned' ? 'mt-0.5' : 'mt-1' }} text-sm font-medium theme-username opacity-80" style="display: {{ $showUsername ? 'block' : 'none' }};">
                             {{ '@' . ($design['profile']['username'] ?? $profile->username ?? $user->username) }}
@@ -259,33 +267,11 @@
             </div>
 
             <div class="mt-8 space-y-4">
-                @forelse($links as $link)
-                    @php
-                        $variantClass = '';
-                        if (($design['buttons']['variant'] ?? '') === 'offset') {
-                            $variantClass = 'variant-offset';
-                        } elseif (($design['buttons']['variant'] ?? '') === 'glass') {
-                            $variantClass = 'backdrop-blur-md variant-glass';
-                        }
-                    @endphp
-                    <a href="{{ route('public.redirect', $link->id) }}" target="_blank" rel="noopener noreferrer" class="flex items-center p-3 transition-all duration-300 theme-card group relative {{ $variantClass }}">
-                        <div class="theme-card-icon-wrap flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-black/5 dark:bg-white/5 group-hover:scale-110 transition-transform" style="color: var(--btn-icon, var(--link-color))">
-                            <i class="{{ $link->icon_class }} theme-card-icon text-xl"></i>
-                        </div>
-
-                        <div class="theme-card-label flex-1 font-bold {{ ($design['buttons']['align'] ?? 'center') === 'center' ? 'pr-10' : '' }}">
-                            {{ $link->title }}
-                        </div>
-
-                        @if($link->password)
-                            <div class="absolute right-4 text-gray-400 opacity-50">
-                                <i class="fas fa-lock text-xs"></i>
-                            </div>
-                        @endif
-                    </a>
+                @forelse($blocks as $block)
+                    @include('public.blocks.render', ['block' => $block, 'design' => $design])
                 @empty
                     <div class="text-center p-6 rounded-xl border border-dashed theme-empty">
-                        <p>Bu profil henüz bir link eklememiş.</p>
+                        <p>Bu profil henuz bir blok eklememis.</p>
                     </div>
                 @endforelse
             </div>
@@ -337,6 +323,8 @@
                 shared.loadGoogleFont(design.typography.font_family);
 
                 const nameEl = document.querySelector('.theme-name');
+                const nameTextEl = document.querySelector('.theme-name-text');
+                const titleRowEl = document.querySelector('.theme-title-row');
                 const usernameEl = document.querySelector('.theme-username');
                 const bioEl = document.querySelector('.theme-bio');
                 const cardWrapper = document.querySelector('.anim-target');
@@ -351,7 +339,11 @@
                 let videoContainer = document.querySelector('.bg-video-container');
                 let animContainer = document.querySelector('.bg-anim-container');
 
-                if (nameEl) nameEl.textContent = design.profile.name || runtimeDefaults.profile.name;
+                if (nameTextEl) {
+                    nameTextEl.textContent = design.profile.name || runtimeDefaults.profile.name;
+                } else if (nameEl) {
+                    nameEl.textContent = design.profile.name || runtimeDefaults.profile.name;
+                }
                 if (usernameEl) {
                     const username = String(design.profile.username || runtimeDefaults.profile.username).replace(/^@/, '');
                     usernameEl.textContent = username ? '@' + username : '';
@@ -486,6 +478,7 @@
                         cardWrapper.classList.add('text-left');
                         flexContainer.className = 'flex flex-row items-center gap-6';
                         if (textContainer) textContainer.className = 'flex-1 pt-1';
+                        if (titleRowEl) titleRowEl.classList.add('theme-title-left');
                         if (heroCover) heroCover.style.display = 'none';
                         avatarImg.classList.remove('w-16', 'h-16', 'w-24', 'h-24', 'w-32', 'h-32', 'w-40', 'h-40');
                         avatarImg.classList.add('w-20', 'h-20');
@@ -493,6 +486,7 @@
                     } else if (design.header.layout === 'hero-cover') {
                         cardWrapper.classList.add('text-center', 'relative', 'pt-12', 'mt-16');
                         flexContainer.className = 'flex flex-col items-center';
+                        if (titleRowEl) titleRowEl.classList.remove('theme-title-left');
                         if (heroCover) heroCover.style.display = 'block';
                         if (heroImage) heroImage.style.backgroundImage = `url('${design.header.hero_image_url || defaultHeroImage}')`;
                         avatarImg.classList.add('-mt-24', 'border-4', 'border-background', 'bg-background', 'shadow-2xl', 'mb-4');
@@ -501,6 +495,7 @@
                     } else {
                         cardWrapper.classList.add('text-center');
                         flexContainer.className = 'flex flex-col items-center';
+                        if (titleRowEl) titleRowEl.classList.remove('theme-title-left');
                         if (heroCover) heroCover.style.display = 'none';
                     }
                 }

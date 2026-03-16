@@ -4,18 +4,20 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Profile;
-use App\Models\Link;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 
 class ProfileService
 {
+    public function __construct(protected BlockService $blockService)
+    {
+    }
+
     /**
      * Get a user's profile and active links with caching.
      */
     public function getProfileData(User $user)
     {
-        $cacheKey = "profile_data_{$user->id}";
+        $cacheKey = "profile_data_v2_{$user->id}";
 
         return Cache::remember($cacheKey, now()->addHours(24), function () use ($user) {
             $profile = $user->profile;
@@ -27,13 +29,13 @@ class ProfileService
             $now = now();
             $links = $user->links()
                 ->where('is_active', true)
-                ->where(function($query) use ($now) {
+                ->where(function ($query) use ($now) {
                     $query->whereNull('starts_at')
-                          ->orWhere('starts_at', '<=', $now);
+                        ->orWhere('starts_at', '<=', $now);
                 })
-                ->where(function($query) use ($now) {
+                ->where(function ($query) use ($now) {
                     $query->whereNull('expires_at')
-                          ->orWhere('expires_at', '>=', $now);
+                        ->orWhere('expires_at', '>=', $now);
                 })
                 ->orderBy('order')
                 ->get();
@@ -41,6 +43,7 @@ class ProfileService
             return [
                 'profile' => $profile,
                 'links' => $links,
+                'blocks' => $this->blockService->getRenderableBlocks($user),
             ];
         });
     }
@@ -50,7 +53,7 @@ class ProfileService
      */
     public function clearProfileCache(User $user)
     {
-        Cache::forget("profile_data_{$user->id}");
+        Cache::forget("profile_data_v2_{$user->id}");
     }
 
     /**

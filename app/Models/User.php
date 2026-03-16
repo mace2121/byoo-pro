@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'is_admin',
         'is_active',
+        'verified',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
+            'verified' => 'boolean',
         ];
     }
 
@@ -60,6 +62,11 @@ class User extends Authenticatable
     public function links()
     {
         return $this->hasMany(Link::class);
+    }
+
+    public function blocks()
+    {
+        return $this->hasMany(Block::class);
     }
 
     // Subscription relationship

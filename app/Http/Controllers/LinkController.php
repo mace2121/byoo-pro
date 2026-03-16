@@ -3,17 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Link;
+use App\Services\BlockService;
+use App\Services\LinkPreviewService;
 use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LinkController extends Controller
 {
-    protected $profileService;
+    protected ProfileService $profileService;
+    protected BlockService $blockService;
+    protected LinkPreviewService $linkPreviewService;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(ProfileService $profileService, BlockService $blockService, LinkPreviewService $linkPreviewService)
     {
         $this->profileService = $profileService;
+        $this->blockService = $blockService;
+        $this->linkPreviewService = $linkPreviewService;
     }
 
     public function index()
@@ -25,9 +31,8 @@ class LinkController extends Controller
 
     public function store(Request $request)
     {
-        // Enforce plan link limit.
         if (Auth::user()->hasReachedLinkLimit()) {
-            return redirect()->route('dashboard')->with('error', 'Link limitinize ulaştınız. Daha fazla link eklemek için planınızı yükseltin.');
+            return redirect()->route('dashboard')->with('error', 'Link limitinize ulastiniz. Daha fazla link eklemek icin planinizi yukseltin.');
         }
 
         $validated = $request->validate([
@@ -51,13 +56,15 @@ class LinkController extends Controller
         ]);
 
         $this->profileService->clearProfileCache(Auth::user());
+        $this->blockService->syncLegacyLinks(Auth::user());
+        $this->refreshPreview($validated['url']);
 
         return redirect()->route('dashboard')->with('success', 'Link eklendi.');
     }
 
     public function update(Request $request, Link $link)
     {
-        Auth::user()->links()->findOrFail($link->id); // Yetki kontrolü
+        Auth::user()->links()->findOrFail($link->id);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -76,8 +83,10 @@ class LinkController extends Controller
         }
 
         $this->profileService->clearProfileCache(Auth::user());
+        $this->blockService->syncLegacyLinks(Auth::user());
+        $this->refreshPreview($validated['url']);
 
-        return redirect()->route('dashboard')->with('success', 'Link güncellendi.');
+        return redirect()->route('dashboard')->with('success', 'Link guncellendi.');
     }
 
     public function toggle(Request $request, Link $link)
@@ -87,6 +96,7 @@ class LinkController extends Controller
         $link->update(['is_active' => ! $link->is_active]);
 
         $this->profileService->clearProfileCache(Auth::user());
+        $this->blockService->syncLegacyLinks(Auth::user());
 
         return response()->json(['success' => true, 'is_active' => $link->is_active]);
     }
@@ -94,6 +104,11 @@ class LinkController extends Controller
     public function destroy(Link $link)
     {
         Auth::user()->links()->findOrFail($link->id);
+
+        if ($this->blockService->blocksTableExists()) {
+            Auth::user()->blocks()->where('source_link_id', $link->id)->delete();
+        }
+
         $link->delete();
 
         $this->profileService->clearProfileCache(Auth::user());
@@ -110,7 +125,21 @@ class LinkController extends Controller
         }
 
         $this->profileService->clearProfileCache(Auth::user());
+        $this->blockService->syncLegacyLinks(Auth::user());
 
         return response()->json(['success' => true]);
+    }
+
+    protected function refreshPreview(?string $url): void
+    {
+        if (! $url) {
+            return;
+        }
+
+        try {
+            $this->linkPreviewService->refresh($url, true);
+        } catch (\Throwable) {
+            // Ignore preview fetch errors to avoid blocking core link actions.
+        }
     }
 }

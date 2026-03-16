@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 use App\Models\ClickLog;
 use App\Models\Link;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-
-use App\Models\ViewLog;
 use App\Models\Profile;
+use App\Models\User;
+use App\Models\ViewLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -20,7 +18,7 @@ class AdminController extends Controller
         $total_links = Link::count();
         $total_clicks = ClickLog::count();
         $total_views = ViewLog::count();
-        
+
         $recent_users = User::latest()->take(5)->get();
 
         $popular_profiles = Profile::with('user')
@@ -29,11 +27,11 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.dashboard', compact(
-            'total_users', 
-            'total_links', 
-            'total_clicks', 
-            'total_views', 
-            'recent_users', 
+            'total_users',
+            'total_links',
+            'total_clicks',
+            'total_views',
+            'recent_users',
             'popular_profiles'
         ));
     }
@@ -41,51 +39,61 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         $search = $request->input('search');
-        
+
         $users = User::with(['profile', 'links'])
             ->withCount(['links'])
-            ->when($search, function($query) use ($search) {
+            ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('username', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(15)
             ->withQueryString();
-        
+
         return view('admin.users.index', compact('users', 'search'));
     }
 
     public function toggleStatus(User $user)
     {
         if ($user->id === Auth::id()) {
-            return back()->with('error', 'Kendinizi pasif yapamazsınız.');
+            return back()->with('error', 'Kendinizi pasif yapamazsiniz.');
         }
 
-        $user->is_active = !$user->is_active;
+        $user->is_active = ! $user->is_active;
         $user->save();
 
-        $status = $user->is_active ? 'Aktif edildi' : 'Pasif edildi';
-        return back()->with('success', "Kullanıcı {$user->username} başarıyla {$status}.");
+        $status = $user->is_active ? 'aktif edildi' : 'pasif edildi';
+
+        return back()->with('success', "Kullanici {$user->username} basariyla {$status}.");
+    }
+
+    public function toggleVerified(User $user)
+    {
+        $user->verified = ! $user->verified;
+        $user->save();
+
+        $status = $user->verified ? 'dogrulandi' : 'dogrulama rozeti kaldirildi';
+
+        return back()->with('success', "Kullanici {$user->username} icin durum guncellendi: {$status}.");
     }
 
     public function impersonate(User $user)
     {
         if ($user->id === Auth::id()) {
-            return back()->with('error', 'Kendiniz olarak zaten giriş yapmışsınız.');
+            return back()->with('error', 'Zaten bu kullanici ile giris yapmissiniz.');
         }
 
-        // Store original admin ID in session
         session(['impersonator_id' => Auth::id()]);
-        
+
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', "Şu an {$user->name} olarak giriş yaptınız.");
+        return redirect()->route('dashboard')->with('success', "{$user->name} olarak giris yaptiniz.");
     }
 
     public function stopImpersonating()
     {
-        if (!session()->has('impersonator_id')) {
+        if (! session()->has('impersonator_id')) {
             return redirect()->route('dashboard');
         }
 
@@ -94,6 +102,6 @@ class AdminController extends Controller
 
         Auth::login($admin);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Admin paneline geri döndünüz.');
+        return redirect()->route('admin.dashboard')->with('success', 'Admin paneline geri donuldu.');
     }
 }
