@@ -6,6 +6,7 @@ use App\Models\Block;
 use App\Models\Link;
 use App\Models\LinkPreview;
 use App\Models\User;
+use App\Support\IconCatalog;
 use App\Support\WhatsAppLink;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -124,8 +125,8 @@ class BlockService
                 'description' => null,
                 'image' => null,
                 'price' => null,
-                'icon' => $link->icon_class,
-                'manual_icon' => $link->icon,
+                'icon' => IconCatalog::normalizeClass($link->icon_class) ?? 'fas fa-link',
+                'manual_icon' => IconCatalog::normalizeClass($link->icon),
                 'icon_source' => filled($link->icon) ? 'manual' : 'auto',
                 'display_mode' => 'link',
                 'href' => route('public.redirect', $link),
@@ -143,8 +144,8 @@ class BlockService
         $data = is_array($block->data) ? $block->data : [];
         $type = $block->type ?: 'link';
         $sourceLink = $block->sourceLink;
-        $manualIcon = $data['icon'] ?? null;
-        $icon = $manualIcon ?: ($sourceLink?->icon_class ?? ($type === 'product' ? 'fas fa-bag-shopping' : 'fas fa-link'));
+        $manualIcon = IconCatalog::normalizeClass($data['icon'] ?? null);
+        $icon = IconCatalog::normalizeClass($manualIcon ?: ($sourceLink?->icon_class ?? ($type === 'product' ? 'fas fa-bag-shopping' : 'fas fa-link')));
         $preview = $this->resolvePreview($block->url ?: $sourceLink?->url, $sourceLink?->preview);
         $displayMode = $data['display_mode'] ?? ($type === 'link' ? 'link' : 'card');
 

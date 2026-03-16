@@ -1,9 +1,8 @@
 <aside class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'">
     <div class="h-full flex w-64 flex-col">
         <div class="h-14 flex items-center justify-between px-4 border-b border-border">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                <x-application-logo class="h-5 w-5 text-foreground" />
-                <span class="font-bold text-sm tracking-tight italic">byoo<span class="text-muted-foreground">.pro</span></span>
+            <a href="{{ route('dashboard') }}">
+                <x-brand-mark icon-class="h-5 w-5 text-foreground" text-class="font-bold text-sm tracking-tight italic" dot-class="text-muted-foreground" />
             </a>
 
             <button @click="sidebarOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">

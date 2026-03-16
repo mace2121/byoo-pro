@@ -51,7 +51,7 @@
     <meta name="description" content="{{ $profile->meta_description ?: ($profile->bio ? Str::limit($profile->bio, 160) : $user->name . ' adlı kullanıcının byoo.pro profili.') }}">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ url('/' . $user->username) }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <link rel="icon" href="{{ asset('brand/byoo-icon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
@@ -277,8 +277,8 @@
             </div>
 
             <div class="mt-12 text-center">
-                <a href="{{ url('/') }}" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-current/10 bg-white/10 p-2 theme-footer opacity-70 transition-all hover:opacity-100">
-                    <x-application-logo class="h-5 w-5" />
+                <a href="{{ url('/') }}" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-current/10 bg-white/10 p-2 theme-footer opacity-70 transition-all hover:opacity-100">
+                    <x-application-logo class="h-3.5 w-3.5" />
                 </a>
             </div>
         </div>

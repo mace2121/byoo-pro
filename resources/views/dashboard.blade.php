@@ -15,9 +15,8 @@
             <div class="h-full flex flex-col w-64">
                 <!-- Sidebar Header: Logo + Toggle -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-border">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                        <x-application-logo class="h-5 w-5 text-foreground" />
-                        <span class="font-bold text-sm tracking-tight italic">byoo<span class="text-muted-foreground">.pro</span></span>
+                    <a href="{{ route('dashboard') }}">
+                        <x-brand-mark icon-class="h-5 w-5 text-foreground" text-class="font-bold text-sm tracking-tight italic" dot-class="text-muted-foreground" />
                     </a>
                     <button @click="sidebarOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>

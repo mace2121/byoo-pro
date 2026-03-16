@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\IconCatalog;
 use Illuminate\Database\Eloquent\Model;
 
 class Link extends Model
@@ -22,7 +23,7 @@ class Link extends Model
 
     public function getIconClassAttribute()
     {
-        if ($this->icon) return $this->icon;
+        if ($this->icon) return IconCatalog::normalizeClass($this->icon);
 
         $platforms = [
             'instagram' => 'fab fa-instagram',
@@ -37,7 +38,7 @@ class Link extends Model
             'link'      => 'fas fa-link',
         ];
 
-        return $platforms[$this->platform] ?? 'fas fa-link';
+        return IconCatalog::normalizeClass($platforms[$this->platform] ?? 'fas fa-link');
     }
 
     public function getPlatformAttribute()

@@ -6,9 +6,8 @@
         <div class="flex justify-between h-16 items-center">
             <!-- Logo -->
             <div class="flex-shrink-0 flex items-center">
-                <a href="{{ url('/') }}" class="flex items-center gap-2">
-                    <x-application-logo class="h-8 w-auto" />
-                    <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">byoo<span class="text-indigo-600">.pro</span></span>
+                <a href="{{ url('/') }}">
+                    <x-brand-mark icon-class="h-8 w-8 text-gray-900 dark:text-white" text-class="text-xl font-bold tracking-tight text-gray-900 dark:text-white" dot-class="text-indigo-600" />
                 </a>
             </div>
 

@@ -1,28 +1,13 @@
 @php
-    $linkIconOptions = [
-        ['value' => '', 'label' => 'Otomatik sec', 'hint' => 'Link adresine gore secilir', 'icon' => 'fas fa-wand-magic-sparkles'],
-        ['value' => 'fab fa-instagram', 'label' => 'Instagram', 'hint' => 'Profil ve reels linkleri', 'icon' => 'fab fa-instagram'],
-        ['value' => 'fab fa-tiktok', 'label' => 'TikTok', 'hint' => 'Video ve profil linkleri', 'icon' => 'fab fa-tiktok'],
-        ['value' => 'fab fa-youtube', 'label' => 'YouTube', 'hint' => 'Kanal ve video baglantilari', 'icon' => 'fab fa-youtube'],
-        ['value' => 'fab fa-x-twitter', 'label' => 'X / Twitter', 'hint' => 'Tweet ve profil baglantilari', 'icon' => 'fab fa-x-twitter'],
-        ['value' => 'fab fa-whatsapp', 'label' => 'WhatsApp', 'hint' => 'Iletisim ve siparis linkleri', 'icon' => 'fab fa-whatsapp'],
-        ['value' => 'fab fa-linkedin', 'label' => 'LinkedIn', 'hint' => 'CV ve kariyer baglantilari', 'icon' => 'fab fa-linkedin'],
-        ['value' => 'fab fa-github', 'label' => 'GitHub', 'hint' => 'Repo ve proje linkleri', 'icon' => 'fab fa-github'],
-        ['value' => 'fab fa-telegram', 'label' => 'Telegram', 'hint' => 'Kanal ve mesaj baglantilari', 'icon' => 'fab fa-telegram'],
-        ['value' => 'fas fa-envelope', 'label' => 'E-posta', 'hint' => 'Mailto veya iletisim linki', 'icon' => 'fas fa-envelope'],
-        ['value' => 'fas fa-phone', 'label' => 'Telefon', 'hint' => 'Telefon baglantisi', 'icon' => 'fas fa-phone'],
-        ['value' => 'fas fa-globe', 'label' => 'Web Sitesi', 'hint' => 'Genel web sayfasi', 'icon' => 'fas fa-globe'],
-        ['value' => 'fas fa-link', 'label' => 'Standart Link', 'hint' => 'Klasik baglanti ikonu', 'icon' => 'fas fa-link'],
-    ];
+    $catalogIcons = \App\Support\IconCatalog::popular();
 
-    $productIconOptions = [
-        ['value' => '', 'label' => 'Varsayilan urun', 'hint' => 'Standart urun simgesi', 'icon' => 'fas fa-bag-shopping'],
-        ['value' => 'fas fa-bag-shopping', 'label' => 'Alisveris', 'hint' => 'Genel urun vitrini', 'icon' => 'fas fa-bag-shopping'],
-        ['value' => 'fas fa-shirt', 'label' => 'Moda', 'hint' => 'Giyim ve aksesuar', 'icon' => 'fas fa-shirt'],
-        ['value' => 'fas fa-mobile-screen', 'label' => 'Teknoloji', 'hint' => 'Elektronik ve cihazlar', 'icon' => 'fas fa-mobile-screen'],
-        ['value' => 'fas fa-gem', 'label' => 'Premium', 'hint' => 'Ozel teklifler', 'icon' => 'fas fa-gem'],
-        ['value' => 'fas fa-box-open', 'label' => 'Kutu urun', 'hint' => 'Fiziksel urunler', 'icon' => 'fas fa-box-open'],
-    ];
+    $linkIconOptions = array_merge([
+        ['value' => '', 'label' => 'Otomatik sec', 'hint' => 'Link adresine gore secilir', 'keywords' => 'otomatik auto varsayilan sistem'],
+    ], $catalogIcons);
+
+    $productIconOptions = array_merge([
+        ['value' => '', 'label' => 'Varsayilan urun', 'hint' => 'Standart urun simgesi', 'keywords' => 'varsayilan urun alisveris'],
+    ], $catalogIcons);
 
     $displayModeOptions = [
         ['value' => 'link', 'label' => 'Link', 'hint' => 'Klasik tek satir buton', 'icon' => 'fas fa-link'],
@@ -113,7 +98,7 @@
 
                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <x-ui.picker name="display_mode" label="Blok yapisi" :options="$displayModeOptions" value="link" placeholder="Blok gorunumu sec" />
-                                            <x-ui.picker name="icon" label="Ikon" :options="$linkIconOptions" value="" placeholder="Populer ikonlardan sec" searchable="true" />
+                                            <x-ui.icon-picker name="icon" label="Ikon" :options="$linkIconOptions" value="" placeholder="Populer ikonlardan sec" />
                                         </div>
                                     </div>
                                 </template>
@@ -141,7 +126,7 @@
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                            <x-ui.picker name="icon" label="Ikon" :options="$productIconOptions" value="" placeholder="Urun ikonunu sec" searchable="true" />
+                                            <x-ui.icon-picker name="icon" label="Ikon" :options="$productIconOptions" value="" placeholder="Urun ikonunu sec" />
                                             <x-ui.picker name="button_type" label="Buton tipi" :options="$buttonTypeOptions" value="external_link" placeholder="Yonlendirme sec" change-event="picker-button-type-updated" />
                                         </div>
 
@@ -180,8 +165,8 @@
                         @forelse($blocks as $block)
                             @php
                                 $blockData = is_array($block->data) ? $block->data : [];
-                                $iconValue = $blockData['icon'] ?? ($block->sourceLink?->icon ?? '');
-                                $summaryIcon = $iconValue ?: ($block->type === 'product' ? 'fas fa-bag-shopping' : ($block->sourceLink?->icon_class ?? 'fas fa-link'));
+                                $iconValue = \App\Support\IconCatalog::normalizeClass($blockData['icon'] ?? ($block->sourceLink?->icon ?? '')) ?? '';
+                                $summaryIcon = \App\Support\IconCatalog::normalizeClass($iconValue ?: ($block->type === 'product' ? 'fas fa-bag-shopping' : ($block->sourceLink?->icon_class ?? 'fas fa-link')));
                                 $displayMode = $blockData['display_mode'] ?? ($block->type === 'link' ? 'link' : 'card');
                                 $buttonType = $block->button_type ?? 'external_link';
                                 $price = $blockData['price'] ?? '';
@@ -266,7 +251,7 @@
                                                 <input type="url" name="url" value="{{ $block->url }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
                                             </div>
                                             <x-ui.picker name="display_mode" label="Blok yapisi" :options="$displayModeOptions" :value="$displayMode" placeholder="Blok gorunumu sec" />
-                                            <x-ui.picker name="icon" label="Ikon" :options="$linkIconOptions" :value="$iconValue" placeholder="Populer ikonlardan sec" searchable="true" />
+                                            <x-ui.icon-picker name="icon" label="Ikon" :options="$linkIconOptions" :value="$iconValue" placeholder="Populer ikonlardan sec" />
                                         </div>
                                     </template>
 
@@ -302,7 +287,7 @@
                                             </div>
 
                                             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                <x-ui.picker name="icon" label="Ikon" :options="$productIconOptions" :value="$iconValue" placeholder="Urun ikonunu sec" searchable="true" />
+                                                <x-ui.icon-picker name="icon" label="Ikon" :options="$productIconOptions" :value="$iconValue" placeholder="Urun ikonunu sec" />
                                                 <x-ui.picker name="button_type" label="Buton tipi" :options="$buttonTypeOptions" :value="$buttonType" placeholder="Yonlendirme sec" change-event="picker-button-type-updated" />
                                             </div>
 

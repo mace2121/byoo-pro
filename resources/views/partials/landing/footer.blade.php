@@ -2,9 +2,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div class="col-span-1 md:col-span-2">
-                <a href="{{ url('/') }}" class="flex items-center gap-2 mb-6">
-                    <x-application-logo class="h-8 w-auto" />
-                    <span class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">byoo<span class="text-indigo-600">.pro</span></span>
+                <a href="{{ url('/') }}" class="mb-6 inline-flex">
+                    <x-brand-mark icon-class="h-8 w-8 text-gray-900 dark:text-white" text-class="text-xl font-bold tracking-tight text-gray-900 dark:text-white" dot-class="text-indigo-600" />
                 </a>
                 <p class="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
                     {{ __('Dijital dünyanızı merkezileştirmek için ihtiyacınız olan tek araç. Şık, hızlı ve güvenli.') }}
