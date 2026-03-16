@@ -1,10 +1,12 @@
-<!-- Admin Inline Navbar -->
 <nav class="h-14 flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-4 md:px-6">
+    <button x-show="!sidebarOpen" x-cloak @click="sidebarOpen = true" class="p-2 rounded-md hover:bg-accent transition-colors mr-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+
     <div class="flex flex-1 items-center justify-end space-x-4">
-        <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" 
-           class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm">
+        <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-md text-xs font-medium hover:bg-primary/90 transition-colors shadow-sm">
             <i class="fas fa-external-link-alt text-[10px]"></i>
-            {{ __('Sayfamı Gör') }}
+            Sayfami Gor
         </a>
 
         <div class="flex items-center gap-2 border-l border-border pl-4">
@@ -19,19 +21,17 @@
                 </x-slot>
 
                 <x-slot name="content">
-                    <div class="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest">{{ __('Account') }}</div>
+                    <div class="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest">Account</div>
                     <x-dropdown-link :href="route('dashboard', ['tab' => 'settings'])" class="flex items-center">
-                        <i class="fas fa-cog mr-2 w-4 opacity-50"></i> {{ __('Ayarlar') }}
+                        <i class="fas fa-cog mr-2 w-4 opacity-50"></i> Ayarlar
                     </x-dropdown-link>
 
                     <div class="h-px bg-border my-1"></div>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();"
-                                class="flex items-center text-destructive hover:bg-destructive/10">
-                            <i class="fas fa-sign-out-alt mr-2 w-4"></i> {{ __('Çıkış Yap') }}
+                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();" class="flex items-center text-destructive hover:bg-destructive/10">
+                            <i class="fas fa-sign-out-alt mr-2 w-4"></i> Cikis Yap
                         </x-dropdown-link>
                     </form>
                 </x-slot>

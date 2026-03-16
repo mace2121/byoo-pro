@@ -53,7 +53,7 @@
     <link rel="canonical" href="{{ url('/' . $user->username) }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('brand/byoo-icon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
 
     <meta property="og:type" content="profile">
@@ -277,8 +277,8 @@
             </div>
 
             <div class="mt-12 text-center">
-                <a href="{{ url('/') }}" class="inline-flex items-center text-sm font-semibold transition-colors theme-footer hover:opacity-100 opacity-60">
-                    <span>by byoo.pro</span>
+                <a href="{{ url('/') }}" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-current/10 bg-white/10 p-2 theme-footer opacity-70 transition-all hover:opacity-100">
+                    <x-application-logo class="h-5 w-5" />
                 </a>
             </div>
         </div>

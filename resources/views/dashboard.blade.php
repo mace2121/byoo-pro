@@ -16,7 +16,7 @@
                 <!-- Sidebar Header: Logo + Toggle -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-border">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                        <x-application-logo class="h-5 w-5 fill-current" />
+                        <x-application-logo class="h-5 w-5 text-foreground" />
                         <span class="font-bold text-sm tracking-tight italic">byoo<span class="text-muted-foreground">.pro</span></span>
                     </a>
                     <button @click="sidebarOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">

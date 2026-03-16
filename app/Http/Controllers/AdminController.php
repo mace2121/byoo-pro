@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\ViewLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class AdminController extends Controller
 {
@@ -39,9 +40,10 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         $search = $request->input('search');
+        $blocksEnabled = Schema::hasTable('blocks');
 
         $users = User::with(['profile', 'links'])
-            ->withCount(['links'])
+            ->withCount($blocksEnabled ? ['links', 'blocks'] : ['links'])
             ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('username', 'like', "%{$search}%")
@@ -51,7 +53,7 @@ class AdminController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.users.index', compact('users', 'search'));
+        return view('admin.users.index', compact('users', 'search', 'blocksEnabled'));
     }
 
     public function toggleStatus(User $user)
@@ -76,6 +78,22 @@ class AdminController extends Controller
         $status = $user->verified ? 'dogrulandi' : 'dogrulama rozeti kaldirildi';
 
         return back()->with('success', "Kullanici {$user->username} icin durum guncellendi: {$status}.");
+    }
+
+    public function destroyUser(User $user)
+    {
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'Kendinizi silemezsiniz.');
+        }
+
+        if ($user->is_admin) {
+            return back()->with('error', 'Baska bir admin hesabi panelden silinemez.');
+        }
+
+        $username = $user->username;
+        $user->delete();
+
+        return back()->with('success', "Kullanici {$username} silindi.");
     }
 
     public function impersonate(User $user)

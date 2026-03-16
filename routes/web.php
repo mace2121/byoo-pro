@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/users', [AdminController::class, 'users'])->name('users.index');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleStatus'])->name('users.toggle');
     Route::patch('/users/{user}/verified', [AdminController::class, 'toggleVerified'])->name('users.verified');
+    Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     Route::get('/users/{user}/impersonate', [AdminController::class, 'impersonate'])->name('users.impersonate');
 });
 

@@ -10,7 +10,7 @@
         <title>{{ config('app.name', 'byoo.pro') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+        <link rel="icon" type="image/svg+xml" href="{{ asset('brand/byoo-icon.svg') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

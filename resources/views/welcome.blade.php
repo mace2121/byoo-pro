@@ -24,7 +24,7 @@
         <title>byoo.pro - Linklerini Tek Sayfada Topla</title>
 
         <!-- Favicon -->
-        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        <link rel="icon" href="{{ asset('brand/byoo-icon.svg') }}" type="image/svg+xml">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

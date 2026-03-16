@@ -30,21 +30,11 @@
                         <form action="{{ route('admin.users.index') }}" method="GET" class="flex gap-3">
                             <div class="relative flex-1">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
-                                <input
-                                    type="text"
-                                    name="search"
-                                    value="{{ $search ?? '' }}"
-                                    placeholder="Isim, kullanici adi veya e-posta ile ara..."
-                                    class="w-full pl-9 h-9 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                />
+                                <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="Isim, kullanici adi veya e-posta ile ara..." class="w-full pl-9 h-9 rounded-md border border-input bg-background text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
                             </div>
-                            <button type="submit" class="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">
-                                Ara
-                            </button>
+                            <button type="submit" class="inline-flex items-center gap-2 h-9 px-4 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm">Ara</button>
                             @if($search)
-                                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center h-9 px-4 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors">
-                                    Temizle
-                                </a>
+                                <a href="{{ route('admin.users.index') }}" class="inline-flex items-center h-9 px-4 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors">Temizle</a>
                             @endif
                         </form>
                     </div>
@@ -69,9 +59,7 @@
                                             <td class="px-4 py-3 text-xs text-muted-foreground font-mono">#{{ $user->id }}</td>
                                             <td class="px-4 py-3">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold flex-shrink-0">
-                                                        {{ substr($user->name, 0, 1) }}
-                                                    </div>
+                                                    <div class="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold flex-shrink-0">{{ substr($user->name, 0, 1) }}</div>
                                                     <div class="min-w-0">
                                                         <div class="flex items-center gap-1.5">
                                                             <p class="text-sm font-semibold truncate">{{ $user->name }}</p>
@@ -87,7 +75,7 @@
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 text-center">
-                                                <span class="text-xs font-semibold text-muted-foreground">{{ $user->links_count }}</span>
+                                                <span class="text-xs font-semibold text-muted-foreground">{{ $blocksEnabled ? ($user->blocks_count ?? $user->links_count) : $user->links_count }}</span>
                                             </td>
                                             <td class="px-4 py-3 text-center">
                                                 <div class="text-xs">
@@ -125,7 +113,7 @@
                                                         <form action="{{ route('admin.users.toggle', $user) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-green-500 hover:text-green-700 hover:bg-green-50' }}" title="{{ $user->is_active ? 'Askıya Al' : 'Aktiflestir' }}">
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-green-500 hover:text-green-700 hover:bg-green-50' }}" title="{{ $user->is_active ? 'Askiya Al' : 'Aktiflestir' }}">
                                                                 <i class="fas {{ $user->is_active ? 'fa-ban' : 'fa-check-circle' }} text-xs"></i>
                                                             </button>
                                                         </form>
@@ -134,6 +122,13 @@
                                                             @method('PATCH')
                                                             <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:text-sky-700 hover:bg-sky-50' : 'text-muted-foreground hover:text-sky-600 hover:bg-sky-50' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
                                                                 <i class="fas fa-circle-check text-xs"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Bu kullaniciyi kalici olarak silmek istediginize emin misiniz?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="p-1.5 rounded-md text-destructive transition-colors hover:bg-destructive/10" title="Kullaniciyi Sil">
+                                                                <i class="fas fa-trash text-xs"></i>
                                                             </button>
                                                         </form>
                                                     </div>

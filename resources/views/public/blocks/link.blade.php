@@ -7,11 +7,13 @@
     }
 
     $preview = $block->preview ?? null;
-    $hasRichPreview = filled($preview?->image) || filled($preview?->description);
+    $displayMode = $block->display_mode ?? 'link';
+    $hasRichPreview = $displayMode === 'card' && (filled($preview?->image) || filled($preview?->description) || filled($preview?->domain));
     $displayTitle = $block->title ?: ($preview?->title ?: 'Baglanti');
     $displayDescription = $preview?->description;
     $displayDomain = $preview?->domain;
     $favicon = $preview?->favicon;
+    $usesManualIcon = ($block->icon_source ?? 'auto') === 'manual' || filled($block->manual_icon ?? null);
 @endphp
 
 <a href="{{ $block->href }}" target="_blank" rel="noopener noreferrer" class="group relative block overflow-hidden transition-all duration-300 theme-card {{ $hasRichPreview ? 'theme-card-stacked' : '' }} {{ $variantClass }}">
@@ -23,7 +25,7 @@
 
     <div class="flex items-{{ $hasRichPreview ? 'start' : 'center' }} gap-3 p-3 {{ $hasRichPreview ? 'md:p-4' : '' }}">
         <div class="theme-card-icon-wrap flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-black/5 dark:bg-white/5 transition-transform group-hover:scale-110" style="color: var(--btn-icon, var(--link-color))">
-            @if($favicon)
+            @if(! $usesManualIcon && $favicon)
                 <img src="{{ $favicon }}" alt="" class="h-5 w-5 object-contain" loading="lazy">
             @else
                 <i class="{{ $block->icon ?: 'fas fa-link' }} theme-card-icon text-xl"></i>
@@ -35,11 +37,11 @@
                 {{ $displayTitle }}
             </div>
 
-            @if($displayDescription)
+            @if($hasRichPreview && $displayDescription)
                 <p class="mt-1 overflow-hidden text-sm font-medium opacity-75" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
                     {{ $displayDescription }}
                 </p>
-            @elseif($displayDomain)
+            @elseif($hasRichPreview && $displayDomain)
                 <p class="mt-1 text-xs font-semibold uppercase tracking-widest opacity-60">{{ $displayDomain }}</p>
             @endif
         </div>

@@ -125,6 +125,9 @@ class BlockService
                 'image' => null,
                 'price' => null,
                 'icon' => $link->icon_class,
+                'manual_icon' => $link->icon,
+                'icon_source' => filled($link->icon) ? 'manual' : 'auto',
+                'display_mode' => 'link',
                 'href' => route('public.redirect', $link),
                 'button_label' => null,
                 'button_type' => 'external_link',
@@ -140,8 +143,10 @@ class BlockService
         $data = is_array($block->data) ? $block->data : [];
         $type = $block->type ?: 'link';
         $sourceLink = $block->sourceLink;
-        $icon = $data['icon'] ?? ($sourceLink?->icon_class ?? 'fas fa-link');
+        $manualIcon = $data['icon'] ?? null;
+        $icon = $manualIcon ?: ($sourceLink?->icon_class ?? ($type === 'product' ? 'fas fa-bag-shopping' : 'fas fa-link'));
         $preview = $this->resolvePreview($block->url ?: $sourceLink?->url, $sourceLink?->preview);
+        $displayMode = $data['display_mode'] ?? ($type === 'link' ? 'link' : 'card');
 
         return (object) [
             'id' => 'block-'.$block->id,
@@ -153,6 +158,9 @@ class BlockService
             'image' => $block->image_url,
             'price' => $data['price'] ?? null,
             'icon' => $icon,
+            'manual_icon' => $manualIcon,
+            'icon_source' => filled($manualIcon) ? 'manual' : 'auto',
+            'display_mode' => $displayMode,
             'href' => $this->resolveBlockUrl($block, $data),
             'button_label' => $this->resolveButtonLabel($block),
             'button_type' => $block->button_type ?: 'external_link',
