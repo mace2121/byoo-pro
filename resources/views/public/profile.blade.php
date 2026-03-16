@@ -127,7 +127,20 @@
         .theme-cyber { --bg: #0d0221; --text: #ff00ff; --text-secondary: #00ffff; --card-bg: rgba(255,0,255,0.05); --card-border: #ff00ff; --card-hover: rgba(255,0,255,0.12); --avatar-ring: #00ffff; --link-color: #ff00ff; --footer-color: #00ffff66; }
         .theme-obsidian { --bg: #121212; --text: #e0e0e0; --text-secondary: #888888; --card-bg: #1e1e1e; --card-border: #333333; --card-hover: #2a2a2a; --avatar-ring: #555555; --link-color: #cccccc; --footer-color: #555555; }
 
-        .bg-anim-container { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+        .bg-anim-container {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            min-height: 100vh;
+            min-height: 100dvh;
+            pointer-events: none;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            transform-origin: center;
+            will-change: transform, background-position;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
         .bg-anim-1 { background-color: var(--anim-color-1); background-image: linear-gradient(135deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(225deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(45deg, var(--anim-color-2) 25%, transparent 25%), linear-gradient(315deg, var(--anim-color-2) 25%, var(--anim-color-1) 25%); background-position: 40px 0, 40px 0, 0 0, 0 0; background-size: 80px 80px; animation: bg-move-1 20s linear infinite; }
         @keyframes bg-move-1 { from { background-position: 40px 0, 40px 0, 0 0, 0 0; } to { background-position: 40px 80px, 40px 80px, 0 80px, 0 80px; } }
         .bg-anim-2 { background: var(--anim-color-1); background-image: radial-gradient(circle at 20% 30%, var(--anim-color-2) 0%, transparent 20%), radial-gradient(circle at 80% 70%, var(--anim-color-2) 0%, transparent 25%); background-size: 200% 200%; animation: bg-move-2 15s ease infinite alternate; }
@@ -140,13 +153,32 @@
         @keyframes bg-move-5 { from { background-position: 0 0; } to { background-position: 0 100px; } }
 
         body { font-family: var(--font-family); }
-        .theme-page { min-height: 100vh; display: flex; justify-content: center; padding: 3rem 1rem; position: relative; z-index: 10; }
-        .bg-layer-wrapper { position: fixed; inset: 0; z-index: -10; pointer-events: none; background-color: var(--bg-color, var(--bg, #f9fafb)); }
+        .theme-page {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1rem;
+            position: relative;
+            z-index: 10;
+            isolation: isolate;
+        }
+        .bg-layer-wrapper {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            background-color: var(--bg-color, var(--bg, #f9fafb));
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
         .bg-image-layer { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; background-attachment: fixed; display: none; }
         .bg-video-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
         .bg-video-container video { min-width: 100%; min-height: 100%; width: auto; height: auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); object-fit: cover; }
         .bg-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, {{ ($design['background']['overlay'] ?? 0) / 100 }}); backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px); -webkit-backdrop-filter: blur({{ $design['background']['blur'] ?? 0 }}px); z-index: 10; pointer-events: none; }
-        .hero-cover-container { position: absolute; top: 0; left: 0; right: 0; height: 24rem; overflow: hidden; pointer-events: none; z-index: 0; -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
+        .hero-cover-container { position: absolute; top: 0; left: 0; right: 0; height: 24rem; overflow: hidden; pointer-events: none; z-index: 1; -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); mask-image: linear-gradient(to bottom, black 60%, transparent 100%); }
         .hero-image-bg { width: 100%; height: 100%; background-size: cover; background-position: center; }
         .theme-name { color: var(--text-title, var(--text)); font-size: var(--font-title-size); }
         .theme-username { color: var(--text-secondary); font-size: var(--font-username-size); }
@@ -164,6 +196,21 @@
         .avatar-polygon { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
         .theme-footer { color: var(--footer-color); }
         .theme-empty { color: var(--text-secondary); background: var(--card-bg); border-color: var(--card-border); }
+
+        .theme-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .bg-anim-container {
+                inset: -2px;
+            }
+
+            .bg-image-layer {
+                background-attachment: scroll;
+            }
+        }
     </style>
 </head>
 <body class="h-full theme-{{ $theme }}" style="{{ $bodyStyle }}">
@@ -191,7 +238,7 @@
             <div class="bg-overlay"></div>
         </div>
 
-        <div class="max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
+        <div class="theme-content max-w-md w-full space-y-8 relative {{ $headerLayout === 'hero-cover' ? 'pt-16' : '' }}">
             <div class="{{ $layoutWrapperClass }} relative z-10 p-2 anim-target">
                 <div class="{{ $layoutFlexClass }}">
                     <img class="{{ $avatarClasses }} {{ $frameClasses }} avatar-preview-img object-cover theme-avatar-ring flex-shrink-0 {{ $headerLayout === 'hero-cover' ? 'w-32 h-32 -mt-24 border-4 border-background bg-background shadow-2xl scale-110' : '' }} {{ $headerLayout === 'left-aligned' ? 'w-20 h-20' : '' }}"
