@@ -1,48 +1,33 @@
-<footer class="bg-white dark:bg-gray-950 pt-20 pb-10 border-t border-gray-100 dark:border-gray-900">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div class="col-span-1 md:col-span-2">
-                <a href="{{ url('/') }}" class="mb-6 inline-flex">
-                    <x-brand-mark icon-class="h-8 w-8 text-gray-900 dark:text-white" text-class="text-xl font-bold tracking-tight text-gray-900 dark:text-white" dot-class="text-indigo-600" />
-                </a>
-                <p class="text-gray-500 dark:text-gray-400 max-w-xs mb-6">
-                    {{ __('Dijital dünyanızı merkezileştirmek için ihtiyacınız olan tek araç. Şık, hızlı ve güvenli.') }}
-                </p>
-                <div class="flex gap-4">
-                    <a href="#" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fab fa-twitter text-xl"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fab fa-instagram text-xl"></i></a>
-                    <a href="#" class="text-gray-400 hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin text-xl"></i></a>
-                </div>
-            </div>
-            
-            <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Ürün') }}</h4>
-                <ul class="space-y-4">
-                    <li><a href="#features" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Özellikler') }}</a></li>
-                    <li><a href="#showcase" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Örnekler') }}</a></li>
-                    <li><a href="{{ route('pricing') }}" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Fiyatlandırma') }}</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-6">{{ __('Yasal') }}</h4>
-                <ul class="space-y-4">
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Gizlilik Politikası') }}</a></li>
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('Kullanım Şartları') }}</a></li>
-                    <li><a href="#" class="text-gray-500 dark:text-gray-400 hover:text-indigo-600 transition-colors">{{ __('İletişim') }}</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="border-t border-gray-100 dark:border-gray-900 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p class="text-gray-400 text-sm">
-                &copy; {{ date('Y') }} byoo.pro. {{ __('Tüm hakları saklıdır.') }}
+<footer class="border-t border-white/10 bg-slate-950/80 pb-10 pt-8">
+    <div class="mx-auto flex max-w-7xl flex-col gap-6 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div class="flex flex-col gap-3">
+            <a href="#hero" class="inline-flex items-center">
+                <x-brand-mark
+                    class="text-white"
+                    icon-class="h-8 w-8 text-white"
+                    text-class="text-lg font-semibold tracking-tight text-white"
+                    dot-class="text-cyan-300"
+                />
+            </a>
+            <p class="max-w-md text-sm leading-7 text-slate-400">
+                Link, urun ve siparis akisini tek sayfada birlestiren modern bio site builder.
             </p>
-            <div class="flex items-center gap-2 text-sm text-gray-400">
-                <span>{{ __('Üreticiler için') }}</span>
-                <i class="fas fa-heart text-rose-500"></i>
-                <span>{{ __('ile yapıldı') }}</span>
-            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 text-sm text-slate-400">
+            <a href="#problem" class="transition hover:text-white">Neden byoo?</a>
+            <a href="#builder" class="transition hover:text-white">Builder</a>
+            <a href="#customize" class="transition hover:text-white">Temalar</a>
+            <a href="#proof" class="transition hover:text-white">Guven</a>
+            <a href="#faq" class="transition hover:text-white">SSS</a>
+        </div>
+    </div>
+
+    <div class="mx-auto mt-8 flex max-w-7xl flex-col gap-4 border-t border-white/10 px-4 pt-6 text-sm text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <p>&copy; {{ date('Y') }} byoo.pro. Tum haklari saklidir.</p>
+        <div class="flex items-center gap-3 text-slate-400">
+            <x-application-logo class="h-4 w-4 text-white/80" />
+            <span>Creators, store owners ve dijital markalar icin tasarlandi.</span>
         </div>
     </div>
 </footer>
