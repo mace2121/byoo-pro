@@ -23,6 +23,13 @@ class AnalyticsController extends Controller
     public function index()
     {
         $user = auth()->user();
+
+        if (! $user->canUseAnalytics()) {
+            return redirect()
+                ->route('dashboard', ['tab' => 'links'])
+                ->with('error', 'Analytics özelliği yalnızca Pro pakette kullanılabilir.');
+        }
+
         $stats = $this->analyticsService->getDashboardStats($user);
 
         if (!$stats) {

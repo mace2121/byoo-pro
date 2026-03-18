@@ -12,23 +12,23 @@ class PlanSeeder extends Seeder
      */
     public function run(): void
     {
-        Plan::create([
+        Plan::updateOrCreate(['slug' => 'free'], [
             'name' => 'Free',
             'slug' => 'free',
             'price' => 0,
             'link_limit' => 5,
-            'description' => 'Free plan with basic features.',
+            'description' => 'Hızlı başlangıç için temel paket.',
         ]);
 
-        Plan::create([
+        Plan::updateOrCreate(['slug' => 'pro'], [
             'name' => 'Pro',
             'slug' => 'pro',
             'price' => 9.99,
-            'link_limit' => 25,
-            'description' => 'Pro plan with increased limits.',
+            'link_limit' => 0,
+            'description' => 'Sınırsız link ve premium özellikler.',
         ]);
 
-        Plan::create([
+        Plan::updateOrCreate(['slug' => 'business'], [
             'name' => 'Business',
             'slug' => 'business',
             'price' => 29.99,

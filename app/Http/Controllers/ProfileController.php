@@ -114,6 +114,10 @@ class ProfileController extends Controller
      */
     public function updateDesign(Request $request)
     {
+        if ($response = $this->ensureThemeAccess($request)) {
+            return $response;
+        }
+
         $user = $request->user();
         $profile = $this->ensureProfile($user);
 
@@ -225,6 +229,10 @@ class ProfileController extends Controller
 
     public function uploadDesignMedia(Request $request)
     {
+        if ($response = $this->ensureThemeAccess($request)) {
+            return $response;
+        }
+
         $request->validate([
             'media_type' => ['required', 'in:hero_image,bg_image,bg_video'],
             'file' => ['required', 'file'],
@@ -260,6 +268,10 @@ class ProfileController extends Controller
 
     public function uploadDesignMediaChunk(Request $request)
     {
+        if ($response = $this->ensureThemeAccess($request)) {
+            return $response;
+        }
+
         $request->validate([
             'media_type' => ['required', 'in:bg_video'],
             'upload_id' => ['required', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
@@ -298,6 +310,10 @@ class ProfileController extends Controller
 
     public function finalizeDesignMediaUpload(Request $request)
     {
+        if ($response = $this->ensureThemeAccess($request)) {
+            return $response;
+        }
+
         $request->validate([
             'media_type' => ['required', 'in:bg_video'],
             'upload_id' => ['required', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
@@ -416,6 +432,24 @@ class ProfileController extends Controller
         return $user->profile ?: $user->profile()->create([
             'username' => $user->username,
         ]);
+    }
+
+    private function ensureThemeAccess(Request $request)
+    {
+        if ($request->user()?->canCustomizeTheme()) {
+            return null;
+        }
+
+        $message = 'Tema özelleştirme yalnızca Pro pakette kullanılabilir.';
+
+        if ($request->expectsJson() || $request->isJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], 403);
+        }
+
+        return Redirect::route('dashboard', ['tab' => 'design'])->with('error', $message);
     }
 
     private function chunkDirectory(int $userId, string $uploadId): string

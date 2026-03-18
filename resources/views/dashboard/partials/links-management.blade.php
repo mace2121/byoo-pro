@@ -1,5 +1,6 @@
 @php
     $catalogIcons = \App\Support\IconCatalog::popular();
+    $canUseProducts = auth()->user()?->canUseProductBlocks() ?? false;
 
     $linkIconOptions = array_merge([
         ['value' => '', 'label' => 'Otomatik sec', 'hint' => 'Link adresine gore secilir', 'keywords' => 'otomatik auto varsayilan sistem'],
@@ -79,10 +80,16 @@
                                     <button type="button" @click="createType = 'link'" :class="createType === 'link' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors">
                                         <i class="fas fa-link mr-2 text-xs"></i> Baglanti
                                     </button>
-                                    <button type="button" @click="createType = 'product'" :class="createType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors">
+                                    <button type="button" @click="{{ $canUseProducts ? "createType = 'product'" : '' }}" {{ $canUseProducts ? '' : 'disabled' }} :class="createType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors {{ $canUseProducts ? '' : 'cursor-not-allowed opacity-50' }}">
                                         <i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun
                                     </button>
                                 </div>
+
+                                @unless($canUseProducts)
+                                    <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                        Urun bloklari yalnizca Pro pakette acilir.
+                                    </div>
+                                @endunless
 
                                 <div class="space-y-2">
                                     <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Baslik</label>

@@ -38,6 +38,12 @@ class BlockController extends Controller
 
         $validated = $this->validateBlock($request);
 
+        if (($validated['type'] ?? null) === 'product' && ! $user->canUseProductBlocks()) {
+            return redirect()
+                ->route('dashboard', ['tab' => 'links'])
+                ->with('error', 'Ürün blokları yalnızca Pro pakette kullanılabilir.');
+        }
+
         $previewUrl = null;
 
         DB::transaction(function () use ($request, $user, $validated, &$previewUrl) {
@@ -102,6 +108,12 @@ class BlockController extends Controller
         $user = Auth::user();
         $this->authorizeBlock($block, $user->id);
         $validated = $this->validateBlock($request);
+
+        if (($validated['type'] ?? null) === 'product' && ! $user->canUseProductBlocks()) {
+            return redirect()
+                ->route('dashboard', ['tab' => 'links'])
+                ->with('error', 'Ürün blokları yalnızca Pro pakette kullanılabilir.');
+        }
 
         $previewUrl = null;
 
@@ -333,6 +345,10 @@ class BlockController extends Controller
     {
         $plan = $user->plan();
         $limit = $plan?->link_limit ?? 5;
+
+        if ((int) $limit <= 0) {
+            return false;
+        }
 
         return $user->blocks()->count() >= $limit;
     }

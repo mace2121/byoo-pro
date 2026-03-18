@@ -1,76 +1,48 @@
-<section id="features" class="py-24 bg-gray-50 dark:bg-gray-900/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{{ __('İhtiyacınız olan her şey tek bir yerde') }}</h2>
-            <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{{ __('Byoo, dijital varlığınızı tam istediğiniz gibi oluşturmanız için gerekli tüm araçları sunar.') }}</p>
+<section id="features" class="relative py-24 sm:py-28">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+            <div class="premium-tag justify-center">
+                <i class="fa-solid fa-star"></i>
+                Güçlü özellikler
+            </div>
+            <h2 class="landing-heading mt-6 text-3xl font-semibold text-white sm:text-5xl">
+                İki paket, net sınırlar, premium deneyim.
+            </h2>
+            <p class="mt-5 text-lg leading-8 text-zinc-300">
+                byoo.pro karmaşık hissettirmez. Free paket ile hızlı başlarsın, Pro ile görünümünü ve dönüşüm gücünü bir üst seviyeye taşırsın.
+            </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
-            <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6">
-                    <i class="fas fa-magic text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Akıllı Temalar') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Harika hazır temalar arasından seçim yapın veya gelişmiş tasarım motorumuzla kendinizinkini oluşturun. Kodlama gerekmez.') }}
+        <div class="mt-14 grid gap-6 lg:grid-cols-3">
+            <article class="premium-panel rounded-[2rem] p-6">
+                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(216,178,122,0.14)] text-[color:var(--landing-accent)]">
+                    <i class="fa-solid fa-link"></i>
+                </span>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Bağlantı kontrolü</h3>
+                <p class="mt-3 text-sm leading-7 text-zinc-400">
+                    Free kullanıcılar maksimum 5 link ile başlar. Pro pakette sınırsız link ekleyebilir, vitrininin derinliğini dilediğin kadar büyütebilirsin.
                 </p>
-            </div>
+            </article>
 
-            <!-- Feature 2 -->
-            <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6">
-                    <i class="fas fa-bolt text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Anında Kurulum') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Sayfanızı 60 saniyenin altında yayına alın. Linklerinizi ekleyin, bir isim seçin ve dünyayla paylaşın.') }}
+            <article class="premium-panel rounded-[2rem] p-6">
+                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(139,211,199,0.14)] text-[color:var(--landing-success)]">
+                    <i class="fa-solid fa-palette"></i>
+                </span>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Özel tema & CSS</h3>
+                <p class="mt-3 text-sm leading-7 text-zinc-400">
+                    Pro pakette sayfanı markana göre şekillendir. Tema özelleştirme, renk dili ve özel CSS ile profilin daha prestijli görünür.
                 </p>
-            </div>
+            </article>
 
-            <!-- Feature 3 -->
-            <div class="p-8 bg-white dark:bg-white-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6">
-                    <i class="fas fa-chart-pie text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Detaylı Analizler') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Kitlenizin en çok neye önem verdiğini anlamak için her tıklamayı, görüntülemeyi ve ziyaretçi konumunu takip edin.') }}
+            <article class="premium-panel rounded-[2rem] p-6">
+                <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(216,178,122,0.14)] text-[color:var(--landing-accent)]">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+                <h3 class="mt-6 text-2xl font-semibold text-white">Verified & analytics</h3>
+                <p class="mt-3 text-sm leading-7 text-zinc-400">
+                    Pro kullanıcılar verified badge ile güven verir; analytics ekranı sayesinde hangi bağlantının nasıl performans gösterdiğini görebilir.
                 </p>
-            </div>
-
-            <!-- Feature 4 -->
-            <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center text-green-600 dark:text-green-400 mb-6">
-                    <i class="fas fa-globe text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Özel Domainler') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Profilinizi daha profesyonel hale getirmek için kendi alan adınızı (örn. adiniz.com) bağlayın.') }}
-                </p>
-            </div>
-
-            <!-- Feature 5 -->
-            <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-600 dark:text-amber-400 mb-6">
-                    <i class="fas fa-shield-alt text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Planlama') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Linklerinizi önceden planlayın. Promosyonlarınız veya sosyal medya güncellemeleriniz için başlangıç ve bitiş tarihleri belirleyin.') }}
-                </p>
-            </div>
-
-            <!-- Feature 6 -->
-            <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-600 dark:text-rose-400 mb-6">
-                    <i class="fas fa-lock text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Şifre Korumalı') }}</h3>
-                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-                    {{ __('Özel içerikleri güvenli bir şekilde paylaşın. Belirli linkleri veya tüm profilinizi bir şifre ile koruyun.') }}
-                </p>
-            </div>
+            </article>
         </div>
     </div>
 </section>

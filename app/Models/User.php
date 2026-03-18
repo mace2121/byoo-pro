@@ -81,6 +81,33 @@ class User extends Authenticatable
         return $this->subscription ? $this->subscription->plan : null;
     }
 
+    public function hasPremiumAccess(): bool
+    {
+        $slug = $this->plan()?->slug;
+
+        return in_array($slug, ['pro', 'business'], true);
+    }
+
+    public function canUseProductBlocks(): bool
+    {
+        return $this->hasPremiumAccess();
+    }
+
+    public function canCustomizeTheme(): bool
+    {
+        return $this->hasPremiumAccess();
+    }
+
+    public function canUseAnalytics(): bool
+    {
+        return $this->hasPremiumAccess();
+    }
+
+    public function canUseVerifiedBadge(): bool
+    {
+        return $this->hasPremiumAccess();
+    }
+
     // Helper to check if user reached their link limit based on plan
     public function hasReachedLinkLimit(): bool
     {
@@ -89,6 +116,11 @@ class User extends Authenticatable
             // Fallback to a default limit if no plan (should not happen)
             return $this->links()->count() >= 5;
         }
+
+        if ((int) $plan->link_limit <= 0) {
+            return false;
+        }
+
         return $this->links()->count() >= $plan->link_limit;
     }
 }

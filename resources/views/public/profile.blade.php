@@ -251,7 +251,7 @@
                         <h2 class="{{ $headerLayout === 'hero-cover' ? 'mt-6 text-4xl' : 'mt-4 text-3xl' }} font-extrabold tracking-tight theme-name break-words" style="display: {{ $showName ? 'block' : 'none' }};">
                             <span class="theme-title-row {{ $headerLayout === 'left-aligned' ? 'theme-title-left' : '' }}">
                                 <span class="theme-name-text">{{ $design['profile']['name'] ?? $user->name }}</span>
-                                @if($user->verified)
+                                @if($user->verified && $user->canUseVerifiedBadge())
                                     <x-verified-badge class="theme-verified-badge" size="md" />
                                 @endif
                             </span>
