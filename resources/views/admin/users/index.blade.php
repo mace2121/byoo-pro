@@ -113,36 +113,42 @@
                                             </td>
                                             <td class="px-4 py-3 text-xs text-muted-foreground">{{ $user->created_at->format('d M Y') }}</td>
                                             <td class="px-4 py-3 text-right">
-                                                @if($user->id !== auth()->id())
-                                                    <div class="flex justify-end gap-1">
-                                                        <a href="{{ route('public.profile', $user->username) }}" target="_blank" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Profili Gor">
-                                                            <i class="fas fa-external-link-alt text-xs"></i>
-                                                        </a>
-                                                        <a href="{{ route('admin.users.impersonate', $user) }}" class="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors" title="Kullanici Olarak Giris">
+                                                <div class="flex justify-end gap-1">
+                                                    <a href="{{ route('public.profile', $user->username) }}" target="_blank" class="p-1.5 rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" title="Profili Gor">
+                                                        <i class="fas fa-external-link-alt text-xs"></i>
+                                                    </a>
+                                                    
+                                                    @if($user->id !== auth()->id())
+                                                        <a href="{{ route('admin.users.impersonate', $user) }}" class="p-1.5 rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground" title="Kullanici Olarak Giris">
                                                             <i class="fas fa-user-secret text-xs"></i>
                                                         </a>
                                                         <form action="{{ route('admin.users.toggle', $user) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-green-500 hover:text-green-700 hover:bg-green-50' }}" title="{{ $user->is_active ? 'Askiya Al' : 'Aktiflestir' }}">
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->is_active ? 'text-amber-500 hover:bg-amber-50 hover:text-amber-700' : 'text-green-500 hover:bg-green-50 hover:text-green-700' }}" title="{{ $user->is_active ? 'Askiya Al' : 'Aktiflestir' }}">
                                                                 <i class="fas {{ $user->is_active ? 'fa-ban' : 'fa-check-circle' }} text-xs"></i>
                                                             </button>
                                                         </form>
-                                                        <form action="{{ route('admin.users.verified', $user) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:text-sky-700 hover:bg-sky-50' : 'text-muted-foreground hover:text-sky-500 hover:bg-sky-50' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
-                                                                <i class="fas fa-circle-check text-xs"></i>
-                                                            </button>
-                                                        </form>
-                                                        <form action="{{ route('admin.users.plan', $user) }}" method="POST" class="inline">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <input type="hidden" name="plan" value="{{ $user->plan === 'pro' ? 'free' : 'pro' }}">
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->plan === 'pro' ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-muted-foreground hover:text-amber-500 hover:bg-amber-50' }}" title="{{ $user->plan === 'pro' ? 'Free Plana Düşür' : 'Pro Plana Yükselt' }}">
-                                                                <i class="fas fa-crown text-xs"></i>
-                                                            </button>
-                                                        </form>
+                                                    @endif
+
+                                                    <form action="{{ route('admin.users.verified', $user) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:bg-sky-50 hover:text-sky-700' : 'text-muted-foreground hover:bg-sky-50 hover:text-sky-500' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
+                                                            <i class="fas fa-circle-check text-xs"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    <form action="{{ route('admin.users.plan', $user) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="plan" value="{{ $user->plan === 'pro' ? 'free' : 'pro' }}">
+                                                        <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->plan === 'pro' ? 'text-amber-500 hover:bg-amber-50 hover:text-amber-700' : 'text-muted-foreground hover:bg-amber-50 hover:text-amber-500' }}" title="{{ $user->plan === 'pro' ? 'Free Plana Düşür' : 'Pro Plana Yükselt' }}">
+                                                            <i class="fas fa-crown text-xs"></i>
+                                                        </button>
+                                                    </form>
+
+                                                    @if($user->id !== auth()->id())
                                                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Bu kullaniciyi kalici olarak silmek istediginize emin misiniz?')">
                                                             @csrf
                                                             @method('DELETE')
@@ -150,8 +156,8 @@
                                                                 <i class="fas fa-trash text-xs"></i>
                                                             </button>
                                                         </form>
-                                                    </div>
-                                                @endif
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty

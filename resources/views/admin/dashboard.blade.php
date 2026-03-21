@@ -40,6 +40,7 @@
                             </div>
                             <p class="text-2xl font-bold mt-2 text-emerald-600">${{ number_format($monthly_revenue) }}</p>
                         </div>
+                    </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="rounded-lg border border-border bg-card shadow-sm">
