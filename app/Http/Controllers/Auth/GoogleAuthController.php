@@ -48,6 +48,24 @@ class GoogleAuthController extends Controller
                     'password' => bcrypt(Str::random(16)),
                     'verified' => true,
                 ]);
+
+                // Create associated profile
+                $user->profile()->create([
+                    'username' => $user->username,
+                ]);
+
+                // Assign default free plan subscription
+                $freePlan = \App\Models\Plan::where('slug', 'free')->first();
+                if ($freePlan) {
+                    \App\Models\Subscription::create([
+                        'user_id' => $user->id,
+                        'plan_id' => $freePlan->id,
+                        'status' => 'active',
+                        'starts_at' => now(),
+                    ]);
+                }
+
+                event(new \Illuminate\Auth\Events\Registered($user));
             }
 
             Auth::login($user);
