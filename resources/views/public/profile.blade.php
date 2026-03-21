@@ -214,6 +214,14 @@
                 background-attachment: scroll;
             }
         }
+
+        @keyframes bq-soft-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+        .bq-logo-anim {
+            animation: bq-soft-pulse 3s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="h-full theme-{{ $theme }} selection:bg-primary/30" style="{{ $bodyStyle }}" x-data="profileShare()">
@@ -222,7 +230,7 @@
         <div class="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 pointer-events-none">
             <div class="pointer-events-auto">
                 <a href="{{ url('/') }}" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-background/20 text-foreground backdrop-blur-xl transition-all hover:bg-background/40 hover:scale-105 active:scale-95 shadow-sm">
-                    <x-application-logo class="h-4.5 w-4.5 opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <x-application-logo class="h-5.5 w-5.5 bq-logo-anim transition-opacity" />
                 </a>
             </div>
             <div class="pointer-events-auto">
