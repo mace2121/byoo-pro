@@ -215,12 +215,15 @@
             }
         }
 
-        @keyframes bq-soft-pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 1; }
+        @keyframes bq-tracking-contract {
+            0% { letter-spacing: 0.5em; opacity: 0; transform: scale(1.2); }
+            40% { opacity: 0.6; }
+            100% { letter-spacing: normal; opacity: 1; transform: scale(1); }
         }
         .bq-logo-anim {
-            animation: bq-soft-pulse 3s ease-in-out infinite;
+            animation: bq-tracking-contract 2.5s cubic-bezier(0.215, 0.610, 0.355, 1.000) infinite alternate;
+            height: 52% !important; /* Visual 50% adjustment */
+            width: auto;
         }
     </style>
 </head>
@@ -230,7 +233,7 @@
         <div class="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 pointer-events-none">
             <div class="pointer-events-auto">
                 <a href="{{ url('/') }}" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-background/20 text-foreground backdrop-blur-xl transition-all hover:bg-background/40 hover:scale-105 active:scale-95 shadow-sm">
-                    <x-application-logo class="h-5.5 w-5.5 bq-logo-anim transition-opacity" />
+                    <x-application-logo class="bq-logo-anim transition-opacity" />
                 </a>
             </div>
             <div class="pointer-events-auto">
