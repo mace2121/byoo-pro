@@ -92,6 +92,7 @@ class BlockController extends Controller
                 'data' => [
                     'icon' => $validated['icon'] ?: null,
                     'price' => $validated['price'] ?? null,
+                    'button_label' => $validated['button_label'] ?? null,
                     'whatsapp_message' => $validated['whatsapp_message'] ?? null,
                 ],
             ]);
@@ -147,6 +148,7 @@ class BlockController extends Controller
                     ? ($validated['display_mode'] ?? 'link')
                     : ($validated['display_mode'] ?? 'card'),
                 'price' => $validated['type'] === 'product' ? ($validated['price'] ?? null) : null,
+                'button_label' => $validated['type'] === 'product' ? ($validated['button_label'] ?? null) : null,
                 'whatsapp_message' => $validated['type'] === 'product' ? ($validated['whatsapp_message'] ?? null) : null,
             ], static fn ($value) => $value !== null && $value !== '');
             $block->save();
@@ -306,6 +308,7 @@ class BlockController extends Controller
             'price' => ['nullable', 'string', 'max:120'],
             'button_type' => ['nullable', Rule::in(['external_link', 'whatsapp'])],
             'button_link' => ['nullable', 'string', 'max:2048'],
+            'button_label' => ['nullable', 'string', 'max:120'],
             'whatsapp_message' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['nullable', 'boolean'],
         ]);

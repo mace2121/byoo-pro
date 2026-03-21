@@ -155,6 +155,11 @@
                                                 <textarea name="whatsapp_message" rows="3" class="w-full resize-none rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" placeholder="Merhaba, bu urun hakkinda bilgi almak istiyorum."></textarea>
                                             </div>
                                         </template>
+
+                                        <div class="space-y-2">
+                                            <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Buton etiketi (opsiyonel)</label>
+                                            <input type="text" name="button_label" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" :placeholder="buttonType === 'whatsapp' ? 'WhatsApp ile Sipariş Ver' : 'Ürünü İncele'">
+                                        </div>
                                     </div>
                                 </template>
 
@@ -330,6 +335,11 @@
                                                     <textarea name="whatsapp_message" rows="3" class="w-full resize-none rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">{{ $message }}</textarea>
                                                 </div>
                                             </template>
+
+                                            <div class="space-y-2">
+                                                <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Buton etiketi (opsiyonel)</label>
+                                                <input type="text" name="button_label" value="{{ $blockData['button_label'] ?? '' }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" :placeholder="buttonType === 'whatsapp' ? 'WhatsApp ile Sipariş Ver' : 'Ürünü İncele'">
+                                            </div>
                                         </div>
                                     </template>
 
