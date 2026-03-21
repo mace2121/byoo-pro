@@ -410,7 +410,7 @@
         </div>
     </div>
 
-    {{-- Shepherd.js Onboarding Tour --}}
+    {{-- Shepherd.js Onboarding Tour (shepherd bundled via app.js) --}}
     <style>
         .shepherd-button-primary { background: #f59e0b !important; border-radius: 9999px !important; font-weight: 700 !important; color: #fff !important; }
         .shepherd-button-secondary { border-radius: 9999px !important; font-weight: 600 !important; border: 1px solid #e5e7eb !important; }
@@ -422,115 +422,80 @@
         .shepherd-arrow:before { background: #fff !important; }
     </style>
     <script>
-        function loadShepherd(callback) {
-            // CSS zaten yüklüyse tekrar yükleme
-            if (!document.querySelector('link[data-shepherd-css]')) {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.setAttribute('data-shepherd-css', '1');
-                link.href = 'https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/css/shepherd.css';
-                document.head.appendChild(link);
-            }
-            // Shepherd zaten yüklüyse direkt callback
-            if (typeof Shepherd !== 'undefined') {
-                callback();
-                return;
-            }
-            // Script zaten eklenmişse (yükleniyor), bekle
-            if (document.querySelector('script[data-shepherd-js]')) {
-                const interval = setInterval(() => {
-                    if (typeof Shepherd !== 'undefined') {
-                        clearInterval(interval);
-                        callback();
-                    }
-                }, 50);
-                return;
-            }
-            // Dinamik script yükle
-            const script = document.createElement('script');
-            script.setAttribute('data-shepherd-js', '1');
-            script.src = 'https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/js/shepherd.min.js';
-            script.onload = callback;
-            script.onerror = () => alert('Tur yüklenemedi. İnternet bağlantınızı kontrol edin.');
-            document.head.appendChild(script);
-        }
-
         window.startByooTour = function() {
-            loadShepherd(function() {
-                const completeUrl = '{{ route('profile.onboarding.complete') }}';
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const completeUrl = '{{ route('profile.onboarding.complete') }}';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-                async function markDone() {
-                    try {
-                        await fetch(completeUrl, {
-                            method: 'PATCH',
-                            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                            credentials: 'same-origin'
-                        });
-                    } catch(e) {}
-                }
+            async function markDone() {
+                try {
+                    await fetch(completeUrl, {
+                        method: 'PATCH',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                } catch(e) {}
+            }
 
-                if (window._byooTour) {
-                    try { window._byooTour.cancel(); } catch(e) {}
-                }
+            if (window._byooTour) {
+                try { window._byooTour.cancel(); } catch(e) {}
+            }
 
-                const tour = new Shepherd.Tour({
-                    useModalOverlay: true,
-                    defaultStepOptions: {
-                        cancelIcon: { enabled: true },
-                        scrollTo: false,
-                        buttons: [
-                            { text: 'Kapat', action() { this.cancel(); }, classes: 'shepherd-button-secondary' },
-                            { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
-                        ]
-                    }
-                });
-
-                window._byooTour = tour;
-                tour.on('complete', markDone);
-
-                tour.addStep({
-                    id: 'welcome',
-                    title: '👋 byoo\'ya Hoş Geldin!',
-                    text: 'Sana kısa bir tur hazırladık. Her adımda platformun nasıl kullanıldığını göstereceğiz.',
+            const tour = new Shepherd.Tour({
+                useModalOverlay: true,
+                defaultStepOptions: {
+                    cancelIcon: { enabled: true },
+                    scrollTo: false,
                     buttons: [
-                        { text: 'Kapat', action() { tour.cancel(); }, classes: 'shepherd-button-secondary' },
-                        { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
+                        { text: 'Kapat', action() { this.cancel(); }, classes: 'shepherd-button-secondary' },
+                        { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
                     ]
-                });
-
-                tour.addStep({
-                    id: 'sidebar',
-                    title: '📋 Sol Menü',
-                    text: 'Buradan Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
-                    attachTo: { element: '#tour-sidebar', on: 'right' },
-                });
-
-                tour.addStep({
-                    id: 'links',
-                    title: '🔗 Bloklar',
-                    text: 'Profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
-                    attachTo: { element: '#tour-links-tab', on: 'right' },
-                });
-
-                tour.addStep({
-                    id: 'design',
-                    title: '🎨 Tasarım',
-                    text: 'Renk, font, arka plan ve buton stilini buradan özelleştirebilirsin.',
-                    attachTo: { element: '#tour-design-tab', on: 'right' },
-                });
-
-                tour.addStep({
-                    id: 'done',
-                    title: '🚀 Hazırsın!',
-                    text: 'Profilini düzenleyip canlı önizlemeyi sağ üstteki "Önizleme" butonundan açabilirsin. Başarılar! 🎉',
-                    buttons: [
-                        { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
-                    ]
-                });
-
-                tour.start();
+                }
             });
+
+            window._byooTour = tour;
+            tour.on('complete', markDone);
+
+            tour.addStep({
+                id: 'welcome',
+                title: '👋 byoo\'ya Hoş Geldin!',
+                text: 'Sana kısa bir tur hazırladık. Her adımda platformun nasıl kullanıldığını göstereceğiz.',
+                buttons: [
+                    { text: 'Kapat', action() { tour.cancel(); }, classes: 'shepherd-button-secondary' },
+                    { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
+
+            tour.addStep({
+                id: 'sidebar',
+                title: '📋 Sol Menü',
+                text: 'Buradan Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
+                attachTo: { element: '#tour-sidebar', on: 'right' },
+            });
+
+            tour.addStep({
+                id: 'links',
+                title: '🔗 Bloklar',
+                text: 'Profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
+                attachTo: { element: '#tour-links-tab', on: 'right' },
+            });
+
+            tour.addStep({
+                id: 'design',
+                title: '🎨 Tasarım',
+                text: 'Renk, font, arka plan ve buton stilini buradan özelleştirebilirsin.',
+                attachTo: { element: '#tour-design-tab', on: 'right' },
+            });
+
+            tour.addStep({
+                id: 'done',
+                title: '🚀 Hazırsın!',
+                text: 'Profilini düzenleyip canlı önizlemeyi sağ üstteki "Önizleme" butonundan açabilirsin. Başarılar! 🎉',
+                buttons: [
+                    { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
+
+            tour.start();
         };
     </script>
 
