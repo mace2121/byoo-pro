@@ -122,4 +122,70 @@ class AdminController extends Controller
 
         return redirect()->route('admin.dashboard')->with('success', 'Admin paneline geri donuldu.');
     }
+
+    public function settings()
+    {
+        return view('admin.settings.index');
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'google_client_id' => 'nullable|string',
+            'google_client_secret' => 'nullable|string',
+            'google_redirect_uri' => 'nullable|string',
+        ]);
+
+        $this->setEnvironmentValue([
+            'GOOGLE_CLIENT_ID' => $request->google_client_id,
+            'GOOGLE_CLIENT_SECRET' => $request->google_client_secret,
+            'GOOGLE_REDIRECT_URI' => $request->google_redirect_uri,
+        ]);
+
+        return back()->with('success', 'Ayarlar başarıyla güncellendi.');
+    }
+
+    private function setEnvironmentValue(array $values)
+    {
+        $envFile = app()->environmentFilePath();
+        if (!file_exists($envFile)) {
+            return false;
+        }
+
+        $str = file_get_contents($envFile);
+        $str .= "\n"; // Ensure file ends with newline for easier parsing
+
+        if (count($values) > 0) {
+            foreach ($values as $envKey => $envValue) {
+                // Determine if we need to quote the value
+                // Use double quotes if there are spaces or special characters
+                if (preg_match('/\s/', $envValue) || strpos($envValue, '${') !== false || strpos($envValue, '#') !== false) {
+                    $parsedValue = '"' . trim($envValue, '"\'') . '"';
+                } else {
+                    $parsedValue = trim($envValue, '"\'');
+                }
+
+                $keyPosition = mb_strpos($str, "{$envKey}=");
+                
+                if ($keyPosition !== false) {
+                    $endOfLinePosition = mb_strpos($str, "\n", $keyPosition);
+                    $oldLine = mb_substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
+                    
+                    // Replace the old line completely
+                    $str = str_replace($oldLine, "{$envKey}={$parsedValue}", $str);
+                } else {
+                    // Key doesn't exist, append it
+                    $str .= "{$envKey}={$parsedValue}\n";
+                }
+            }
+        }
+
+        $str = trim($str); // Remove trailing newlines
+
+        if (file_put_contents($envFile, $str) !== false) {
+            return true;
+        }
+
+        return false;
+    }
 }

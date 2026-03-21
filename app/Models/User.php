@@ -26,6 +26,9 @@ class User extends Authenticatable
         'is_admin',
         'is_active',
         'verified',
+        'google_id',
+        'provider',
+        'avatar',
     ];
 
     /**

@@ -57,6 +57,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::patch('/users/{user}/verified', [AdminController::class, 'toggleVerified'])->name('users.verified');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     Route::get('/users/{user}/impersonate', [AdminController::class, 'impersonate'])->name('users.impersonate');
+    
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings.index');
+    Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
 });
 
 Route::get('/admin/stop-impersonating', [AdminController::class, 'stopImpersonating'])
@@ -64,6 +67,11 @@ Route::get('/admin/stop-impersonating', [AdminController::class, 'stopImpersonat
     ->name('admin.stop-impersonating');
 
 require __DIR__.'/auth.php';
+
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('google.login');
+    Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('google.callback');
+});
 
 Route::get('/l/{link}', [PublicProfileController::class, 'redirect'])->name('public.redirect');
 Route::post('/l/{link}/verify', [PublicProfileController::class, 'verifyPassword'])->name('public.verify-password');

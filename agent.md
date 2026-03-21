@@ -1,445 +1,269 @@
-# agent.md
-## Türkçe Tasarım Editörü Refactor Görev Dosyası
+# 🚀 AGENT.MD — Animasyonlu SaaS Landing Page (BYOO / kisa.bio)
 
-Bu dosya, mevcut tasarım editöründeki hataları düzeltmek, gereksiz yapıları kaldırmak, canlı önizlemeyi tamamen anlık hale getirmek ve editörü daha sade / stabil / profesyonel bir yapıya dönüştürmek için hazırlanmıştır.
+## 🎯 PROJE TANIMI
 
----
+Bu görevde amaç, modern, animasyonlu ve yüksek dönüşüm odaklı bir SaaS landing page geliştirmektir.
 
-# 1. Ana Hedef
+Landing page, klasik tanıtım sayfası değil; ürünün kendisini deneyimleten, interaktif ve canlı bir demo hissi veren bir yapı olmalıdır.
 
-Mevcut tasarım editörü aşağıdaki sorunlara sahiptir:
-
-- bazı ayarlar canlı önizlemeye yansımıyor
-- bazı alanlar sadece UI üzerinde değişiyor gibi görünüyor ama preview değişmiyor
-- arka plan tipleri birbirine karışıyor
-- gereksiz sekmeler ve tekrar eden ayarlar var
-- bazı layout’larda desteklenmeyen alanlar görünmeye devam ediyor
-- bazı grid / picker / radius / buton alanları görsel olarak bozuk
-- sistemin bazı bölümlerinde aynı anda birden fazla stil / css / renderer aktif kalıyor
-
-Bu çalışma sonunda sistem:
-
-- tamamen Türkçe olacak
-- tüm ayarlar anlık canlı önizlemeye yansıyacak
-- arka plan sistemi tek aktif mod mantığı ile çalışacak
-- gereksiz “Özel Tasarım” sekmesi kaldırılacak
-- font, renk, buton, arka plan, tema alanları net şekilde ayrılacak
-- editör tek bir merkezi tasarım state’i ile çalışacak
+Proje: Link-in-bio + ürün satışı + blok builder sistemi (BYOO / kisa.bio)
 
 ---
 
-# 2. En Kritik Kural
+## 🧱 TEKNOLOJİ STACK
 
-## Tasarım editöründe yapılan her ayar anlık olarak canlı görünümde güncellenmelidir.
+* Backend: Laravel (Blade)
+* Frontend: HTML + TailwindCSS
+* Animasyon:
 
-Buna dahil olan tüm alanlar:
+  * AOS (scroll animasyonları)
+  * Vanilla JS (mikro etkileşimler)
+* Ekstra:
 
-- header düzeni
-- avatar boyutu
-- tema seçimi
-- font seçimi
-- font boyutu
-- arka plan tipi
-- arka plan rengi
-- gradyan renkleri
-- gradyan yönü
-- gradyan açısı
-- görsel arka plan
-- video arka plan
-- video blur
-- video karartma
-- animasyon türü
-- animasyon renkleri
-- tüm metin renkleri
-- buton varyantı
-- buton radius
-- buton border style
-- buton border width
-- buton hover renkleri
+  * GSAP (opsiyonel, ağır animasyonlar için)
 
-Hiçbir ayar yalnızca panelde değişmiş gibi görünmemelidir.
-Canlı önizleme editör state’ini gerçek zamanlı dinlemelidir.
+⚠️ React kullanılmayacak.
+⚠️ Sayfa hızlı ve SEO uyumlu olmalı.
 
 ---
 
-# 3. Header Düzeni Sorunları
+## 🎨 TASARIM DİLİ
 
-## 3.1 Sol Hizalı düzen + Avatar Boyutu
+### Stil:
 
-Sorun:
-- Header düzeni “Sola Hizalı” seçildiğinde `Profil Görseli (Avatar) > Görsel Boyutu` alanı seçim yapıyor gibi görünse de canlı önizlemede değişiklik olmuyor.
+* Dark modern SaaS UI
+* Glassmorphism (blur + şeffaf kartlar)
+* Gradient arka planlar
+* Neon / soft glow efektler
 
-İstenen çözüm:
-- Eğer sol hizalı düzen avatar boyutu değişimini teknik olarak destekliyorsa, bu alan düzgün çalışmalı ve preview anlık güncellenmeli.
-- Eğer desteklemiyorsa, `Sola Hizalı` düzen aktifken `Görsel Boyutu` alanı tamamen gizlenmeli.
+### Renk Paleti:
 
-Uygulama notu:
-- Layout-aware conditional rendering yapılmalı.
-- Desteklenmeyen kontrol, kullanıcıya gösterilmemeli.
+* Primary: #00ffcc
+* Secondary: #6c5ce7
+* Background: #0f172a / siyah tonları
 
----
+### Font:
 
-## 3.2 Hero Kapak + Varsayılan Avatar Boyutu
-
-Sorun:
-- Hero Kapak seçildiğinde avatar boyutu otomatik olarak “Dev” geliyor.
-- Sonrasında diğer boyutlar seçilse bile canlı önizleme düzgün güncellenmiyor.
-
-İstenen çözüm:
-- Hero Kapak seçildiğinde varsayılan avatar boyutu `Orta` olmalı.
-- Boyut alanı çalışır durumda olmalı.
-- Kullanıcı `Küçük / Orta / Büyük / Dev` arasında geçince preview anlık değişmeli.
-
-Uygulama notu:
-- Header layout değişiminde avatarSize normalize edilmeli.
-- Preview component state ile aynı kaynaktan beslenmeli.
+* Inter / Poppins
 
 ---
 
-# 4. Tema Sistemi
-
-Sorun:
-- “Hazır Tema” seçildiğinde sayfa aşağı boş bir alana kayıyor.
-- Üst taraftaki “Özel Tasarım” sekmesi gereksiz.
-- Hazır tema seçimi sadece görünsel seçim değil, canlı önizlemeye anında uygulanmalı.
-
-İstenen çözüm:
-- “Hazır Tema” bölümü sadece hazır renk kombinasyonları / stil presetleri sunmalı.
-- Tema kartına tıklanması hiçbir scroll / anchor / sekme atlaması tetiklememeli.
-- Seçilen tema anında preview’a uygulanmalı.
-- `Özel Tasarım` sekmesi tamamen kaldırılmalı.
-
-Uygulama notu:
-- Tema seçici navigation değil, saf preset selector gibi çalışmalı.
-- Preset theme ile manuel ayarlar aynı tasarım state’i üzerinde çalışmalı.
+## 🧩 SAYFA YAPISI (SECTION SECTION)
 
 ---
 
-# 5. Menü Sıralaması ve Türkçe Yapı
+### 1️⃣ HERO SECTION
 
-Sistem tamamen Türkçe olacaktır.
+Amaç: İlk 3 saniyede ürünü anlatmak
 
-Önerilen menü sırası:
-1. Header
-2. Font
-3. Tema
-4. Arka Plan
-5. Renk
-6. Butonlar
+İçerik:
 
-Not:
-- Menüde “Butonlar” bölümünden önce mutlaka `Font` alanı gelmeli.
-- Kullanıcı menüden ilgili bölüme tıklayınca editör tek sayfa içinde ilgili bölüme gitmeli.
+* Başlık:
+  “Linklerin artık sadece link değil.”
 
----
+* Alt metin:
+  “Profilini mini bir web sitesine dönüştür.”
 
-# 6. Font Alanı
+* CTA:
+  “Ücretsiz Başla”
 
-Mevcut durum:
-- Font alanı eski “Özel Tasarım” sekmesindeydi.
-- Bu sekme kaldırıldığı için font alanı bağımsız bölüm olarak eklenmeli.
+* Sağ taraf:
+  Telefon mockup (canlı preview)
 
-İstenen çözüm:
-- Ayrı bir `Font` bölümü oluşturulmalı.
-- Google Fonts kullanılmalı.
-- Aşağıdaki fontlar seçenek olarak gelmeli:
+Animasyon:
 
-  - Inter
-  - Roboto
-  - Oswald
-  - Poppins
-  - Bai Jamjure
-  - Playfair Display
-  - Montserrat
-
-Not:
-- “Montserat” değil, doğru isimle `Montserrat` kullanılmalı.
-
-Font uygulama kuralı:
-- Seçilen font sayfadaki tüm metinlere uygulanmalı:
-  - profil ismi
-  - kullanıcı adı
-  - biyografi
-  - link / buton metinleri
-  - diğer tüm text alanları
-
-Ek istek:
-- `Font Size` alanı olmalı.
-- Seçenekler:
-  - Küçük
-  - Orta
-  - Büyük
-  - Çok Büyük
-
-Font size da genel tipografi sistemini etkilemeli.
+* Fade + slide-up giriş
+* Background blur blob hareketi
+* CTA hover glow efekti
 
 ---
 
-# 7. Arka Plan Düzeni
+### 2️⃣ PROBLEM → SOLUTION
 
-Sistemde arka plan türleri:
-- Renk
-- Gradyan
-- Görsel
-- Video
-- Animasyon
+Layout: Split (2 kolon)
 
-## 7.1 Arka plan seçim kartları
+Sol:
 
-Sorun:
-- 5 kart aynı satırda görünmesi gerekirken bazı kartlar aşağı kayıyor.
+* Tek link sorunu
+* Satış yapılamaması
+* Kısıtlı özelleştirme
 
-İstenen çözüm:
-- `Renk / Gradyan / Görsel / Video / Animasyon` kartlarının tamamı aynı satırda görünmeli.
+Sağ:
 
----
+* Ürün satışı
+* WhatsApp sipariş
+* Tam kontrol
 
-## 7.2 Tek aktif arka plan modu
+Animasyon:
 
-Çok kritik sorun:
-- Kullanıcı arka plan türünü değiştirince önceki türün css / renderer / class / effect katmanları sistemde kalıyor.
-- Aynı anda hem renk hem animasyon vb. uygulanabiliyor.
-
-İstenen çözüm:
-- Aynı anda sadece bir adet `activeBackgroundType` aktif olabilir.
-- Yeni arka plan seçildiğinde önceki arka plan tipine ait tüm kod / css / class / effect / DOM / video / canvas katmanları temizlenmeli.
-
-Bu kural tüm background modları için zorunludur.
+* Scroll ile left → right dönüşüm
+* Before / After hissi
 
 ---
 
-# 8. Arka Plan Renk Seçici Görünümü
+### 3️⃣ BLOCK BUILDER DEMO (KRİTİK)
 
-Sorun:
-- Renk picker alanı dikdörtgen duruyor.
-- Animasyon renk seçicilerinde de yuvarlak alan düzgün hizalanmamış.
+Amaç: Ürünün kalbini göstermek
 
-İstenen çözüm:
-- Renk seçiciler tam daire formunda olmalı.
-- İçerik daire içine düzgün oturmalı.
-- Padding / clipping / overflow düzenlenmeli.
+İçerik:
 
----
+* Sol panel:
 
-# 9. Gradyan Alanı
+  * Link Block
+  * Product Block
+  * WhatsApp Button
+  * Social Icons
 
-Sorun:
-- Mevcut gradyan bölümünde CSS gradient inputu ve hazır gradient listesi bulunuyor.
-- Bu yapı kullanıcı dostu değil.
+* Sağ panel:
 
-İstenen çözüm:
-- Manuel CSS gradient inputu kaldırılmalı.
-- 2 adet renk seçici olmalı.
-- Kullanıcı bu renkleri seçince sistem gradyanı otomatik oluşturmalı.
-- Kullanıcı ayrıca:
-  - yön
-  - açı
-  ayarlayabilmeli.
+  * Canlı preview (telefon görünümü)
 
-Beklenen davranış:
-- Her değişiklik preview’a anlık yansımalı.
+Davranış:
+
+* Sol tarafta block eklenince sağ taraf anlık değişmeli
+
+Animasyon:
+
+* Drag & drop simülasyonu
+* Hover animasyonları
 
 ---
 
-# 10. Video Arka Plan
+### 4️⃣ PRODUCT SHOWCASE
 
-İstenen yapı:
-- Kullanıcı video yüklediğinde video otomatik arka plan olmalı.
-- Canlı önizlemede gerçek video görünmeli.
-- Sadece input tarafında değil, preview tarafında da mount edilmeli.
+İçerik:
 
-Ayrıca aşağıdaki kontroller preview’da anlık çalışmalı:
-- Karartma Yoğunluğu
-- Bulanıklık (Blur)
+* Ürün kartları:
 
----
+  * Görsel
+  * Fiyat
+  * “WhatsApp ile sipariş”
 
-# 11. Animasyon Arka Plan
+Animasyon:
 
-Durum:
-- Animasyon seçildiğinde hazır animasyon seçenekleri görünüyor.
-- Seçilen animasyon preview’da çıkıyor.
-
-Düzeltme:
-- Bu çalışma korunmalı ama görsel bozukluklar düzeltilmeli.
-- Animasyon renk seçicileri tam dairesel ve hizalı görünmeli.
-
-Ek kural:
-- Animasyon modu aktif olduğunda diğer background modlarına ait stil katmanları temizlenmeli.
+* Hover scale
+* Button bounce
 
 ---
 
-# 12. Butonlar Bölümü
+### 5️⃣ CUSTOMIZATION DEMO
 
-## 12.1 Görünüm Varyantları
+Amaç: Tema gücünü göstermek
 
-Buton varyantları:
-- Solid
-- Outline
-- Glass
-- Offset
+İçerik:
 
-İstenen çözüm:
-- Hangi arka plan tipi seçilirse seçilsin bu varyantlar düzgün çalışmalı.
-- Seçilen varyant preview’daki link kartlarına anlık uygulanmalı.
+* Renk seçici
+* Blur ayarı
+* Font seçimi
 
----
+Davranış:
 
-## 12.2 Köşe Yuvarlaklığı
+* Kullanıcı seçim yaptıkça sayfa anlık değişmeli
 
-Sorun:
-- Mevcut yapı kart seçimi / preset gibi duruyor.
-- İstenen görünüm slider bazlı.
+Animasyon:
 
-İstenen çözüm:
-- `Köşe Yuvarlaklığı` alanı slider olarak yeniden tasarlanmalı.
-- Slider hareket ettikçe preview’daki butonlar anlık değişmeli.
+* Real-time UI değişimi
 
 ---
 
-## 12.3 Border Style
+### 6️⃣ SOSYAL KANIT
 
-Yeni alan:
-- `Buton Border Style`
+İçerik:
 
-Kullanıcı:
-- border türünü
-- border kalınlığını
-belirleyebilmeli.
+* 500+ kullanıcı
+* 10.000+ link
+* Kullanıcı yorumları
 
-Desteklenen border türleri örneği:
-- solid
-- dashed
-- dotted
-- double
+Animasyon:
 
-Ek kural:
-- Eğer buton varyantı `offset` ise bu alan pasif / gizli / kapalı olmalı.
+* Count-up (sayılarda)
+* Slider (yorumlar)
 
 ---
 
-# 13. Renk Menüsü
+### 7️⃣ CTA SECTION
 
-Mevcut hata:
-- Buton menüsünde buton renk alanları bulunuyor.
-- Bu dağıtık yapı kafa karıştırıyor.
+İçerik:
 
-Yeni kural:
-- Arka plan menüsü dışında sistemdeki tüm renkler `Renk` menüsünden seçilmeli.
-- Buton menüsündeki renk alanları kaldırılmalı.
+* “2 dakikada hazır”
+* “Ücretsiz başla”
 
-Renk menüsünde olması gereken alanlar:
+Animasyon:
 
-- Ana Başlık (İsim)
-- Kullanıcı Adı
-- Biyografi
-- Buton Arka Plan
-- Buton Metni
-- Buton Kenarlık
-- Buton İkon
-
-Ek hover alanları:
-- Buton Arka Plan Hover
-- Buton Metni Hover
-- Buton Kenarlık Hover
-- Buton İkon Hover
+* Pulse button
+* Gradient hareket
 
 ---
 
-## 13.1 Button Arka Plan alanı kuralı
+## ⚡ MİKRO ETKİLEŞİMLER
 
-Kural:
-- Eğer buton varyantı `glass` ise `Buton Arka Plan` alanı gizlenmeli.
-
----
-
-## 13.2 Offset varyantında border rengi
-
-Kural:
-- Offset varyantında kullanılan box-shadow rengi, `Buton Kenarlık` alanından beslenmeli.
-
-Örnek davranış:
-`.variant-offset { box-shadow: 4px 4px 0px 0px var(--button-border); }`
-
-Bu mantık diğer buton varyantlarının border color yapısı ile de uyumlu olmalı.
+* Button hover → glow
+* Card hover → scale + shadow
+* Input focus → border highlight
+* Smooth scroll
 
 ---
 
-# 14. Tüm Editör Ayarları Türkçe Olmalı
+## 🧠 UX PRENSİPLERİ
 
-Bu sistem Türkçe olduğu için:
+* Her section bir soruya cevap verir:
 
-- tüm editör label’ları
-- dropdown seçenekleri
-- menü isimleri
-- section başlıkları
-- tooltip / helper text’ler
-- varyant isimleri kullanıcıya görünen tarafta
+  * Bu ne?
+  * Ne işe yarar?
+  * Neden kullanayım?
+  * Nasıl çalışır?
 
-Türkçe olmalıdır.
+* Kullanıcı:
 
-Örnekler:
-- Header Düzeni
-- Profil Görseli
-- Görsel Boyutu
-- Hazır Tema
-- Arka Plan
-- Renk
-- Butonlar
-- Köşe Yuvarlaklığı
-- Kenarlık Stili
-- Karartma Yoğunluğu
-- Bulanıklık
-
-Not:
-- İç state / teknik key isimleri İngilizce olabilir.
-- Kullanıcıya görünen arayüz tamamen Türkçe olmalı.
+  * Okumaz → görür
+  * Görmez → hisseder
 
 ---
 
-# 15. Canlı Önizleme Mimari Zorunluluğu
+## 🚀 ÖZEL İSTEKLER
 
-Bu editörde yapılan her işlem şu akış ile çalışmalı:
+### 1. Fake Builder Demo
 
-Editor Control
-→ Global Design State Güncelle
-→ Live Preview Renderer Yenile / Uygula
+Landing içinde kullanıcı:
 
-Yani:
-- UI ayrı state tutmamalı
-- preview ayrı state tutmamalı
-- tüm yapı tek merkezi tasarım state’ine bağlanmalı
+* Block ekleyebilmeli (fake)
+* Anlık preview görmeli
 
-Preview hiçbir zaman editörden kopuk olmamalıdır.
+### 2. Live Phone Preview
 
----
+Scroll oldukça telefon ekranı değişmeli
 
-# 16. Temizlenecek / Kaldırılacak Sistemler
+### 3. AI Feature (Opsiyonel)
 
-Aşağıdaki yapılar sistemden kaldırılmalı veya yeniden yazılmalı:
-
-- Özel Tasarım sekmesi
-- Eski CSS gradient input alanı
-- Buton menüsündeki buton renk alanları
-- Tema seçince scroll yapan eski davranış
-- Önceki background modundan kalan css katmanları
-- Desteklenmeyen header layout’larda görünen gereksiz kontroller
+Prompt gir → otomatik sayfa oluştur simülasyonu
 
 ---
 
-# 17. Beklenen Nihai Sonuç
+## ⚠️ KURALLAR
 
-Yeni editör şu özelliklere sahip olmalı:
+* Kod modüler olmalı
+* CSS tekrarları olmamalı
+* Tek sayfa (one-page navigation)
+* Responsive zorunlu
+* Performans optimize edilmeli
 
-- sade
-- tamamen Türkçe
-- tek sayfa editör
-- anlık canlı önizleme
-- temiz state yönetimi
-- arka planlarda tek aktif mod sistemi
-- tutarlı renk yönetimi
-- profesyonel buton yönetimi
-- kullanıcı dostu font ve tema düzeni
-- CSS çakışması azaltılmış yapı
+---
 
-Bu görev tamamlandığında kullanıcı editörde yaptığı her değişikliği sağ tarafta / canlı görünümde anlık olarak görebilmelidir.
+
+## ✅ TESLİM KRİTERLERİ
+
+* Tüm sectionlar çalışır durumda
+* Animasyonlar aktif
+* Mobil uyumlu
+* Görsel olarak modern SaaS kalitesinde
+
+---
+
+## 🎯 SON HEDEF
+
+Bu landing page:
+
+* Sadece tanıtım değil
+* Ürünün kendisini deneyimleten
+* Kullanıcıyı direkt signup’a götüren
+  bir satış makinesi olmalıdır.
