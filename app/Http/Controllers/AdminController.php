@@ -147,6 +147,7 @@ class AdminController extends Controller
         ]);
 
         if ($success) {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
             return back()->with('success', 'Ayarlar başarıyla güncellendi.');
         } else {
             return back()->with('error', '.env dosyasına yazılamadı. Dosya izinlerini kontrol edin.');
