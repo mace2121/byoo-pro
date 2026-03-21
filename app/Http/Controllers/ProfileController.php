@@ -544,4 +544,10 @@ class ProfileController extends Controller
 
         return Storage::url($filename);
     }
+
+    public function completeOnboarding(Request $request)
+    {
+        $request->user()->update(['onboarding_completed' => true]);
+        return response()->json(['success' => true]);
+    }
 }

@@ -10,7 +10,7 @@
     @endphp
     <div class="h-full flex" x-data="dashboardManager(@js(request()->query('tab', 'links')), @js($initialSettings))">
         <!-- LEFT SIDEBAR (Navigation) -->
-        <aside class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" 
+        <aside id="tour-sidebar" class="border-r border-border bg-background flex-shrink-0 transition-all duration-300 z-30 flex flex-col" 
                :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'">
             <div class="h-full flex flex-col w-64">
                 <!-- Sidebar Header: Logo + Toggle -->
@@ -29,7 +29,7 @@
                         <p class="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{{ __('Menu') }}</p>
                     </div>
                     <nav class="space-y-1 px-2">
-                        <button @click="tab = 'links'; if(window.innerWidth < 768) sidebarOpen = false" 
+                        <button id="tour-links-tab" @click="tab = 'links'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'links' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             <i class="fas fa-layer-group w-4 text-center"></i>
@@ -41,7 +41,7 @@
                             <i class="fas fa-chart-pie w-4 text-center"></i>
                             {{ __('Analizler') }}
                         </button>
-                        <button @click="tab = 'design'; if(window.innerWidth < 768) sidebarOpen = false" 
+                        <button id="tour-design-tab" @click="tab = 'design'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'design' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                             <i class="fas fa-paint-brush w-4 text-center"></i>
@@ -93,7 +93,7 @@
             <!-- Navbar -->
             <nav class="h-14 flex-shrink-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-4 md:px-6">
                 <!-- Sidebar toggle (only when collapsed) -->
-                <button x-show="!sidebarOpen" x-cloak @click="sidebarOpen = true" class="p-2 rounded-md hover:bg-accent transition-colors mr-3">
+                <button id="tour-sidebar-toggle" x-show="!sidebarOpen" x-cloak @click="sidebarOpen = true" class="p-2 rounded-md hover:bg-accent transition-colors mr-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
                 </button>
 
@@ -359,7 +359,7 @@
                 </div>
 
                 <!-- RIGHT PREVIEW SIDEBAR (second column, grid-controlled) -->
-                <div class="bg-muted/50 transition-all duration-300" 
+                <div id="tour-preview" class="bg-muted/50 transition-all duration-300" 
                      :class="previewOpen ? 'border-l border-border overflow-y-auto' : 'overflow-hidden'"
                      style="min-width: 0;">
                     <div class="h-full flex flex-col p-5">
@@ -400,6 +400,94 @@
             </div>
         </div>
     </div>
+
+    @if(!auth()->user()->onboarding_completed)
+    {{-- Shepherd.js Onboarding Tour --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/css/shepherd.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/js/shepherd.min.js"></script>
+    <style>
+        .shepherd-button-primary { background: #f59e0b !important; border-radius: 9999px !important; font-weight: 700 !important; }
+        .shepherd-button-secondary { border-radius: 9999px !important; font-weight: 600 !important; }
+        .shepherd-has-title .shepherd-content .shepherd-header { background: #fff; padding: 1.25rem 1.25rem 0.5rem !important; }
+        .shepherd-text { font-size: 0.875rem !important; line-height: 1.6 !important; color: #374151 !important; padding: 0.5rem 1.25rem 1rem !important; }
+        .shepherd-footer { padding: 0.75rem 1.25rem 1.25rem !important; gap: 0.5rem !important; }
+        .shepherd-element { border-radius: 1rem !important; box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important; border: 1px solid #e5e7eb !important; max-width: 340px !important; }
+        .shepherd-arrow:before { background: #fff !important; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const completeUrl = '{{ route('profile.onboarding.complete') }}';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            async function markOnboardingDone() {
+                await fetch(completeUrl, {
+                    method: 'PATCH',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+            }
+
+            const tour = new Shepherd.Tour({
+                useModalOverlay: true,
+                defaultStepOptions: {
+                    cancelIcon: { enabled: true },
+                    scrollTo: { behavior: 'smooth', block: 'center' },
+                    classes: 'shadow-xl',
+                    buttons: [
+                        { text: 'Turu Atla', action() { markOnboardingDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
+                        { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
+                    ]
+                }
+            });
+
+            tour.addStep({
+                id: 'welcome',
+                title: '👋 byoo\'ya Hoş Geldin!',
+                text: 'Birkaç saniyede platformu tanıtalım. İstediğin zaman "Turu Atla" diyebilirsin.',
+                attachTo: { element: '#tour-sidebar', on: 'right' },
+                buttons: [
+                    { text: 'Turu Atla', action() { markOnboardingDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
+                    { text: 'Başlayalım →', action() { this.next(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
+
+            tour.addStep({
+                id: 'links',
+                title: '🔗 Bağlantılarını Ekle',
+                text: 'Buradan profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
+                attachTo: { element: '#tour-links-tab', on: 'right' },
+            });
+
+            tour.addStep({
+                id: 'design',
+                title: '🎨 Tasarımını Özelleştir',
+                text: 'Profil sayfanın renklerini, fontunu, arka planını ve buton stilini buradan ayarlıyorsun.',
+                attachTo: { element: '#tour-design-tab', on: 'right' },
+            });
+
+            tour.addStep({
+                id: 'preview',
+                title: '📱 Canlı Önizleme',
+                text: 'Yaptığın değişiklikleri anında bu önizleme alanında görebilirsin. Sağ üstteki butona bas!',
+                attachTo: { element: '#tour-preview', on: 'left' },
+            });
+
+            tour.addStep({
+                id: 'sidebar-toggle',
+                title: '☰ Menüyü Aç/Kapat',
+                text: 'Sol menüyü (sidebar) bu butonla istediğin zaman gizleyip açabilirsin.',
+                attachTo: { element: '#tour-sidebar-toggle', on: 'bottom' },
+                buttons: [
+                    { text: '← Geri', action() { this.back(); }, classes: 'shepherd-button-secondary' },
+                    { text: '✅ Tamamla!', action() { markOnboardingDone(); this.complete(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
+
+            // Kısa gecikme ile başlat (Alpine.js dom'un hazır olmasını bekle)
+            setTimeout(() => tour.start(), 1200);
+        });
+    </script>
+    @endif
 
     <style>
         .design-color-control {

@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/design', [ProfileController::class, 'updateDesign'])->name('profile.design.update');
+    Route::patch('/profile/onboarding', [ProfileController::class, 'completeOnboarding'])->name('profile.onboarding.complete');
     Route::post('/profile/design/media', [ProfileController::class, 'uploadDesignMedia'])->name('profile.design.media.upload');
     Route::post('/profile/design/media/chunk', [ProfileController::class, 'uploadDesignMediaChunk'])->name('profile.design.media.chunk');
     Route::post('/profile/design/media/finalize', [ProfileController::class, 'finalizeDesignMediaUpload'])->name('profile.design.media.finalize');
