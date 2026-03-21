@@ -48,15 +48,33 @@
                                     <x-text-input id="google_redirect_uri" name="google_redirect_uri" type="text" class="mt-1 block w-full" :value="$google_redirect_uri" placeholder="${APP_URL}/auth/google/callback" />
                                     <p class="mt-1 text-xs text-muted-foreground">Genellikle <code>${APP_URL}/auth/google/callback</code> olarak girilir.</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Pro Yükseltme Ayarları -->
+                        <div class="rounded-lg border border-border bg-card shadow-sm mt-6">
+                            <div class="p-6 border-b border-border">
+                                <h3 class="text-lg font-semibold flex items-center gap-2">
+                                    <i class="fab fa-whatsapp text-emerald-500"></i>
+                                    Pro Plana Geçiş Ayarları
+                                </h3>
+                                <p class="text-sm text-muted-foreground mt-1">Sistem üzerindeki tüm CTA (Aksiyon) butonlarından kullanıcılar Pro plan almak için burada belirttiğiniz WhatsApp numarasına yönlendirilir.</p>
+                            </div>
+                            <div class="p-6 space-y-6">
+                                <div>
+                                    <x-input-label for="whatsapp_upgrade_number" value="WHATSAPP_UPGRADE_NUMBER" />
+                                    <x-text-input id="whatsapp_upgrade_number" name="whatsapp_upgrade_number" type="text" class="mt-1 block w-full" :value="$whatsapp_upgrade_number" placeholder="905555555555" />
+                                    <p class="mt-1 text-xs text-muted-foreground">Ülke kodu ile birlikte boşluksuz yazın (Örnek: 905555555555)</p>
+                                </div>
 
                                 <div class="flex items-center justify-end">
                                     <x-primary-button>
                                         {{ __('Ayarları Kaydet') }}
                                     </x-primary-button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </main>
         </div>

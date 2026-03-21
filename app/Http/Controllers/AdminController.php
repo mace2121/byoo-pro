@@ -154,8 +154,9 @@ class AdminController extends Controller
         $google_client_id = $this->getEnvValue('GOOGLE_CLIENT_ID');
         $google_client_secret = $this->getEnvValue('GOOGLE_CLIENT_SECRET');
         $google_redirect_uri = $this->getEnvValue('GOOGLE_REDIRECT_URI') ?: '${APP_URL}/auth/google/callback';
+        $whatsapp_upgrade_number = $this->getEnvValue('WHATSAPP_UPGRADE_NUMBER');
 
-        return view('admin.settings.index', compact('google_client_id', 'google_client_secret', 'google_redirect_uri'));
+        return view('admin.settings.index', compact('google_client_id', 'google_client_secret', 'google_redirect_uri', 'whatsapp_upgrade_number'));
     }
 
     public function updateSettings(Request $request)
@@ -164,12 +165,14 @@ class AdminController extends Controller
             'google_client_id' => 'nullable|string',
             'google_client_secret' => 'nullable|string',
             'google_redirect_uri' => 'nullable|string',
+            'whatsapp_upgrade_number' => 'nullable|string',
         ]);
 
         $success = $this->setEnvironmentValue([
             'GOOGLE_CLIENT_ID' => $request->google_client_id ?? '',
             'GOOGLE_CLIENT_SECRET' => $request->google_client_secret ?? '',
             'GOOGLE_REDIRECT_URI' => $request->google_redirect_uri ?? '',
+            'WHATSAPP_UPGRADE_NUMBER' => $request->whatsapp_upgrade_number ?? '',
         ]);
 
         if ($success) {
