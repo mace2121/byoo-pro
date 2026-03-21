@@ -222,7 +222,7 @@
         <div class="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 pointer-events-none">
             <div class="pointer-events-auto">
                 <a href="{{ url('/') }}" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-background/20 text-foreground backdrop-blur-xl transition-all hover:bg-background/40 hover:scale-105 active:scale-95 shadow-sm">
-                    <x-application-logo class="h-5 w-5 opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <x-application-logo class="h-4.5 w-4.5 opacity-80 group-hover:opacity-100 transition-opacity" />
                 </a>
             </div>
             <div class="pointer-events-auto">
@@ -289,11 +289,6 @@
                 @endforelse
             </div>
 
-            <div class="mt-12 text-center">
-                <a href="{{ url('/') }}" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-current/10 bg-white/10 p-2 theme-footer opacity-70 transition-all hover:opacity-100">
-                    <x-application-logo class="h-3.5 w-3.5" />
-                </a>
-            </div>
         </div>
     </div>
 
