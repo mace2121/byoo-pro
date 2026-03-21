@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     @php
         $initialSettings = \App\Support\DesignEditor::resolve(auth()->user()->profile, [
             'profile' => [
@@ -220,14 +220,28 @@
 
                                 <!-- Content Area: Single Page Scrolling -->
                                 <div class="flex-1 overflow-y-auto scroll-smooth no-scrollbar p-6" x-ref="designScrollArea" @scroll="handleDesignScroll">
-                                    <div id="design-header" class="mb-12 scroll-mt-20">
+                                    <div id="design-header" class="mb-12 scroll-mt-20 relative z-40">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-id-card"></i> Header
                                         </h3>
                                         @include('dashboard.partials.design.header')
                                     </div>
-                                    <hr class="border-border/50 my-10">
-                                    <div id="design-font" class="mb-12 scroll-mt-20">
+
+                                    <div class="relative">
+                                        @if(!auth()->user()->canCustomizeTheme())
+                                            <div class="absolute inset-0 z-30 flex flex-col items-center justify-start pt-32 bg-background/70 backdrop-blur-[3px] rounded-3xl border border-border/50">
+                                                <div class="p-6 text-center max-w-sm rounded-[28px] border border-border bg-card shadow-2xl sticky top-40">
+                                                    <div class="w-14 h-14 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                        <i class="fas fa-lock text-xl text-amber-500"></i>
+                                                    </div>
+                                                    <h3 class="text-base font-bold">{{ __('Pro Plan Özelliği') }}</h3>
+                                                    <p class="mt-2 text-sm text-muted-foreground mb-5">{{ __('Bu özellik Pro plan ile aktif edilir. Gelişmiş tasarım ayarlarını kullanmak için hesabınızı yükseltin.') }}</p>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <hr class="border-border/50 my-10">
+                                        <div id="design-font" class="mb-12 scroll-mt-20">
                                         <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
                                             <i class="fas fa-font"></i> Font
                                         </h3>
@@ -260,6 +274,22 @@
                                             <i class="fas fa-hand-pointer"></i> Butonlar
                                         </h3>
                                         @include('dashboard.partials.design.buttons')
+                                        <div id="design-custom-css" class="mb-12 scroll-mt-20">
+                                            <h3 class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4 flex items-center gap-2">
+                                                <i class="fab fa-css3-alt"></i> Custom CSS
+                                            </h3>
+                                            <div class="rounded-2xl border border-input bg-muted/40 p-5 opacity-70 cursor-not-allowed" title="Bu özellik Pro plan ile aktif edilir">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <h4 class="text-sm font-semibold flex items-center gap-2">
+                                                        {{ __('Özel CSS Kodu') }}
+                                                        <i class="fas fa-lock text-xs text-amber-500"></i>
+                                                    </h4>
+                                                </div>
+                                                <p class="text-xs text-muted-foreground mb-4">{{ __('Kendi CSS kodlarınızı yazarak profilinizi tamamen özelleştirin. Sadece Pro plan kullanıcıları içindir.') }}</p>
+                                                <textarea disabled rows="4" class="w-full resize-none rounded-xl border-input bg-background/50 text-xs font-mono text-muted-foreground shadow-sm cursor-not-allowed" placeholder="/* Custom CSS buraya yazilir... */"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
 

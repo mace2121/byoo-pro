@@ -80,16 +80,23 @@
                                     <button type="button" @click="createType = 'link'" :class="createType === 'link' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors">
                                         <i class="fas fa-link mr-2 text-xs"></i> Baglanti
                                     </button>
-                                    <button type="button" @click="{{ $canUseProducts ? "createType = 'product'" : '' }}" {{ $canUseProducts ? '' : 'disabled' }} :class="createType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors {{ $canUseProducts ? '' : 'cursor-not-allowed opacity-50' }}">
+                                    <button type="button" 
+                                        @if($canUseProducts)
+                                            @click="createType = 'product'" 
+                                            :class="createType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'"
+                                            class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"
+                                        @else
+                                            disabled
+                                            title="Bu özellik Pro plan ile aktif edilir"
+                                            class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-not-allowed opacity-50 bg-muted/50"
+                                        @endif
+                                    >
                                         <i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun
+                                        @unless($canUseProducts)
+                                            <i class="fas fa-lock absolute right-3 top-1/2 -translate-y-1/2 text-xs text-amber-500"></i>
+                                        @endunless
                                     </button>
                                 </div>
-
-                                @unless($canUseProducts)
-                                    <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                                        Urun bloklari yalnizca Pro pakette acilir.
-                                    </div>
-                                @endunless
 
                                 <div class="space-y-2">
                                     <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Baslik</label>
@@ -240,7 +247,21 @@
                                             <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Blok tipi</label>
                                             <div class="grid grid-cols-2 gap-3">
                                                 <button type="button" @click="blockType = 'link'" :class="blockType === 'link' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"><i class="fas fa-link mr-2 text-xs"></i> Baglanti</button>
-                                                <button type="button" @click="blockType = 'product'" :class="blockType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" class="rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"><i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun</button>
+                                                <button type="button" 
+                                                    @if($canUseProducts)
+                                                        @click="blockType = 'product'" :class="blockType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" 
+                                                        class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"
+                                                    @else
+                                                        disabled
+                                                        title="Bu özellik Pro plan ile aktif edilir"
+                                                        class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-not-allowed opacity-50 bg-muted/50"
+                                                    @endif
+                                                >
+                                                    <i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun
+                                                    @unless($canUseProducts)
+                                                        <i class="fas fa-lock absolute right-3 top-1/2 -translate-y-1/2 text-xs text-amber-500"></i>
+                                                    @endunless
+                                                </button>
                                             </div>
                                         </div>
                                         <label class="flex items-center justify-between rounded-2xl border border-border bg-muted/20 px-4 py-3 text-sm">

@@ -40,6 +40,26 @@
                 <x-text-input id="name" name="name" type="text" :value="old('name', $user->name)" required autocomplete="name" />
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
+
+            <div class="space-y-2 md:col-span-2">
+                <div class="flex items-center justify-between p-4 rounded-xl border border-input {{ $user->canAccess('verified') ? 'bg-background' : 'bg-muted/40 cursor-not-allowed opacity-70' }}" {{ $user->canAccess('verified') ? '' : 'title="Bu özellik Pro plan ile aktif edilir"' }}>
+                    <div>
+                        <h4 class="text-sm font-semibold flex items-center gap-2">
+                            {{ __('Doğrulanmış Rozeti') }}
+                            @if(!$user->canAccess('verified'))
+                                <i class="fas fa-lock text-xs text-amber-500"></i>
+                            @endif
+                        </h4>
+                        <p class="text-xs text-muted-foreground mt-1">{{ __('Profilinizde isminizin yanında premium onay işareti sergileyin.') }}</p>
+                    </div>
+                    <div>
+                        <label class="relative inline-flex items-center {{ $user->canAccess('verified') ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none' }}">
+                            <input type="checkbox" name="verified" value="1" class="sr-only peer" {{ $user->verified ? 'checked' : '' }} {{ $user->canAccess('verified') ? '' : 'disabled' }}>
+                            <div class="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="space-y-2">

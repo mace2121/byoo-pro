@@ -96,46 +96,55 @@ class User extends Authenticatable
         return $this->subscription ? $this->subscription->plan : null;
     }
 
+    public function canAccess(string $feature): bool
+    {
+        if ($this->isPro()) {
+            return true;
+        }
+
+        $restricted = [
+            'product',
+            'custom_theme',
+            'custom_css',
+            'verified'
+        ];
+
+        return !in_array($feature, $restricted, true);
+    }
+
     public function hasPremiumAccess(): bool
     {
-        $slug = $this->activePlan()?->slug;
-
-        return in_array($slug, ['pro', 'business'], true);
+        return $this->isPro();
     }
 
     public function canUseProductBlocks(): bool
     {
-        return $this->hasPremiumAccess();
+        return $this->canAccess('product');
     }
 
     public function canCustomizeTheme(): bool
     {
-        return $this->hasPremiumAccess();
+        return $this->canAccess('custom_theme');
     }
 
     public function canUseAnalytics(): bool
     {
+        // Analytics can be restricted later
         return $this->hasPremiumAccess();
     }
 
     public function canUseVerifiedBadge(): bool
     {
-        return $this->hasPremiumAccess();
+        return $this->canAccess('verified');
     }
 
     // Helper to check if user reached their link limit based on plan
     public function hasReachedLinkLimit(): bool
     {
-        $plan = $this->activePlan();
-        if (!$plan) {
-            // Fallback to a default limit if no plan (should not happen)
-            return $this->links()->count() >= 5;
-        }
-
-        if ((int) $plan->link_limit <= 0) {
+        if ($this->isPro()) {
             return false;
         }
 
-        return $this->links()->count() >= $plan->link_limit;
+        return $this->links()->count() >= 5;
     }
 }

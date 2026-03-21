@@ -49,6 +49,10 @@ class ProfileController extends Controller
             'email' => $request->email,
         ]);
 
+        if ($user->canAccess('verified')) {
+            $user->verified = $request->has('verified');
+        }
+
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
@@ -114,10 +118,6 @@ class ProfileController extends Controller
      */
     public function updateDesign(Request $request)
     {
-        if ($response = $this->ensureThemeAccess($request)) {
-            return $response;
-        }
-
         $user = $request->user();
         $profile = $this->ensureProfile($user);
 
@@ -131,6 +131,15 @@ class ProfileController extends Controller
                         'success' => false,
                         'message' => 'Invalid design payload.',
                     ], 422);
+                }
+
+                if (!$user->canCustomizeTheme()) {
+                    $existing = is_array($profile->design_settings) ? $profile->design_settings : [];
+                    $designSettings['theme'] = $existing['theme'] ?? [];
+                    $designSettings['background'] = $existing['background'] ?? [];
+                    $designSettings['colors'] = $existing['colors'] ?? [];
+                    $designSettings['typography'] = $existing['typography'] ?? [];
+                    $designSettings['buttons'] = $existing['buttons'] ?? [];
                 }
 
                 if (isset($designSettings['profile'])) {
@@ -177,6 +186,15 @@ class ProfileController extends Controller
             if (isset($designSettings['profile'])) {
                 $user->update(['name' => $designSettings['profile']['name'] ?? $user->name]);
                 $profile->update(['bio' => $designSettings['profile']['bio'] ?? $profile->bio]);
+            }
+
+            if (!$user->canCustomizeTheme()) {
+                $existing = is_array($profile->design_settings) ? $profile->design_settings : [];
+                $designSettings['theme'] = $existing['theme'] ?? [];
+                $designSettings['background'] = $existing['background'] ?? [];
+                $designSettings['colors'] = $existing['colors'] ?? [];
+                $designSettings['typography'] = $existing['typography'] ?? [];
+                $designSettings['buttons'] = $existing['buttons'] ?? [];
             }
 
             // Hero Image
@@ -436,11 +454,15 @@ class ProfileController extends Controller
 
     private function ensureThemeAccess(Request $request)
     {
+        if ($request->input('media_type') === 'hero_image') {
+            return null; // Header customization is free
+        }
+
         if ($request->user()?->canCustomizeTheme()) {
             return null;
         }
 
-        $message = 'Tema özelleştirme yalnızca Pro pakette kullanılabilir.';
+        $message = 'Gelişmiş tema özelleştirme yalnızca Pro pakette kullanılabilir.';
 
         if ($request->expectsJson() || $request->isJson()) {
             return response()->json([
