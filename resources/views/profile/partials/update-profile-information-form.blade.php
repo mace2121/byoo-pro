@@ -51,6 +51,11 @@
                             @endif
                         </h4>
                         <p class="text-xs text-muted-foreground mt-1">{{ __('Profilinizde isminizin yanında premium onay işareti sergileyin.') }}</p>
+                        @if(!$user->canAccess('verified'))
+                            <a href="{{ auth()->user()->getUpgradeUrl() }}" target="_blank" class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 transition-colors hover:text-amber-600">
+                                <i class="fab fa-whatsapp text-sm"></i> {{ __('Pro\'ya Geçerek Aktifleştir') }}
+                            </a>
+                        @endif
                     </div>
                     <div>
                         <label class="relative inline-flex items-center {{ $user->canAccess('verified') ? 'cursor-pointer' : 'cursor-not-allowed pointer-events-none' }}">

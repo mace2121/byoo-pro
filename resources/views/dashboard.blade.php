@@ -150,6 +150,26 @@
                 <!-- MAIN CONTENT AREA (always first column) -->
                 <div style="overflow-y: auto; min-width: 0;">
                     <div class="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
+                        @if(!auth()->user()->isPro())
+                            <div class="rounded-[28px] border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+                                <div>
+                                    <h3 class="flex items-center gap-2 text-xl font-extrabold text-amber-900">
+                                        <i class="fas fa-crown text-amber-500"></i> byoo Pro'ya Geç
+                                    </h3>
+                                    <p class="mt-2 text-sm font-medium text-amber-800">Sınırsız bağlantı, ürün ekleme, onaylanmış rozet, animasyonlu arka planlar ve tamamen özel temalar.</p>
+                                    <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold text-amber-900/80">
+                                        <li class="flex items-center gap-1.5"><i class="fas fa-check text-amber-500"></i> Sınırsız Blok</li>
+                                        <li class="flex items-center gap-1.5"><i class="fas fa-check text-amber-500"></i> Ürün & Fiyat</li>
+                                        <li class="flex items-center gap-1.5"><i class="fas fa-check text-amber-500"></i> Doğrulanmış Rozeti</li>
+                                        <li class="flex items-center gap-1.5"><i class="fas fa-check text-amber-500"></i> Gelişmiş Tasarım</li>
+                                    </ul>
+                                </div>
+                                <a href="{{ auth()->user()->getUpgradeUrl() }}" target="_blank" class="shrink-0 inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-6 py-4 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-amber-600 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-amber-500/20">
+                                    <i class="fab fa-whatsapp text-xl"></i>
+                                    Hemen Yükselt
+                                </a>
+                            </div>
+                        @endif
                         <div x-show="tab === 'links'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
                             @include('dashboard.partials.links-management')
                         </div>
@@ -235,7 +255,12 @@
                                                         <i class="fas fa-lock text-xl text-amber-500"></i>
                                                     </div>
                                                     <h3 class="text-base font-bold">{{ __('Pro Plan Özelliği') }}</h3>
-                                                    <p class="mt-2 text-sm text-muted-foreground mb-5">{{ __('Bu özellik Pro plan ile aktif edilir. Gelişmiş tasarım ayarlarını kullanmak için hesabınızı yükseltin.') }}</p>
+                                                    <p class="mt-2 text-sm text-muted-foreground mb-5">{{ __('Gelişmiş tema ayarları, arka planlar, renk ve font özelleştirmeleri için Pro plan gereklidir.') }}</p>
+                                                    
+                                                    <a href="{{ auth()->user()->getUpgradeUrl() }}" target="_blank" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-amber-600">
+                                                        <i class="fab fa-whatsapp text-lg"></i>
+                                                        {{ __('Hemen Pro\'ya Geç') }}
+                                                    </a>
                                                 </div>
                                             </div>
                                         @endif
@@ -286,7 +311,10 @@
                                                     </h4>
                                                 </div>
                                                 <p class="text-xs text-muted-foreground mb-4">{{ __('Kendi CSS kodlarınızı yazarak profilinizi tamamen özelleştirin. Sadece Pro plan kullanıcıları içindir.') }}</p>
-                                                <textarea disabled rows="4" class="w-full resize-none rounded-xl border-input bg-background/50 text-xs font-mono text-muted-foreground shadow-sm cursor-not-allowed" placeholder="/* Custom CSS buraya yazilir... */"></textarea>
+                                                <textarea disabled rows="4" class="w-full resize-none rounded-xl border-input bg-background/50 text-xs font-mono text-muted-foreground shadow-sm cursor-not-allowed mb-3" placeholder="/* Custom CSS buraya yazilir... */"></textarea>
+                                                <a href="{{ auth()->user()->getUpgradeUrl() }}" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 transition-colors hover:text-amber-600">
+                                                    <i class="fab fa-whatsapp text-sm"></i> {{ __('Pro\'ya Geçerek Aktifleştir') }}
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

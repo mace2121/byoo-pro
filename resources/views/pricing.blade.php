@@ -47,8 +47,7 @@
                     @foreach ($plans as $plan)
                         @php
                             $isCurrentPlan = auth()->check()
-                                && auth()->user()->subscription
-                                && auth()->user()->subscription->plan_id === $plan->id;
+                                && auth()->user()->plan === $plan->slug;
                             $isPro = $plan->slug === 'pro';
                             $features = $featureMap[$plan->slug] ?? [];
                         @endphp
@@ -101,9 +100,21 @@
                                         Aktif Plan
                                     </span>
                                 @else
-                                    <span class="block w-full rounded-full {{ $isPro ? 'bg-amber-500 text-black' : 'bg-black text-white dark:bg-white dark:text-black' }} px-5 py-4 text-center text-sm font-semibold">
-                                        {{ $isPro ? 'Pro’ya Geç' : 'Free ile Devam Et' }}
-                                    </span>
+                                    @if ($isPro)
+                                        @if(auth()->check())
+                                            <a href="{{ auth()->user()->getUpgradeUrl() }}" target="_blank" class="block w-full rounded-full bg-amber-500 px-5 py-4 text-center text-sm font-semibold text-black transition-transform shadow hover:-translate-y-1 hover:shadow-lg">
+                                                <i class="fab fa-whatsapp mr-1 text-lg"></i> Pro’ya Geç
+                                            </a>
+                                        @else
+                                            <a href="{{ route('register') }}" class="block w-full rounded-full bg-amber-500 px-5 py-4 text-center text-sm font-semibold text-black transition-transform shadow hover:-translate-y-1 hover:shadow-lg">
+                                                <i class="fas fa-rocket mr-1"></i> Hemen Başla
+                                            </a>
+                                        @endif
+                                    @else
+                                        <span class="block w-full rounded-full bg-black text-white dark:bg-white dark:text-black px-5 py-4 text-center text-sm font-semibold">
+                                            Free ile Devam Et
+                                        </span>
+                                    @endif
                                 @endif
                             </div>
                         </article>

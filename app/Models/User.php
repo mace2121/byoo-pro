@@ -147,4 +147,12 @@ class User extends Authenticatable
 
         return $this->links()->count() >= 5;
     }
+
+    // Helper to generate WhatsApp upgrade URL
+    public function getUpgradeUrl(): string
+    {
+        $phone = env('WHATSAPP_UPGRADE_NUMBER', '905555555555');
+        $message = "Merhaba, Pro üyelik almak istiyorum. Kullanıcı adım: " . $this->username;
+        return "https://wa.me/{$phone}?text=" . urlencode($message);
+    }
 }

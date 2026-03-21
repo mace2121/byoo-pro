@@ -86,9 +86,9 @@
                                             :class="createType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'"
                                             class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"
                                         @else
-                                            disabled
-                                            title="Bu özellik Pro plan ile aktif edilir"
-                                            class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-not-allowed opacity-50 bg-muted/50"
+                                            @click="window.open('{{ auth()->user()->getUpgradeUrl() }}', '_blank')"
+                                            title="Bu özellik Pro plan ile aktif edilir. Yükseltmek için tıklayın."
+                                            class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-pointer bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 border-amber-500/30"
                                         @endif
                                     >
                                         <i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun
@@ -252,9 +252,9 @@
                                                         @click="blockType = 'product'" :class="blockType === 'product' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'" 
                                                         class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors"
                                                     @else
-                                                        disabled
-                                                        title="Bu özellik Pro plan ile aktif edilir"
-                                                        class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-not-allowed opacity-50 bg-muted/50"
+                                                        @click="window.open('{{ auth()->user()->getUpgradeUrl() }}', '_blank')"
+                                                        title="Bu özellik Pro plan ile aktif edilir. Yükseltmek için tıklayın."
+                                                        class="relative rounded-2xl border px-4 py-3 text-sm font-semibold transition-colors cursor-pointer bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 border-amber-500/30"
                                                     @endif
                                                 >
                                                     <i class="fas fa-bag-shopping mr-2 text-xs"></i> Urun
