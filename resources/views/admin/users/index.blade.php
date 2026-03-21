@@ -98,6 +98,17 @@
                                                             Dogrulanmis
                                                         </span>
                                                     @endif
+
+                                                    @if($user->plan === 'pro')
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                                                            <i class="fas fa-crown text-[9px]"></i>
+                                                            PRO
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center gap-1 rounded-full bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground border border-border">
+                                                            FREE
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 text-xs text-muted-foreground">{{ $user->created_at->format('d M Y') }}</td>
@@ -120,8 +131,16 @@
                                                         <form action="{{ route('admin.users.verified', $user) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:text-sky-700 hover:bg-sky-50' : 'text-muted-foreground hover:text-sky-600 hover:bg-sky-50' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->verified ? 'text-sky-500 hover:text-sky-700 hover:bg-sky-50' : 'text-muted-foreground hover:text-sky-500 hover:bg-sky-50' }}" title="{{ $user->verified ? 'Dogrulamayi Kaldir' : 'Dogrula' }}">
                                                                 <i class="fas fa-circle-check text-xs"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{ route('admin.users.plan', $user) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="plan" value="{{ $user->plan === 'pro' ? 'free' : 'pro' }}">
+                                                            <button type="submit" class="p-1.5 rounded-md transition-colors {{ $user->plan === 'pro' ? 'text-amber-500 hover:text-amber-700 hover:bg-amber-50' : 'text-muted-foreground hover:text-amber-500 hover:bg-amber-50' }}" title="{{ $user->plan === 'pro' ? 'Free Plana Düşür' : 'Pro Plana Yükselt' }}">
+                                                                <i class="fas fa-crown text-xs"></i>
                                                             </button>
                                                         </form>
                                                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline" onsubmit="return confirm('Bu kullaniciyi kalici olarak silmek istediginize emin misiniz?')">

@@ -16,6 +16,10 @@ class AdminController extends Controller
     public function index()
     {
         $total_users = User::count();
+        $pro_users = User::where('plan', 'pro')->count();
+        $free_users = User::where('plan', 'free')->count();
+        $monthly_revenue = $pro_users * 5;
+
         $total_links = Link::count();
         $total_clicks = ClickLog::count();
         $total_views = ViewLog::count();
@@ -29,6 +33,9 @@ class AdminController extends Controller
 
         return view('admin.dashboard', compact(
             'total_users',
+            'pro_users',
+            'free_users',
+            'monthly_revenue',
             'total_links',
             'total_clicks',
             'total_views',
@@ -78,6 +85,25 @@ class AdminController extends Controller
         $status = $user->verified ? 'dogrulandi' : 'dogrulama rozeti kaldirildi';
 
         return back()->with('success', "Kullanici {$user->username} icin durum guncellendi: {$status}.");
+    }
+
+    public function updatePlan(Request $request, User $user)
+    {
+        $request->validate([
+            'plan' => 'required|in:free,pro'
+        ]);
+
+        $user->plan = $request->plan;
+        
+        if ($request->plan === 'pro') {
+            $user->plan_expire_date = now()->addMonths(1);
+        } else {
+            $user->plan_expire_date = null;
+        }
+        
+        $user->save();
+
+        return back()->with('success', "Kullanici {$user->username} plani " . strtoupper($request->plan) . " olarak guncellendi.");
     }
 
     public function destroyUser(User $user)

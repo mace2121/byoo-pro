@@ -11,37 +11,35 @@
                         <h1 class="text-2xl font-bold tracking-tight">Yonetici Paneli</h1>
                         <p class="mt-1 text-sm text-muted-foreground">Platform genelindeki kullanici hareketlerini ve sistem istatistiklerini izleyin.</p>
                     </div>
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-muted-foreground">Toplam Kullanici</p>
+                                <p class="text-sm font-medium text-muted-foreground">Toplam Kullanıcı</p>
                                 <i class="fas fa-users text-muted-foreground/50"></i>
                             </div>
                             <p class="text-2xl font-bold mt-2">{{ number_format($total_users) }}</p>
                         </div>
-                        <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+                        <div class="rounded-lg border border-amber-200/50 bg-amber-50/10 p-6 shadow-sm">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-muted-foreground">Toplam Goruntulenme</p>
-                                <i class="fas fa-eye text-muted-foreground/50"></i>
+                                <p class="text-sm font-medium text-amber-700/70">Pro Kullanıcı</p>
+                                <i class="fas fa-crown text-amber-500/70"></i>
                             </div>
-                            <p class="text-2xl font-bold mt-2">{{ number_format($total_views) }}</p>
+                            <p class="text-2xl font-bold mt-2 text-amber-600">{{ number_format($pro_users) }}</p>
                         </div>
                         <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-muted-foreground">Toplam Tiklanma</p>
-                                <i class="fas fa-mouse-pointer text-muted-foreground/50"></i>
+                                <p class="text-sm font-medium text-muted-foreground">Free Kullanıcı</p>
+                                <i class="fas fa-user text-muted-foreground/50"></i>
                             </div>
-                            <p class="text-2xl font-bold mt-2">{{ number_format($total_clicks) }}</p>
+                            <p class="text-2xl font-bold mt-2">{{ number_format($free_users) }}</p>
                         </div>
-                        <div class="rounded-lg border border-border bg-card p-6 shadow-sm">
+                        <div class="rounded-lg border border-emerald-200/50 bg-emerald-50/10 p-6 shadow-sm">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-medium text-muted-foreground">Toplam Link</p>
-                                <i class="fas fa-link text-muted-foreground/50"></i>
+                                <p class="text-sm font-medium text-emerald-700/70">Tahmini Aylık Gelir</p>
+                                <i class="fas fa-dollar-sign text-emerald-500/70"></i>
                             </div>
-                            <p class="text-2xl font-bold mt-2">{{ number_format($total_links) }}</p>
+                            <p class="text-2xl font-bold mt-2 text-emerald-600">${{ number_format($monthly_revenue) }}</p>
                         </div>
-                    </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="rounded-lg border border-border bg-card shadow-sm">
