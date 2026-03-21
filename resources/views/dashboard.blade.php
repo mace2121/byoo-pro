@@ -425,6 +425,11 @@
     </style>
     <script>
         window.startByooTour = function() {
+            if (typeof Shepherd === 'undefined') {
+                console.warn('Shepherd.js henuz yuklenmedi, lutfen sayfayi yenileyin.');
+                alert('Tarayici kaynak yuklenemedi. Lutfen sayfayi yenileyip tekrar deneyin.');
+                return;
+            }
             const completeUrl = '{{ route('profile.onboarding.complete') }}';
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -802,18 +807,31 @@
                     const iframe = this.$refs.previewIframe;
                     if (!iframe || !iframe.contentWindow || !this.pendingPreviewPayload) return;
 
+                    // Serialize to plain object to avoid DataCloneError with Proxy/Alpine objects
+                    let safePayload;
+                    try {
+                        safePayload = JSON.parse(JSON.stringify(this.pendingPreviewPayload));
+                    } catch(e) {
+                        console.warn('Preview payload serialization failed:', e);
+                        return;
+                    }
+
                     try {
                         if (typeof iframe.contentWindow.applyByooDesignPreview === 'function') {
-                            iframe.contentWindow.applyByooDesignPreview(this.pendingPreviewPayload);
+                            iframe.contentWindow.applyByooDesignPreview(safePayload);
                         }
                     } catch (error) {
                         console.warn('Direct preview sync failed:', error);
                     }
 
-                    iframe.contentWindow.postMessage({
-                        type: 'DESIGN_UPDATE',
-                        payload: this.pendingPreviewPayload,
-                    }, '*');
+                    try {
+                        iframe.contentWindow.postMessage({
+                            type: 'DESIGN_UPDATE',
+                            payload: safePayload,
+                        }, '*');
+                    } catch(e) {
+                        console.warn('postMessage failed:', e);
+                    }
 
                     if (force) {
                         this.previewSyncTimer = null;
