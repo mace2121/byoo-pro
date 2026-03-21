@@ -406,85 +406,115 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/css/shepherd.css"/>
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/js/shepherd.min.js"></script>
     <style>
-        .shepherd-button-primary { background: #f59e0b !important; border-radius: 9999px !important; font-weight: 700 !important; }
-        .shepherd-button-secondary { border-radius: 9999px !important; font-weight: 600 !important; }
-        .shepherd-has-title .shepherd-content .shepherd-header { background: #fff; padding: 1.25rem 1.25rem 0.5rem !important; }
-        .shepherd-text { font-size: 0.875rem !important; line-height: 1.6 !important; color: #374151 !important; padding: 0.5rem 1.25rem 1rem !important; }
-        .shepherd-footer { padding: 0.75rem 1.25rem 1.25rem !important; gap: 0.5rem !important; }
-        .shepherd-element { border-radius: 1rem !important; box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important; border: 1px solid #e5e7eb !important; max-width: 340px !important; }
+        .shepherd-button-primary { background: #f59e0b !important; border-radius: 9999px !important; font-weight: 700 !important; color: #fff !important; }
+        .shepherd-button-secondary { border-radius: 9999px !important; font-weight: 600 !important; border: 1px solid #e5e7eb !important; }
+        .shepherd-has-title .shepherd-content .shepherd-header { background: #fff; padding: 1.25rem 1.25rem 0.5rem !important; border-radius: 1rem 1rem 0 0 !important; }
+        .shepherd-has-title .shepherd-content .shepherd-title { font-weight: 700; font-size: 1rem; }
+        .shepherd-text { font-size: 0.875rem !important; line-height: 1.65 !important; color: #374151 !important; padding: 0.5rem 1.25rem 1rem !important; }
+        .shepherd-footer { padding: 0.75rem 1.25rem 1.25rem !important; gap: 0.5rem !important; justify-content: flex-end !important; }
+        .shepherd-element { border-radius: 1rem !important; box-shadow: 0 20px 60px rgba(0,0,0,0.18) !important; border: 1px solid #e5e7eb !important; max-width: 340px !important; }
         .shepherd-arrow:before { background: #fff !important; }
+        .shepherd-modal-overlay-container { opacity: 1 !important; }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const completeUrl = '{{ route('profile.onboarding.complete') }}';
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            async function markOnboardingDone() {
-                await fetch(completeUrl, {
-                    method: 'PATCH',
-                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                    credentials: 'same-origin'
-                });
+            async function markDone() {
+                try {
+                    await fetch(completeUrl, {
+                        method: 'PATCH',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                } catch(e) {}
             }
 
-            const tour = new Shepherd.Tour({
-                useModalOverlay: true,
-                defaultStepOptions: {
-                    cancelIcon: { enabled: true },
-                    scrollTo: { behavior: 'smooth', block: 'center' },
-                    classes: 'shadow-xl',
+            function safeAttach(selector) {
+                const el = document.querySelector(selector);
+                if (!el) return undefined;
+                // Shepherd x-cloak / display:none uyumu: geçici olarak göster
+                return { element: selector, on: 'right' };
+            }
+
+            function startTour() {
+                const tour = new Shepherd.Tour({
+                    useModalOverlay: true,
+                    defaultStepOptions: {
+                        cancelIcon: { enabled: true },
+                        scrollTo: false,
+                        buttons: [
+                            { text: 'Atla', action() { markDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
+                            { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
+                        ]
+                    }
+                });
+
+                tour.on('cancel', markDone);
+                tour.on('complete', markDone);
+
+                // Adım 1 — Hoş geldin (elementi olmadan ortada göster)
+                tour.addStep({
+                    id: 'welcome',
+                    title: '👋 byoo\'ya Hoş Geldin!',
+                    text: 'Birkaç adımda platformu sana tanıtalım. İstediğinde turu atlayabilirsin.',
                     buttons: [
-                        { text: 'Turu Atla', action() { markOnboardingDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
-                        { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
+                        { text: 'Atla', action() { markDone(); tour.cancel(); }, classes: 'shepherd-button-secondary' },
+                        { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
                     ]
-                }
-            });
+                });
 
-            tour.addStep({
-                id: 'welcome',
-                title: '👋 byoo\'ya Hoş Geldin!',
-                text: 'Birkaç saniyede platformu tanıtalım. İstediğin zaman "Turu Atla" diyebilirsin.',
-                attachTo: { element: '#tour-sidebar', on: 'right' },
-                buttons: [
-                    { text: 'Turu Atla', action() { markOnboardingDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
-                    { text: 'Başlayalım →', action() { this.next(); }, classes: 'shepherd-button-primary' }
-                ]
-            });
+                // Adım 2 — Sidebar
+                const sidebarEl = document.querySelector('#tour-sidebar');
+                tour.addStep({
+                    id: 'sidebar',
+                    title: '📋 Sol Menü',
+                    text: 'Bu menüden Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
+                    attachTo: sidebarEl ? { element: '#tour-sidebar', on: 'right' } : undefined,
+                });
 
-            tour.addStep({
-                id: 'links',
-                title: '🔗 Bağlantılarını Ekle',
-                text: 'Buradan profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
-                attachTo: { element: '#tour-links-tab', on: 'right' },
-            });
+                // Adım 3 — Linkler sekmesi
+                const linksEl = document.querySelector('#tour-links-tab');
+                tour.addStep({
+                    id: 'links',
+                    title: '🔗 Bağlantılarını Ekle',
+                    text: 'Buradan profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
+                    attachTo: linksEl ? { element: '#tour-links-tab', on: 'right' } : undefined,
+                });
 
-            tour.addStep({
-                id: 'design',
-                title: '🎨 Tasarımını Özelleştir',
-                text: 'Profil sayfanın renklerini, fontunu, arka planını ve buton stilini buradan ayarlıyorsun.',
-                attachTo: { element: '#tour-design-tab', on: 'right' },
-            });
+                // Adım 4 — Tasarım sekmesi
+                const designEl = document.querySelector('#tour-design-tab');
+                tour.addStep({
+                    id: 'design',
+                    title: '🎨 Tasarımını Özelleştir',
+                    text: 'Profil sayfanın renklerini, fontunu, arka planını ve buton stilini buradan ayarlıyorsun.',
+                    attachTo: designEl ? { element: '#tour-design-tab', on: 'right' } : undefined,
+                });
 
-            tour.addStep({
-                id: 'preview',
-                title: '📱 Canlı Önizleme',
-                text: 'Yaptığın değişiklikleri anında bu önizleme alanında görebilirsin. Sağ üstteki butona bas!',
-                attachTo: { element: '#tour-preview', on: 'left' },
-            });
+                // Adım 5 — Son adım (preview veya genel)
+                tour.addStep({
+                    id: 'done',
+                    title: '🚀 Hazırsın!',
+                    text: 'Profilini düzenleyip canlı önizlemeyi sağ üstten açabilirsin. Başarılar! 🎉',
+                    buttons: [
+                        { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
+                    ]
+                });
 
-            tour.addStep({
-                id: 'sidebar-toggle',
-                title: '☰ Menüyü Aç/Kapat',
-                text: 'Sol menüyü (sidebar) bu butonla istediğin zaman gizleyip açabilirsin.',
-                attachTo: { element: '#tour-sidebar-toggle', on: 'bottom' },
-                buttons: [
-                    { text: '← Geri', action() { this.back(); }, classes: 'shepherd-button-secondary' },
-                    { text: '✅ Tamamla!', action() { markOnboardingDone(); this.complete(); }, classes: 'shepherd-button-primary' }
-                ]
-            });
+                tour.start();
+            }
 
-            // Kısa gecikme ile başlat (Alpine.js dom'un hazır olmasını bekle)
-            setTimeout(() => tour.start(), 1200);
+            // Alpine.js ve sayfa tam hazır olduktan sonra başlat
+            if (typeof Alpine !== 'undefined') {
+                Alpine.nextTick(() => setTimeout(startTour, 800));
+            } else {
+                window.addEventListener('alpine:init', () => setTimeout(startTour, 800));
+                // Fallback: Alpine yüklü değilse düz timeout
+                setTimeout(() => {
+                    if (!document.querySelector('.shepherd-is-active')) startTour();
+                }, 2000);
+            }
         });
     </script>
     @endif
