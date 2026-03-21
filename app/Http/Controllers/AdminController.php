@@ -125,7 +125,11 @@ class AdminController extends Controller
 
     public function settings()
     {
-        return view('admin.settings.index');
+        $google_client_id = $this->getEnvValue('GOOGLE_CLIENT_ID');
+        $google_client_secret = $this->getEnvValue('GOOGLE_CLIENT_SECRET');
+        $google_redirect_uri = $this->getEnvValue('GOOGLE_REDIRECT_URI') ?: '${APP_URL}/auth/google/callback';
+
+        return view('admin.settings.index', compact('google_client_id', 'google_client_secret', 'google_redirect_uri'));
     }
 
     public function updateSettings(Request $request)
@@ -136,13 +140,29 @@ class AdminController extends Controller
             'google_redirect_uri' => 'nullable|string',
         ]);
 
-        $this->setEnvironmentValue([
-            'GOOGLE_CLIENT_ID' => $request->google_client_id,
-            'GOOGLE_CLIENT_SECRET' => $request->google_client_secret,
-            'GOOGLE_REDIRECT_URI' => $request->google_redirect_uri,
+        $success = $this->setEnvironmentValue([
+            'GOOGLE_CLIENT_ID' => $request->google_client_id ?? '',
+            'GOOGLE_CLIENT_SECRET' => $request->google_client_secret ?? '',
+            'GOOGLE_REDIRECT_URI' => $request->google_redirect_uri ?? '',
         ]);
 
-        return back()->with('success', 'Ayarlar başarıyla güncellendi.');
+        if ($success) {
+            return back()->with('success', 'Ayarlar başarıyla güncellendi.');
+        } else {
+            return back()->with('error', '.env dosyasına yazılamadı. Dosya izinlerini kontrol edin.');
+        }
+    }
+
+    private function getEnvValue($key)
+    {
+        $envFile = app()->environmentFilePath();
+        if (file_exists($envFile)) {
+            $str = file_get_contents($envFile);
+            if (preg_match('/^' . preg_quote($key, '/') . '=(.*)$/m', $str, $matches)) {
+                return trim($matches[1], '"\' ');
+            }
+        }
+        return '';
     }
 
     private function setEnvironmentValue(array $values)
@@ -157,6 +177,7 @@ class AdminController extends Controller
 
         if (count($values) > 0) {
             foreach ($values as $envKey => $envValue) {
+                $envValue = (string) $envValue;
                 // Determine if we need to quote the value
                 // Use double quotes if there are spaces or special characters
                 if (preg_match('/\s/', $envValue) || strpos($envValue, '${') !== false || strpos($envValue, '#') !== false) {

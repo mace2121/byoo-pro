@@ -33,19 +33,19 @@
 
                                 <div>
                                     <x-input-label for="google_client_id" value="GOOGLE_CLIENT_ID" />
-                                    <x-text-input id="google_client_id" name="google_client_id" type="text" class="mt-1 block w-full" :value="env('GOOGLE_CLIENT_ID')" placeholder="Müşteri Kimliği" />
+                                    <x-text-input id="google_client_id" name="google_client_id" type="text" class="mt-1 block w-full" :value="$google_client_id" placeholder="Müşteri Kimliği" />
                                     <p class="mt-1 text-xs text-muted-foreground">Google Cloud Console üzerinden aldığınız İstemci Kimliği (Client ID)</p>
                                 </div>
 
                                 <div>
                                     <x-input-label for="google_client_secret" value="GOOGLE_CLIENT_SECRET" />
-                                    <x-text-input id="google_client_secret" name="google_client_secret" type="password" class="mt-1 block w-full" :value="env('GOOGLE_CLIENT_SECRET')" placeholder="Gizli Anahtar" />
+                                    <x-text-input id="google_client_secret" name="google_client_secret" type="password" class="mt-1 block w-full" :value="$google_client_secret" placeholder="Gizli Anahtar" />
                                     <p class="mt-1 text-xs text-muted-foreground">Geliştirici konsolundaki İstemci Gizli Anahtarı (Client Secret)</p>
                                 </div>
 
                                 <div>
                                     <x-input-label for="google_redirect_uri" value="GOOGLE_REDIRECT_URI" />
-                                    <x-text-input id="google_redirect_uri" name="google_redirect_uri" type="text" class="mt-1 block w-full" :value="env('GOOGLE_REDIRECT_URI', '${APP_URL}/auth/google/callback')" placeholder="${APP_URL}/auth/google/callback" />
+                                    <x-text-input id="google_redirect_uri" name="google_redirect_uri" type="text" class="mt-1 block w-full" :value="$google_redirect_uri" placeholder="${APP_URL}/auth/google/callback" />
                                     <p class="mt-1 text-xs text-muted-foreground">Genellikle <code>${APP_URL}/auth/google/callback</code> olarak girilir.</p>
                                 </div>
 
