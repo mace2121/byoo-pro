@@ -18,7 +18,7 @@
                     <a href="{{ route('dashboard') }}">
                         <x-brand-mark icon-class="h-5 w-5 text-foreground" text-class="font-bold text-sm tracking-tight italic" dot-class="text-muted-foreground" />
                     </a>
-                    <button @click="sidebarOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                    <button id="tour-sidebar-close" @click="sidebarOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
                 </div>
@@ -108,7 +108,7 @@
 
                 <div class="flex flex-1 items-center justify-end space-x-3">
                     <!-- Preview Toggle Button -->
-                    <button @click="previewOpen = !previewOpen" 
+                    <button id="tour-preview-toggle" @click="previewOpen = !previewOpen" 
                             :class="previewOpen ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                             class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors">
                         <i class="fas fa-mobile-alt text-[10px]"></i>
@@ -378,7 +378,7 @@
                                 <a href="{{ route('public.profile', auth()->user()->username) }}" target="_blank" class="text-[10px] text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-accent">
                                     <i class="fas fa-external-link-alt"></i>
                                 </a>
-                                <button @click="previewOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
+                                <button id="tour-preview-close" @click="previewOpen = false" class="p-1 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                                 </button>
                             </div>
@@ -488,6 +488,12 @@
                 target: '#tour-sidebar'
             },
             {
+                title: '◀ Menüyü Daralt (1)',
+                text: 'Bu ok butonuna basarak sol menüyü kapatabilirsin. Bu sayede çalışma alanın genişler ve içeriklerine daha rahat odaklanabilirsin.',
+                target: '#tour-sidebar-close',
+                position: 'right'
+            },
+            {
                 title: '🔗 Bloklar',
                 text: 'Profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
                 target: '#tour-links-tab'
@@ -498,8 +504,20 @@
                 target: '#tour-design-tab'
             },
             {
+                title: '▶ Önizlemeyi Kapat (2)',
+                text: 'Sağ paneldeki bu ok butonuna basarak canlı önizlemeyi kapatabilirsin. Böylece daha geniş bir çalışma alanı elde edebilirsin.',
+                target: '#tour-preview-close',
+                position: 'left'
+            },
+            {
+                title: '📱 Önizlemeyi Aç (3)',
+                text: 'Üst menüdeki "Önizleme" butonuna her zaman basarak canlı önizlemeyi tekrar açabilirsin. Değişikliklerini anında görebilirsin!',
+                target: '#tour-preview-toggle',
+                position: 'bottom'
+            },
+            {
                 title: '🚀 Hazırsın!',
-                text: 'Profilini düzenleyip canlı önizlemeyi sağ üstteki "Önizleme" butonundan açabilirsin. Başarılar! 🎉',
+                text: 'Artık byoo\'yu verimli kullanmak için her şeyi biliyorsun. Başarılar! 🎉',
                 target: null,
                 last: true
             }
