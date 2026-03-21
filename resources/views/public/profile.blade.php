@@ -1,4 +1,4 @@
-﻿@php
+@php
     $design = \App\Support\DesignEditor::resolve($profile, [
         'profile' => [
             'name' => $user->name,
@@ -216,8 +216,21 @@
         }
     </style>
 </head>
-<body class="h-full theme-{{ $theme }}" style="{{ $bodyStyle }}">
+<body class="h-full theme-{{ $theme }} selection:bg-primary/30" style="{{ $bodyStyle }}" x-data="profileShare()">
     <div class="theme-page">
+        <!-- TOP NAVIGATIONBAR (BRAND & SHARE) -->
+        <div class="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between p-4 pointer-events-none">
+            <div class="pointer-events-auto">
+                <a href="{{ url('/') }}" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-background/20 text-foreground backdrop-blur-xl transition-all hover:bg-background/40 hover:scale-105 active:scale-95 shadow-sm">
+                    <x-application-logo class="h-5 w-5 opacity-80 group-hover:opacity-100 transition-opacity" />
+                </a>
+            </div>
+            <div class="pointer-events-auto">
+                <button @click="openShareModal" class="group flex h-10 w-10 items-center justify-center rounded-xl border border-current/10 bg-background/20 text-foreground backdrop-blur-xl transition-all hover:bg-background/40 hover:scale-105 active:scale-95 shadow-sm">
+                    <i class="fas fa-share-nodes text-sm opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                </button>
+            </div>
+        </div>
         @if($headerLayout === 'hero-cover')
             <div class="hero-cover-container" style="display: block;">
                 <div class="hero-image-bg" style="background-image: url('{{ $design['header']['hero_image_url'] ?? 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809' }}')"></div>
@@ -512,6 +525,95 @@
                 }
             });
         })();
+    </script>
+
+    <!-- SHARE MODAL -->
+    <div x-show="shareModalOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 pb-10"
+         x-transition:enter-end="opacity-100 pb-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-[200] flex items-end justify-center sm:items-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm"
+         x-cloak>
+        <div @click.away="closeShareModal" 
+             class="relative w-full max-w-sm overflow-hidden rounded-t-[2.5rem] sm:rounded-[2.5rem] border border-border bg-background shadow-2xl transition-all">
+            <div class="p-8">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xl font-bold tracking-tight text-foreground">{{ __('Profilini Paylaş') }}</h3>
+                    <button @click="closeShareModal" class="flex h-8 w-8 items-center justify-center rounded-full bg-muted/50 text-foreground/50 hover:bg-muted transition-colors">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </div>
+
+                <!-- URL Preview -->
+                <div class="mb-8 p-4 rounded-3xl bg-muted/30 border border-border flex items-center justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Link</p>
+                        <p class="text-xs font-mono font-medium truncate opacity-70">{{ url()->current() }}</p>
+                    </div>
+                    <button @click="copyLink" 
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm transition-all hover:scale-105 active:scale-95"
+                            :class="copied ? 'bg-emerald-500' : ''">
+                        <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                    </button>
+                </div>
+
+                <!-- Social Grid -->
+                <div class="grid grid-cols-4 gap-4 mb-2">
+                    <template x-for="social in socialShares" :key="social.name">
+                        <a :href="social.url" target="_blank" 
+                           class="flex flex-col items-center gap-2 group">
+                            <div class="flex h-14 w-14 items-center justify-center rounded-[1.5rem] border border-border bg-muted/20 transition-all group-hover:scale-110 group-active:scale-95 group-hover:border-primary/20 group-hover:bg-primary/5">
+                                <i :class="social.icon" class="text-xl text-foreground opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all"></i>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors" x-text="social.name"></span>
+                        </a>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- Branding -->
+            <div class="border-t border-border bg-muted/10 p-4 text-center">
+                <p class="text-[10px] font-medium text-muted-foreground">byoo.pro ile kendi profilini oluştur</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('profileShare', () => ({
+                shareModalOpen: false,
+                copied: false,
+                socialShares: [
+                    { name: 'WhatsApp', icon: 'fab fa-whatsapp', url: 'https://wa.me/?text=' + encodeURIComponent('{{ ($design['profile']['name'] ?? $user->name) }} profilini incele: {{ url()->current() }}') },
+                    { name: 'Twitter', icon: 'fab fa-x-twitter', url: 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('{{ ($design['profile']['name'] ?? $user->name) }} profilini incele: {{ url()->current() }}') },
+                    { name: 'Facebook', icon: 'fab fa-facebook-f', url: 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent('{{ url()->current() }}') },
+                    { name: 'LinkedIn', icon: 'fab fa-linkedin-in', url: 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent('{{ url()->current() }}') }
+                ],
+                openShareModal() {
+                    this.shareModalOpen = true;
+                    document.body.style.overflow = 'hidden';
+                },
+                closeShareModal() {
+                    this.shareModalOpen = false;
+                    document.body.style.overflow = '';
+                },
+                async copyLink() {
+                    try {
+                        await navigator.clipboard.writeText('{{ url()->current() }}');
+                        this.copied = true;
+                        setTimeout(() => this.copied = false, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy!', err);
+                    }
+                }
+            }));
+        });
     </script>
 </body>
 </html>

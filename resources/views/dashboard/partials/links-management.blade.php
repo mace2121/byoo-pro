@@ -64,7 +64,7 @@
 
             <div class="p-4 md:p-6">
                 <div x-show="activePanel === 'create'" x-cloak>
-                    <form method="post" action="{{ route('blocks.store') }}" enctype="multipart/form-data" class="space-y-6" x-data="{ createType: 'link', buttonType: 'external_link', active: true }" @picker-button-type-updated="buttonType = $event.detail.value">
+                    <form method="post" action="{{ route('blocks.store') }}" enctype="multipart/form-data" class="space-y-6" x-data="{ createType: 'link', buttonType: 'external_link', active: true, showScheduling: false }" @picker-button-type-updated="buttonType = $event.detail.value">
                         @csrf
                         <input type="hidden" name="type" :value="createType">
                         <input type="hidden" name="is_active" :value="active ? 1 : 0">
@@ -163,6 +163,24 @@
                                     </div>
                                 </template>
 
+                                <div class="space-y-4 pt-2">
+                                    <button type="button" @click="showScheduling = !showScheduling" class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary/80">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span x-text="showScheduling ? 'Zamanlamayı Gizle' : 'Zamanlama Ayarları (Pro)'"></span>
+                                    </button>
+
+                                    <div x-show="showScheduling" x-collapse x-cloak class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div class="space-y-2">
+                                            <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Başlangıç Tarihi</label>
+                                            <input type="datetime-local" name="starts_at" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Bitiş Tarihi</label>
+                                            <input type="datetime-local" name="expires_at" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <label class="flex items-center justify-between rounded-2xl border border-border bg-muted/20 px-4 py-3 text-sm">
                                     <span class="font-medium">Bu blok aktif olsun</span>
                                     <button type="button" @click="active = !active" :class="active ? 'bg-primary' : 'bg-muted-foreground/30'" class="relative inline-flex h-6 w-11 rounded-full border-2 border-transparent transition-colors">
@@ -198,7 +216,7 @@
                                 $summaryText = $block->type === 'product' ? ($block->description ?: ($price ?: 'Urun blogu')) : ($linkPreview?->description ?: ($previewDomain ?: ($block->url ?: 'Baglanti blogu')));
                             @endphp
 
-                            <div data-id="{{ $block->id }}" class="block-item rounded-[28px] border border-border bg-background p-4 shadow-sm transition-all hover:border-ring/40" x-data="{ editing: false, blockType: '{{ $block->type }}', buttonType: '{{ $buttonType }}', active: {{ $block->is_active ? 'true' : 'false' }} }" @picker-button-type-updated="buttonType = $event.detail.value">
+                            <div data-id="{{ $block->id }}" class="block-item rounded-[28px] border border-border bg-background p-4 shadow-sm transition-all hover:border-ring/40" x-data="{ editing: false, blockType: '{{ $block->type }}', buttonType: '{{ $buttonType }}', active: {{ $block->is_active ? 'true' : 'false' }}, showScheduling: false }" @picker-button-type-updated="buttonType = $event.detail.value">
                                 <div x-show="!editing" class="flex flex-col gap-4 md:flex-row md:items-center">
                                     <div class="flex items-center gap-4 md:min-w-0 md:flex-1">
                                         <div class="cursor-grab sort-handle rounded-2xl border border-border bg-muted/30 px-3 py-4 text-muted-foreground hover:text-foreground"><i class="fas fa-grip-vertical text-xs"></i></div>
@@ -342,6 +360,24 @@
                                             </div>
                                         </div>
                                     </template>
+
+                                    <div class="space-y-4 pt-2">
+                                        <button type="button" @click="showScheduling = !showScheduling" class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary transition-colors hover:text-primary/80">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span x-text="showScheduling ? 'Zamanlamayı Gizle' : 'Zamanlama Ayarları (Pro)'"></span>
+                                        </button>
+
+                                        <div x-show="showScheduling" x-collapse x-cloak class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div class="space-y-2">
+                                                <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Başlangıç Tarihi</label>
+                                                <input type="datetime-local" name="starts_at" value="{{ $block->starts_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Bitiş Tarihi</label>
+                                                <input type="datetime-local" name="expires_at" value="{{ $block->expires_at?->format('Y-m-d\TH:i') }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="flex items-center justify-end gap-3 border-t border-border pt-4">
                                         <button type="button" @click="editing = false" class="rounded-2xl border border-border px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Vazgec</button>

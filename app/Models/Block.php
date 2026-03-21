@@ -20,6 +20,8 @@ class Block extends Model
         'button_link',
         'position',
         'is_active',
+        'starts_at',
+        'expires_at',
         'data',
     ];
 
@@ -28,6 +30,8 @@ class Block extends Model
         return [
             'data' => 'array',
             'is_active' => 'boolean',
+            'starts_at' => 'datetime',
+            'expires_at' => 'datetime',
         ];
     }
 

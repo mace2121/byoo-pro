@@ -38,6 +38,11 @@ class BlockController extends Controller
 
         $validated = $this->validateBlock($request);
 
+        if (! auth()->user()->canUseScheduling()) {
+            $validated['starts_at'] = null;
+            $validated['expires_at'] = null;
+        }
+
         if (($validated['type'] ?? null) === 'product' && ! $user->canUseProductBlocks()) {
             return redirect()
                 ->route('dashboard', ['tab' => 'links'])
@@ -57,6 +62,8 @@ class BlockController extends Controller
                     'icon' => $validated['icon'] ?: null,
                     'order' => $position,
                     'is_active' => (bool) ($validated['is_active'] ?? true),
+                    'starts_at' => $validated['starts_at'] ?? null,
+                    'expires_at' => $validated['expires_at'] ?? null,
                 ]);
 
                 $user->blocks()->create([
@@ -68,6 +75,8 @@ class BlockController extends Controller
                     'button_link' => $validated['url'],
                     'position' => $position,
                     'is_active' => (bool) ($validated['is_active'] ?? true),
+                    'starts_at' => $validated['starts_at'] ?? null,
+                    'expires_at' => $validated['expires_at'] ?? null,
                     'data' => [
                         'icon' => $validated['icon'] ?: null,
                         'display_mode' => $validated['display_mode'] ?? 'link',
@@ -89,6 +98,8 @@ class BlockController extends Controller
                 'button_link' => $validated['button_link'] ?? null,
                 'position' => $position,
                 'is_active' => (bool) ($validated['is_active'] ?? true),
+                'starts_at' => $validated['starts_at'] ?? null,
+                'expires_at' => $validated['expires_at'] ?? null,
                 'data' => [
                     'icon' => $validated['icon'] ?: null,
                     'price' => $validated['price'] ?? null,
@@ -109,6 +120,11 @@ class BlockController extends Controller
         $user = Auth::user();
         $this->authorizeBlock($block, $user->id);
         $validated = $this->validateBlock($request);
+
+        if (! auth()->user()->canUseScheduling()) {
+            $validated['starts_at'] = null;
+            $validated['expires_at'] = null;
+        }
 
         if (($validated['type'] ?? null) === 'product' && ! $user->canUseProductBlocks()) {
             return redirect()
@@ -142,6 +158,8 @@ class BlockController extends Controller
                 ? ($validated['button_link'] ?? null)
                 : $validated['url'];
             $block->is_active = (bool) ($validated['is_active'] ?? $block->is_active);
+            $block->starts_at = $validated['starts_at'] ?? null;
+            $block->expires_at = $validated['expires_at'] ?? null;
             $block->data = array_filter([
                 'icon' => $validated['icon'] ?: null,
                 'display_mode' => $validated['type'] === 'link'
@@ -166,6 +184,8 @@ class BlockController extends Controller
                 $link->icon = $validated['icon'] ?: null;
                 $link->order = $block->position;
                 $link->is_active = $block->is_active;
+                $link->starts_at = $block->starts_at;
+                $link->expires_at = $block->expires_at;
                 $link->save();
 
                 if (! $block->source_link_id) {
@@ -311,6 +331,8 @@ class BlockController extends Controller
             'button_label' => ['nullable', 'string', 'max:120'],
             'whatsapp_message' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['nullable', 'boolean'],
+            'starts_at' => ['nullable', 'date'],
+            'expires_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ]);
 
         if ($validated['type'] === 'link') {

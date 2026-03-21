@@ -138,6 +138,11 @@ class User extends Authenticatable
         return $this->canAccess('verified');
     }
 
+    public function canUseScheduling(): bool
+    {
+        return $this->isPro();
+    }
+
     // Helper to check if user reached their link limit based on plan
     public function hasReachedLinkLimit(): bool
     {

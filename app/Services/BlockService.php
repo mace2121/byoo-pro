@@ -23,9 +23,18 @@ class BlockService
     public function getRenderableBlocks(User $user): Collection
     {
         if ($this->blocksTableExists()) {
+            $now = now();
             $blocks = $user->blocks()
                 ->with('sourceLink.preview')
                 ->where('is_active', true)
+                ->where(function ($query) use ($now) {
+                    $query->whereNull('starts_at')
+                        ->orWhere('starts_at', '<=', $now);
+                })
+                ->where(function ($query) use ($now) {
+                    $query->whereNull('expires_at')
+                        ->orWhere('expires_at', '>=', $now);
+                })
                 ->orderBy('position')
                 ->get();
 
