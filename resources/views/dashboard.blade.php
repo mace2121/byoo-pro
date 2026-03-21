@@ -410,94 +410,216 @@
         </div>
     </div>
 
-    {{-- Shepherd.js Onboarding Tour (shepherd bundled via app.js) --}}
+    {{-- Onboarding Tour — Sifir bagimlılık, saf JS/CSS --}}
     <style>
-        .shepherd-button-primary { background: #f59e0b !important; border-radius: 9999px !important; font-weight: 700 !important; color: #fff !important; }
-        .shepherd-button-secondary { border-radius: 9999px !important; font-weight: 600 !important; border: 1px solid #e5e7eb !important; }
-        .shepherd-has-title .shepherd-content .shepherd-header { background: #fff; padding: 1.25rem 1.25rem 0.5rem !important; border-radius: 1rem 1rem 0 0 !important; }
-        .shepherd-has-title .shepherd-content .shepherd-title { font-weight: 700; font-size: 1rem; }
-        .shepherd-text { font-size: 0.875rem !important; line-height: 1.65 !important; color: #374151 !important; padding: 0.5rem 1.25rem 1rem !important; }
-        .shepherd-footer { padding: 0.75rem 1.25rem 1.25rem !important; gap: 0.5rem !important; justify-content: flex-end !important; }
-        .shepherd-element { border-radius: 1rem !important; box-shadow: 0 20px 60px rgba(0,0,0,0.18) !important; border: 1px solid #e5e7eb !important; max-width: 340px !important; }
-        .shepherd-arrow:before { background: #fff !important; }
+        #byoo-tour-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+            z-index: 9998; display: none;
+        }
+        #byoo-tour-box {
+            position: fixed; z-index: 9999;
+            background: #fff; border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem; max-width: 320px; width: 90%;
+            font-family: inherit;
+        }
+        #byoo-tour-box .tour-title {
+            font-size: 1rem; font-weight: 700; color: #111827; margin-bottom: 0.5rem;
+        }
+        #byoo-tour-box .tour-text {
+            font-size: 0.875rem; color: #4b5563; line-height: 1.6; margin-bottom: 1.25rem;
+        }
+        #byoo-tour-box .tour-footer {
+            display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+        }
+        #byoo-tour-box .tour-dots {
+            display: flex; gap: 5px;
+        }
+        #byoo-tour-box .tour-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #d1d5db; transition: background .2s;
+        }
+        #byoo-tour-box .tour-dot.active { background: #f59e0b; }
+        #byoo-tour-box .tour-btn-skip {
+            background: none; border: 1px solid #e5e7eb; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 600; padding: 0.4rem 0.9rem;
+            cursor: pointer; color: #6b7280; transition: all .15s;
+        }
+        #byoo-tour-box .tour-btn-skip:hover { background: #f3f4f6; }
+        #byoo-tour-box .tour-btn-next {
+            background: #f59e0b; color: #fff; border: none; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 700; padding: 0.4rem 1rem;
+            cursor: pointer; transition: all .15s;
+        }
+        #byoo-tour-box .tour-btn-next:hover { background: #d97706; }
+        #byoo-tour-highlight {
+            position: fixed; z-index: 9997;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 0 4000px rgba(0,0,0,0.45), 0 0 0 3px #f59e0b;
+            pointer-events: none; transition: all .25s ease;
+        }
     </style>
+
+    <div id="byoo-tour-overlay"></div>
+    <div id="byoo-tour-highlight" style="display:none"></div>
+    <div id="byoo-tour-box" style="display:none">
+        <div class="tour-title" id="byoo-tour-title"></div>
+        <div class="tour-text" id="byoo-tour-text"></div>
+        <div class="tour-footer">
+            <div class="tour-dots" id="byoo-tour-dots"></div>
+            <div style="display:flex;gap:0.5rem">
+                <button class="tour-btn-skip" id="byoo-tour-skip">Kapat</button>
+                <button class="tour-btn-next" id="byoo-tour-next">İleri →</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        window.startByooTour = function() {
-            const completeUrl = '{{ route('profile.onboarding.complete') }}';
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-            async function markDone() {
-                try {
-                    await fetch(completeUrl, {
-                        method: 'PATCH',
-                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                        credentials: 'same-origin'
-                    });
-                } catch(e) {}
-            }
-
-            if (window._byooTour) {
-                try { window._byooTour.cancel(); } catch(e) {}
-            }
-
-            const tour = new Shepherd.Tour({
-                useModalOverlay: true,
-                defaultStepOptions: {
-                    cancelIcon: { enabled: true },
-                    scrollTo: false,
-                    buttons: [
-                        { text: 'Kapat', action() { this.cancel(); }, classes: 'shepherd-button-secondary' },
-                        { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
-                    ]
-                }
-            });
-
-            window._byooTour = tour;
-            tour.on('complete', markDone);
-
-            tour.addStep({
-                id: 'welcome',
+    (function() {
+        const steps = [
+            {
                 title: '👋 byoo\'ya Hoş Geldin!',
                 text: 'Sana kısa bir tur hazırladık. Her adımda platformun nasıl kullanıldığını göstereceğiz.',
-                buttons: [
-                    { text: 'Kapat', action() { tour.cancel(); }, classes: 'shepherd-button-secondary' },
-                    { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
-                ]
-            });
-
-            tour.addStep({
-                id: 'sidebar',
+                target: null
+            },
+            {
                 title: '📋 Sol Menü',
                 text: 'Buradan Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
-                attachTo: { element: '#tour-sidebar', on: 'right' },
-            });
-
-            tour.addStep({
-                id: 'links',
+                target: '#tour-sidebar'
+            },
+            {
                 title: '🔗 Bloklar',
                 text: 'Profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
-                attachTo: { element: '#tour-links-tab', on: 'right' },
-            });
-
-            tour.addStep({
-                id: 'design',
+                target: '#tour-links-tab'
+            },
+            {
                 title: '🎨 Tasarım',
                 text: 'Renk, font, arka plan ve buton stilini buradan özelleştirebilirsin.',
-                attachTo: { element: '#tour-design-tab', on: 'right' },
-            });
-
-            tour.addStep({
-                id: 'done',
+                target: '#tour-design-tab'
+            },
+            {
                 title: '🚀 Hazırsın!',
                 text: 'Profilini düzenleyip canlı önizlemeyi sağ üstteki "Önizleme" butonundan açabilirsin. Başarılar! 🎉',
-                buttons: [
-                    { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
-                ]
-            });
+                target: null,
+                last: true
+            }
+        ];
 
-            tour.start();
+        let current = 0;
+        const overlay   = document.getElementById('byoo-tour-overlay');
+        const box       = document.getElementById('byoo-tour-box');
+        const highlight = document.getElementById('byoo-tour-highlight');
+        const titleEl   = document.getElementById('byoo-tour-title');
+        const textEl    = document.getElementById('byoo-tour-text');
+        const dotsEl    = document.getElementById('byoo-tour-dots');
+        const skipBtn   = document.getElementById('byoo-tour-skip');
+        const nextBtn   = document.getElementById('byoo-tour-next');
+
+        function markDone() {
+            fetch('{{ route('profile.onboarding.complete') }}', {
+                method: 'PATCH',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            }).catch(() => {});
+        }
+
+        function closeTour() {
+            overlay.style.display = 'none';
+            box.style.display = 'none';
+            highlight.style.display = 'none';
+        }
+
+        function renderDots() {
+            dotsEl.innerHTML = steps.map((_, i) =>
+                `<span class="tour-dot ${i === current ? 'active' : ''}"></span>`
+            ).join('');
+        }
+
+        function positionBox(targetEl) {
+            box.style.display = 'block';
+            if (!targetEl) {
+                // Ortada göster
+                box.style.top = '50%';
+                box.style.left = '50%';
+                box.style.transform = 'translate(-50%, -50%)';
+                return;
+            }
+            const r = targetEl.getBoundingClientRect();
+            const bw = box.offsetWidth || 320;
+            const bh = box.offsetHeight || 200;
+            const margin = 16;
+            let top, left;
+            box.style.transform = '';
+
+            // Sağ tarafa sığıyor mu?
+            if (r.right + bw + margin < window.innerWidth) {
+                left = r.right + margin;
+                top  = Math.min(r.top, window.innerHeight - bh - margin);
+            } else {
+                // Sol tarafa düş
+                left = Math.max(margin, r.left - bw - margin);
+                top  = Math.min(r.top, window.innerHeight - bh - margin);
+            }
+
+            box.style.top  = Math.max(margin, top) + 'px';
+            box.style.left = Math.max(margin, left) + 'px';
+        }
+
+        function showStep(index) {
+            const step = steps[index];
+            titleEl.textContent = step.title;
+            textEl.textContent  = step.text;
+            nextBtn.textContent = step.last ? '✅ Turu Bitir' : 'İleri →';
+            renderDots();
+
+            const targetEl = step.target ? document.querySelector(step.target) : null;
+
+            if (targetEl) {
+                const r = targetEl.getBoundingClientRect();
+                highlight.style.display = 'block';
+                highlight.style.top     = r.top + window.scrollY - 4 + 'px';
+                highlight.style.left    = r.left + window.scrollX - 4 + 'px';
+                highlight.style.width   = r.width + 8 + 'px';
+                highlight.style.height  = r.height + 8 + 'px';
+            } else {
+                highlight.style.display = 'none';
+            }
+
+            // Box konumunu targetEl'e göre ayarla
+            setTimeout(() => positionBox(targetEl), 10);
+        }
+
+        window.startByooTour = function() {
+            current = 0;
+            overlay.style.display = 'block';
+            box.style.display = 'block';
+            showStep(0);
         };
+
+        skipBtn.addEventListener('click', function() {
+            closeTour();
+            markDone();
+        });
+
+        nextBtn.addEventListener('click', function() {
+            if (current < steps.length - 1) {
+                current++;
+                showStep(current);
+            } else {
+                closeTour();
+                markDone();
+            }
+        });
+
+        overlay.addEventListener('click', function() {
+            closeTour();
+        });
+    })();
     </script>
+
 
     <style>
         .design-color-control {
