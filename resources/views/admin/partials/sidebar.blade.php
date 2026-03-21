@@ -23,6 +23,10 @@
                     <i class="fas fa-users w-4 text-center"></i>
                     Kullanicilar
                 </a>
+                <a href="{{ route('admin.themes.index') }}" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.themes.*') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground' }}">
+                    <i class="fas fa-palette w-4 text-center"></i>
+                    Temalar
+                </a>
                 <a href="{{ route('admin.settings.index') }}" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('admin.settings.*') ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground' }}">
                     <i class="fas fa-cog w-4 text-center"></i>
                     Ayarlar

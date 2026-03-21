@@ -8,6 +8,7 @@ use App\Http\Controllers\LinkController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicProfileController;
+use App\Http\Controllers\ThemeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,9 +50,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
+    
+    Route::post('/themes', [ThemeController::class, 'store'])->name('themes.store');
+    Route::post('/themes/{theme}/apply', [ThemeController::class, 'apply'])->name('themes.apply');
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminController::class, 'users'])->name('users.index');
     Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleStatus'])->name('users.toggle');
@@ -62,6 +66,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings.index');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('settings.update');
+
+    Route::get('/themes', [AdminController::class, 'themes'])->name('themes.index');
+    Route::patch('/themes/{theme}/toggle', [AdminController::class, 'toggleTheme'])->name('themes.toggle');
+    Route::patch('/themes/{theme}/approve', [AdminController::class, 'approveTheme'])->name('themes.approve');
 });
 
 Route::get('/admin/stop-impersonating', [AdminController::class, 'stopImpersonating'])

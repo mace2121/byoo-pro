@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ClickLog;
 use App\Models\Link;
 use App\Models\Profile;
+use App\Models\Theme;
 use App\Models\User;
 use App\Models\ViewLog;
 use Illuminate\Http\Request;
@@ -13,6 +14,40 @@ use Illuminate\Support\Facades\Schema;
 
 class AdminController extends Controller
 {
+    public function themes(Request $request)
+    {
+        $search = $request->input('search');
+        $themes = Theme::with('creator')
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.themes.index', compact('themes', 'search'));
+    }
+
+    public function toggleTheme(Theme $theme)
+    {
+        $theme->is_active = ! $theme->is_active;
+        $theme->save();
+
+        $status = $theme->is_active ? 'aktif edildi' : 'pasif edildi';
+
+        return back()->with('success', "Tema {$theme->name} basariyla {$status}.");
+    }
+
+    public function approveTheme(Theme $theme)
+    {
+        $theme->is_approved = ! $theme->is_approved;
+        $theme->save();
+
+        $status = $theme->is_approved ? 'onaylandi' : 'onayi kaldirildi';
+
+        return back()->with('success', "Tema {$theme->name} durumu guncellendi: {$status}.");
+    }
+
     public function index()
     {
         $total_users = User::count();

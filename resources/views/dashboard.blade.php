@@ -47,6 +47,13 @@
                             <i class="fas fa-paint-brush w-4 text-center"></i>
                             {{ __('Tasarım') }}
                         </button>
+                        <button @click="tab = 'marketplace'; if(window.innerWidth < 768) sidebarOpen = false" 
+                                :class="tab === 'marketplace' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
+                                class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            <i class="fas fa-store w-4 text-center"></i>
+                            {{ __('Tema Pazarı') }}
+                        </button>
+
                         <button @click="tab = 'settings'; if(window.innerWidth < 768) sidebarOpen = false" 
                                 :class="tab === 'settings' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'"
                                 class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors">
@@ -344,7 +351,74 @@
                             </div>
                         </div>
 
-                        <div x-show="tab === 'settings'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
+                        <div x-show="tab === 'marketplace'" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
+                            <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h1 class="text-3xl font-extrabold tracking-tight text-foreground">{{ __('Tema Pazarı') }}</h1>
+                                    <p class="mt-2 text-muted-foreground">{{ __('Topluluk tarafından oluşturulan en iyi temaları keşfet.') }}</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                @forelse($marketplace_themes as $theme)
+                                    <div class="group relative flex flex-col overflow-hidden rounded-[2.5rem] border border-border bg-card shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
+                                        <div class="aspect-[9/16] w-full overflow-hidden bg-muted relative">
+                                            @if($theme->preview_image)
+                                                <img src="{{ $theme->preview_image }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                            @else
+                                                <div class="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/20">
+                                                    <div class="p-8 text-center">
+                                                        <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-background shadow-sm">
+                                                            <i class="fas fa-palette text-2xl text-primary"></i>
+                                                        </div>
+                                                        <p class="text-sm font-bold uppercase tracking-widest text-primary/60">{{ $theme->name }}</p>
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            @if($theme->is_premium)
+                                                <div class="absolute top-4 right-4 z-10">
+                                                    <span class="inline-flex items-center rounded-full bg-primary/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-primary-foreground backdrop-blur-md shadow-sm">
+                                                        PRO
+                                                    </span>
+                                                </div>
+                                            @endif
+
+                                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-6 backdrop-blur-sm">
+                                                <form action="{{ route('themes.apply', $theme) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="w-full rounded-2xl bg-white px-8 py-3 text-sm font-bold text-black transition-all hover:scale-105 active:scale-95 shadow-lg">
+                                                        {{ __('Temayı Uygula') }}
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-1 flex-col p-6">
+                                            <div class="flex items-start justify-between">
+                                                <div class="min-w-0">
+                                                    <h3 class="text-lg font-bold truncate">{{ $theme->name }}</h3>
+                                                    <p class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">
+                                                        {{ __('Tarafından') }} {{ $theme->creator->name ?? 'System' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="col-span-full py-24 text-center">
+                                        <div class="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-[2rem] bg-muted/50 border border-border">
+                                            <i class="fas fa-store-slash text-2xl text-muted-foreground"></i>
+                                        </div>
+                                        <h3 class="text-xl font-bold">{{ __('Henüz tema yok') }}</h3>
+                                        <p class="mt-2 text-muted-foreground">{{ __('Marketplace açıldığında burada topluluk temalarını göreceksiniz.') }}</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div x-show="tab === 'settings'"
+ x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2">
                             <div class="space-y-6">
                                 <div class="rounded-lg border border-border bg-card p-6 md:p-8 shadow-sm">
                                     <h3 class="text-sm font-semibold mb-4">{{ __('Profil Bilgileri') }}</h3>

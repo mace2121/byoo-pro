@@ -115,7 +115,7 @@ class BlockService
 
         return $user->links()
             ->where('is_active', true)
-            ->where(function ($query) use ($now) {
+            ->where(function (\Illuminate\Database\Eloquent\Builder $query) use ($now) {
                 $query->whereNull('starts_at')
                     ->orWhere('starts_at', '<=', $now);
             })

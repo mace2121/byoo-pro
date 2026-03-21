@@ -23,6 +23,7 @@ class Profile extends Model
         'meta_description',
         'custom_domain',
         'custom_domain_verified',
+        'theme_id',
         'design_settings',
         'is_active',
         'views',
@@ -32,6 +33,11 @@ class Profile extends Model
         'design_settings' => 'array',
         'is_active' => 'boolean',
     ];
+
+    public function theme_ref()
+    {
+        return $this->belongsTo(Theme::class, 'theme_id');
+    }
 
     /**
      * Get the profile's avatar URL with fallback.

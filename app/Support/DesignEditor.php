@@ -27,6 +27,18 @@ class DesignEditor
     public static function resolve(?Profile $profile, array $runtimeDefaults = []): array
     {
         $design = is_array($profile?->design_settings) ? $profile->design_settings : [];
+        
+        // If profile has a selected marketplace theme, use its config as base
+        if ($profile?->theme_id) {
+            $profile->loadMissing('theme_ref');
+            if ($profile->theme_ref && $profile->theme_ref->is_active && $profile->theme_ref->is_approved) {
+                // Check Pro status if theme is premium
+                if (!$profile->theme_ref->is_premium || ($profile->user && $profile->user->isPro())) {
+                    $design = array_replace_recursive($profile->theme_ref->config_json, $design);
+                }
+            }
+        }
+
         $design = array_replace_recursive(self::legacyDesign($profile), $design);
 
         $design['profile'] = array_replace([

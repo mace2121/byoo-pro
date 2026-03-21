@@ -47,7 +47,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $marketplace_themes = \App\Models\Theme::where('is_active', true)
+            ->where('is_approved', true)
+            ->with('creator')
+            ->latest()
+            ->get();
+
         return view('dashboard', [
+            'marketplace_themes' => $marketplace_themes,
             'user' => $user,
             'profile' => $profile,
             'links' => $user->links,

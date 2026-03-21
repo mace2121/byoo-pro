@@ -90,6 +90,11 @@ class User extends Authenticatable
         return $this->hasOne(Subscription::class);
     }
 
+    public function personalThemes()
+    {
+        return $this->hasMany(Theme::class);
+    }
+
     // Convenience accessor for current plan via subscription
     public function activePlan()
     {
