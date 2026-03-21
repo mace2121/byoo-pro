@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\CustomDomainMiddleware::class);
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'checkPlan' => \App\Http\Middleware\CheckPlan::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

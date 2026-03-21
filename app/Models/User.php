@@ -29,6 +29,10 @@ class User extends Authenticatable
         'google_id',
         'provider',
         'avatar',
+        'plan',
+        'plan_expire_date',
+        'is_verified',
+        'onboarding_completed',
     ];
 
     /**
@@ -50,11 +54,19 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'plan_expire_date' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_active' => 'boolean',
             'verified' => 'boolean',
+            'is_verified' => 'boolean',
+            'onboarding_completed' => 'boolean',
         ];
+    }
+
+    public function isPro()
+    {
+        return $this->plan === 'pro';
     }
 
     public function profile()
@@ -79,14 +91,14 @@ class User extends Authenticatable
     }
 
     // Convenience accessor for current plan via subscription
-    public function plan()
+    public function activePlan()
     {
         return $this->subscription ? $this->subscription->plan : null;
     }
 
     public function hasPremiumAccess(): bool
     {
-        $slug = $this->plan()?->slug;
+        $slug = $this->activePlan()?->slug;
 
         return in_array($slug, ['pro', 'business'], true);
     }
@@ -114,7 +126,7 @@ class User extends Authenticatable
     // Helper to check if user reached their link limit based on plan
     public function hasReachedLinkLimit(): bool
     {
-        $plan = $this->plan();
+        $plan = $this->activePlan();
         if (!$plan) {
             // Fallback to a default limit if no plan (should not happen)
             return $this->links()->count() >= 5;
