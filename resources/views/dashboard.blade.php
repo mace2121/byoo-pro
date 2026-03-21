@@ -69,6 +69,15 @@
                     @endif
                 </div>
 
+                <!-- Öğrenme Turu Butonu -->
+                <div class="px-3 pb-2">
+                    <button onclick="window.startByooTour()" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-dashed border-amber-300 bg-amber-50/50 text-amber-700 hover:bg-amber-100 transition-colors text-xs font-semibold dark:border-amber-500/30 dark:bg-amber-500/5 dark:text-amber-400 dark:hover:bg-amber-500/10">
+                        <i class="fas fa-graduation-cap text-sm"></i>
+                        <span>Öğrenme Turu</span>
+                        <i class="fas fa-play ml-auto text-[10px] opacity-60"></i>
+                    </button>
+                </div>
+
                 <!-- Copy URL Card -->
                 <div class="px-3 pb-4">
                     <div class="rounded-lg border border-border bg-card p-3 shadow-sm">
@@ -401,8 +410,7 @@
         </div>
     </div>
 
-    @if(!auth()->user()->onboarding_completed)
-    {{-- Shepherd.js Onboarding Tour --}}
+    {{-- Shepherd.js Onboarding Tour (her zaman yüklü, butona tıklayınca başlar) --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/css/shepherd.css"/>
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@12/dist/js/shepherd.min.js"></script>
     <style>
@@ -414,10 +422,9 @@
         .shepherd-footer { padding: 0.75rem 1.25rem 1.25rem !important; gap: 0.5rem !important; justify-content: flex-end !important; }
         .shepherd-element { border-radius: 1rem !important; box-shadow: 0 20px 60px rgba(0,0,0,0.18) !important; border: 1px solid #e5e7eb !important; max-width: 340px !important; }
         .shepherd-arrow:before { background: #fff !important; }
-        .shepherd-modal-overlay-container { opacity: 1 !important; }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        window.startByooTour = function() {
             const completeUrl = '{{ route('profile.onboarding.complete') }}';
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
@@ -431,93 +438,69 @@
                 } catch(e) {}
             }
 
-            function safeAttach(selector) {
-                const el = document.querySelector(selector);
-                if (!el) return undefined;
-                // Shepherd x-cloak / display:none uyumu: geçici olarak göster
-                return { element: selector, on: 'right' };
+            // Daha önce açık bir tur varsa kapat
+            if (window._byooTour) {
+                try { window._byooTour.cancel(); } catch(e) {}
             }
 
-            function startTour() {
-                const tour = new Shepherd.Tour({
-                    useModalOverlay: true,
-                    defaultStepOptions: {
-                        cancelIcon: { enabled: true },
-                        scrollTo: false,
-                        buttons: [
-                            { text: 'Atla', action() { markDone(); this.cancel(); }, classes: 'shepherd-button-secondary' },
-                            { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
-                        ]
-                    }
-                });
-
-                tour.on('cancel', markDone);
-                tour.on('complete', markDone);
-
-                // Adım 1 — Hoş geldin (elementi olmadan ortada göster)
-                tour.addStep({
-                    id: 'welcome',
-                    title: '👋 byoo\'ya Hoş Geldin!',
-                    text: 'Birkaç adımda platformu sana tanıtalım. İstediğinde turu atlayabilirsin.',
+            const tour = new Shepherd.Tour({
+                useModalOverlay: true,
+                defaultStepOptions: {
+                    cancelIcon: { enabled: true },
+                    scrollTo: false,
                     buttons: [
-                        { text: 'Atla', action() { markDone(); tour.cancel(); }, classes: 'shepherd-button-secondary' },
-                        { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
+                        { text: 'Kapat', action() { this.cancel(); }, classes: 'shepherd-button-secondary' },
+                        { text: 'İleri →', action() { this.next(); }, classes: 'shepherd-button-primary' }
                     ]
-                });
+                }
+            });
 
-                // Adım 2 — Sidebar
-                const sidebarEl = document.querySelector('#tour-sidebar');
-                tour.addStep({
-                    id: 'sidebar',
-                    title: '📋 Sol Menü',
-                    text: 'Bu menüden Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
-                    attachTo: sidebarEl ? { element: '#tour-sidebar', on: 'right' } : undefined,
-                });
+            window._byooTour = tour;
+            tour.on('complete', markDone);
 
-                // Adım 3 — Linkler sekmesi
-                const linksEl = document.querySelector('#tour-links-tab');
-                tour.addStep({
-                    id: 'links',
-                    title: '🔗 Bağlantılarını Ekle',
-                    text: 'Buradan profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
-                    attachTo: linksEl ? { element: '#tour-links-tab', on: 'right' } : undefined,
-                });
+            tour.addStep({
+                id: 'welcome',
+                title: '👋 byoo\'ya Hoş Geldin!',
+                text: 'Sana kısa bir tur hazırladık. Her adımda platformun nasıl kullanıldığını göstereceğiz.',
+                buttons: [
+                    { text: 'Kapat', action() { tour.cancel(); }, classes: 'shepherd-button-secondary' },
+                    { text: 'Başlayalım →', action() { tour.next(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
 
-                // Adım 4 — Tasarım sekmesi
-                const designEl = document.querySelector('#tour-design-tab');
-                tour.addStep({
-                    id: 'design',
-                    title: '🎨 Tasarımını Özelleştir',
-                    text: 'Profil sayfanın renklerini, fontunu, arka planını ve buton stilini buradan ayarlıyorsun.',
-                    attachTo: designEl ? { element: '#tour-design-tab', on: 'right' } : undefined,
-                });
+            tour.addStep({
+                id: 'sidebar',
+                title: '📋 Sol Menü',
+                text: 'Buradan Bloklar, Tasarım, Analizler ve Ayarlar bölümlerine geçiş yapabilirsin.',
+                attachTo: { element: '#tour-sidebar', on: 'right' },
+            });
 
-                // Adım 5 — Son adım (preview veya genel)
-                tour.addStep({
-                    id: 'done',
-                    title: '🚀 Hazırsın!',
-                    text: 'Profilini düzenleyip canlı önizlemeyi sağ üstten açabilirsin. Başarılar! 🎉',
-                    buttons: [
-                        { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
-                    ]
-                });
+            tour.addStep({
+                id: 'links',
+                title: '🔗 Bloklar',
+                text: 'Profil sayfana link, sosyal medya ve ürün blokları ekleyebilirsin.',
+                attachTo: { element: '#tour-links-tab', on: 'right' },
+            });
 
-                tour.start();
-            }
+            tour.addStep({
+                id: 'design',
+                title: '🎨 Tasarım',
+                text: 'Renk, font, arka plan ve buton stilini buradan özelleştirebilirsin.',
+                attachTo: { element: '#tour-design-tab', on: 'right' },
+            });
 
-            // Alpine.js ve sayfa tam hazır olduktan sonra başlat
-            if (typeof Alpine !== 'undefined') {
-                Alpine.nextTick(() => setTimeout(startTour, 800));
-            } else {
-                window.addEventListener('alpine:init', () => setTimeout(startTour, 800));
-                // Fallback: Alpine yüklü değilse düz timeout
-                setTimeout(() => {
-                    if (!document.querySelector('.shepherd-is-active')) startTour();
-                }, 2000);
-            }
-        });
+            tour.addStep({
+                id: 'done',
+                title: '🚀 Hazırsın!',
+                text: 'Profilini düzenleyip canlı önizlemeyi sağ üstteki "Önizleme" butonundan açabilirsin. Başarılar! 🎉',
+                buttons: [
+                    { text: '✅ Turu Bitir', action() { tour.complete(); }, classes: 'shepherd-button-primary' }
+                ]
+            });
+
+            tour.start();
+        };
     </script>
-    @endif
 
     <style>
         .design-color-control {
