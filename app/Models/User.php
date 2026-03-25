@@ -66,7 +66,7 @@ class User extends Authenticatable
 
     public function isPro()
     {
-        return $this->plan === 'pro';
+        return $this->is_admin || $this->plan === 'pro';
     }
 
     public function profile()
@@ -119,7 +119,7 @@ class User extends Authenticatable
 
     public function hasPremiumAccess(): bool
     {
-        return $this->isPro();
+        return $this->is_admin || $this->isPro();
     }
 
     public function canUseProductBlocks(): bool

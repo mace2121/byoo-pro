@@ -368,7 +368,7 @@ class BlockController extends Controller
 
     protected function userHasReachedBlockLimit($user): bool
     {
-        $plan = $user->plan();
+        $plan = $user->activePlan();
         $limit = $plan?->link_limit ?? 5;
 
         if ((int) $limit <= 0) {
