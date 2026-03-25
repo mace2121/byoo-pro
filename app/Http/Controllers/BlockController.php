@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Block;
 use App\Models\Link;
+use App\Models\User;
 use App\Services\BlockService;
 use App\Services\LinkPreviewService;
 use App\Services\ProfileService;
@@ -28,7 +29,9 @@ class BlockController extends Controller
 
     public function store(Request $request)
     {
+        /** @var User $user */
         $user = Auth::user();
+        abort_if(! $user, 401);
         $this->ensureBlocksReady();
 
         if ($this->userHasReachedBlockLimit($user)) {
@@ -366,8 +369,12 @@ class BlockController extends Controller
         abort_unless($this->blockService->blocksTableExists(), 503, 'Blocks tablosu hazir degil. Lutfen migration calistirin.');
     }
 
-    protected function userHasReachedBlockLimit($user): bool
+    protected function userHasReachedBlockLimit(User $user): bool
     {
+        if ($user->hasPremiumAccess()) {
+            return false;
+        }
+
         $plan = $user->activePlan();
         $limit = $plan?->link_limit ?? 5;
 
