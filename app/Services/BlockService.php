@@ -174,6 +174,8 @@ class BlockService
             'href' => $this->resolveBlockUrl($block),
             'button_label' => $this->resolveButtonLabel($block),
             'button_type' => $block->button_type ?: 'external_link',
+            'button_link' => $block->button_link,
+            'data' => $data,
             'password_protected' => filled($sourceLink?->password),
             'position' => $block->position,
             'is_active' => (bool) $block->is_active,
