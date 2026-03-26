@@ -16,9 +16,21 @@ class AnalyticsService
     public function getDashboardStats(User $user, int $days = 30)
     {
         $profile = $user->profile;
-        if (!$profile) return null;
-
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
+
+        // Default empty structure
+        $defaultStats = [
+            'chartData' => ['labels' => [], 'views' => [], 'clicks' => []],
+            'topLinks' => collect(),
+            'topCountries' => collect(),
+            'topCities' => collect(),
+            'topBrowsers' => collect(),
+            'topOS' => collect(),
+            'recentClicks' => collect(),
+            'totalLinks' => $user->blocks()->count(),
+        ];
+
+        if (!$profile) return $defaultStats;
 
         // Daily Views
         $dailyViews = ViewLog::where('profile_id', $profile->id)

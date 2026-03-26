@@ -101,9 +101,11 @@ class PublicProfileController extends Controller
         if (!$block->is_active || 
             ($block->starts_at && $block->starts_at > $now) || 
             ($block->expires_at && $block->expires_at < $now) ||
-            !$block->user?->profile?->is_active) {
+            !($block->user && $block->user->profile && $block->user->profile->is_active)) {
             abort(404);
         }
+
+        $location = $this->profileService->getIPLocation($request->ip());
 
         $block->increment('clicks');
         
