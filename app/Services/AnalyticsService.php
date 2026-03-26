@@ -129,6 +129,7 @@ class AnalyticsService
             'topBrowsers' => $topBrowsers,
             'topOS' => $topOS,
             'recentClicks' => $recentClicks,
+            'totalLinks' => $user->blocks()->count(),
         ];
     }
 }

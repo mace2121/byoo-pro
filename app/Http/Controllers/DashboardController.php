@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function __construct(protected BlockService $blockService)
-    {
+    public function __construct(
+        protected \App\Services\BlockService $blockService,
+        protected \App\Services\AnalyticsService $analyticsService
+    ) {
     }
 
     public function index()
@@ -20,32 +22,8 @@ class DashboardController extends Controller
         $profile = $user->profile;
         $blocks = $this->blockService->getDashboardBlocks($user);
         
-        $total_links = $blocks->isNotEmpty() ? $blocks->count() : $user->links->count();
-        $total_clicks = $user->links->sum('clicks');
-        $profile_views = $profile?->views ?? 0;
-
-        // Analytics data
-        $linkIds = $user->links->pluck('id');
-        $top_browsers = \App\Models\ClickLog::whereIn('link_id', $linkIds)
-            ->selectRaw('browser, count(*) as count')
-            ->groupBy('browser')
-            ->orderByDesc('count')
-            ->limit(5)
-            ->get();
-
-        $top_os = \App\Models\ClickLog::whereIn('link_id', $linkIds)
-            ->selectRaw('os, count(*) as count')
-            ->groupBy('os')
-            ->orderByDesc('count')
-            ->limit(5)
-            ->get();
-
-        $top_countries = \App\Models\ClickLog::whereIn('link_id', $linkIds)
-            ->selectRaw('country, count(*) as count')
-            ->groupBy('country')
-            ->orderByDesc('count')
-            ->limit(5)
-            ->get();
+        /** @var \App\Models\User $user */
+        $stats = $this->analyticsService->getDashboardStats($user);
 
         $marketplace_themes = \App\Models\Theme::where('is_active', true)
             ->where('is_approved', true)
@@ -60,12 +38,14 @@ class DashboardController extends Controller
             'links' => $user->links,
             'blocks' => $blocks,
             'blocks_ready' => $this->blockService->blocksTableExists(),
-            'total_links' => $total_links,
-            'total_clicks' => $total_clicks,
-            'profile_views' => $profile_views,
-            'top_browsers' => $top_browsers,
-            'top_os' => $top_os,
-            'top_countries' => $top_countries,
+            'total_links' => $stats['totalLinks'],
+            'total_clicks' => $stats['chartData']['clicks'] ? array_sum($stats['chartData']['clicks']) : 0,
+            'profile_views' => array_sum($stats['chartData']['views'] ?? [0]),
+            'top_browsers' => $stats['topBrowsers'],
+            'top_os' => $stats['topOS'],
+            'top_countries' => $stats['topCountries'],
+            'top_cities' => $stats['topCities'],
+            'top_links' => $stats['topLinks'],
             'qr_code_url' => "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode(route('public.profile', $user->username)),
         ]);
     }
