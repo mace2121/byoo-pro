@@ -84,5 +84,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::get('/l/{link}', [PublicProfileController::class, 'redirect'])->name('public.redirect');
+Route::get('/b/{block}', [PublicProfileController::class, 'blockRedirect'])->name('public.block.redirect');
 Route::post('/l/{link}/verify', [PublicProfileController::class, 'verifyPassword'])->name('public.verify-password');
 Route::get('/{username}', [PublicProfileController::class, 'show'])->name('public.profile');

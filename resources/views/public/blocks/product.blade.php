@@ -6,13 +6,14 @@
         $variantClass = 'backdrop-blur-md variant-glass';
     }
 
+    $blockData   = is_array($block->data) ? $block->data : json_decode((string) $block->data, true) ?: [];
     $isWhatsapp  = ($block->button_type ?? '') === 'whatsapp';
     $waPhone     = $block->button_link ?? env('WHATSAPP_UPGRADE_NUMBER', '');
     $waPhone     = preg_replace('/\D/', '', $waPhone); // sadece rakam
-    $waMessage   = $block->data['whatsapp_message'] ?? ('Merhaba, ' . $block->title . ' ürününü sipariş vermek istiyorum.');
+    $waMessage   = (is_array($blockData) ? ($blockData['whatsapp_message'] ?? null) : ($blockData->whatsapp_message ?? null)) ?? ('Merhaba, ' . $block->title . ' ürününü sipariş vermek istiyorum.');
     $waUrl       = "https://wa.me/{$waPhone}?text=" . rawurlencode($waMessage);
     $btnHref     = $isWhatsapp ? $waUrl : ($block->button_link ?? $block->url ?? '#');
-    $btnLabel    = ($block->data['button_label'] ?? null) ?: ($isWhatsapp ? 'WhatsApp ile Sipariş Ver' : 'Ürünü İncele');
+    $btnLabel    = (is_array($blockData) ? ($blockData['button_label'] ?? null) : ($blockData->button_label ?? null)) ?: ($isWhatsapp ? 'WhatsApp ile Sipariş Ver' : 'Ürünü İncele');
 @endphp
 
 <div class="overflow-hidden transition-all duration-300 theme-card theme-card-stacked group relative {{ $variantClass }}">
@@ -30,8 +31,9 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <h3 class="truncate text-base font-bold">{{ $block->title }}</h3>
-                    @if(!empty($block->data['price']))
-                        <p class="text-sm font-semibold opacity-90">{{ $block->data['price'] }}</p>
+                    @php $price = is_array($blockData) ? ($blockData['price'] ?? null) : ($blockData->price ?? null); @endphp
+                    @if(!empty($price))
+                        <p class="text-sm font-semibold opacity-90">{{ $price }}</p>
                     @endif
                 </div>
             </div>

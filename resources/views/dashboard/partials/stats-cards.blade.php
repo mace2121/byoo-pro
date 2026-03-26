@@ -39,7 +39,7 @@
                     @forelse($top_browsers as $item)
                         <div class="space-y-2">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ $item->browser ?: 'Other' }}</span>
+                                <span class="font-medium text-muted-foreground">{{ __($item->browser ?: 'Other') }}</span>
                                 <span class="font-bold">{{ $item->count }}</span>
                             </div>
                             <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
@@ -64,7 +64,7 @@
                     @forelse($top_os as $item)
                         <div class="space-y-2">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ $item->os ?: 'Other' }}</span>
+                                <span class="font-medium text-muted-foreground">{{ __($item->os ?: 'Other') }}</span>
                                 <span class="font-bold">{{ $item->count }}</span>
                             </div>
                             <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
@@ -89,7 +89,7 @@
                     @forelse($top_countries as $item)
                         <div class="space-y-2">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ $item->country ?: __('Global') }}</span>
+                                <span class="font-medium text-muted-foreground">{{ __($item->country ?: 'Global') }}</span>
                                 <span class="font-bold">{{ $item->count }}</span>
                             </div>
                             <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">

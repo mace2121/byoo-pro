@@ -23,7 +23,13 @@ class Block extends Model
         'starts_at',
         'expires_at',
         'data',
+        'clicks',
     ];
+
+    public function clickLogs()
+    {
+        return $this->hasMany(ClickLog::class);
+    }
 
     protected function casts(): array
     {

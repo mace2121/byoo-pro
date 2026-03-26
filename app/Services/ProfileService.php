@@ -13,6 +13,36 @@ class ProfileService
     }
 
     /**
+     * Get location data from IP address.
+     */
+    public function getIPLocation($ip)
+    {
+        if ($ip === '127.0.0.1' || !$ip) return null;
+
+        return Cache::remember("ip_loc_{$ip}", now()->addDays(7), function () use ($ip) {
+            try {
+                $response = file_get_contents("http://ip-api.com/json/{$ip}?fields=status,country,city,countryCode", false, stream_context_create([
+                    'http' => ['timeout' => 2]
+                ]));
+                
+                if ($response) {
+                    $data = json_decode($response, true);
+                    if (($data['status'] ?? '') === 'success') {
+                        return [
+                            'country' => $data['country'] ?? null,
+                            'city' => $data['city'] ?? null,
+                            'countryCode' => $data['countryCode'] ?? null,
+                        ];
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silently fail to avoid blocking profile load
+            }
+            return null;
+        });
+    }
+
+    /**
      * Get a user's profile and active links with caching.
      */
     public function getProfileData(User $user)

@@ -8,9 +8,11 @@ class ClickLog extends Model
 {
     protected $fillable = [
         'link_id',
+        'block_id',
         'ip',
         'device',
         'country',
+        'city',
         'browser',
         'os',
         'referer',
@@ -19,5 +21,10 @@ class ClickLog extends Model
     public function link()
     {
         return $this->belongsTo(Link::class);
+    }
+
+    public function block()
+    {
+        return $this->belongsTo(Block::class);
     }
 }

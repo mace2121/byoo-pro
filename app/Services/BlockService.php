@@ -171,7 +171,7 @@ class BlockService
             'manual_icon' => $manualIcon,
             'icon_source' => filled($manualIcon) ? 'manual' : 'auto',
             'display_mode' => $displayMode,
-            'href' => $this->resolveBlockUrl($block, $data),
+            'href' => $this->resolveBlockUrl($block),
             'button_label' => $this->resolveButtonLabel($block),
             'button_type' => $block->button_type ?: 'external_link',
             'password_protected' => filled($sourceLink?->password),
@@ -181,23 +181,9 @@ class BlockService
         ];
     }
 
-    protected function resolveBlockUrl(Block $block, array $data): string
+    protected function resolveBlockUrl(Block $block): string
     {
-        if ($block->type === 'product') {
-            if ($block->button_type === 'whatsapp') {
-                $message = $data['whatsapp_message'] ?? ('Merhaba, '.$block->title.' urunu hakkinda bilgi almak istiyorum.');
-
-                return WhatsAppLink::generate($block->button_link ?: $block->url, $message);
-            }
-
-            return $block->button_link ?: $block->url ?: '#';
-        }
-
-        if ($block->sourceLink) {
-            return route('public.redirect', $block->sourceLink);
-        }
-
-        return $block->url ?: $block->button_link ?: '#';
+        return route('public.block.redirect', $block);
     }
 
     protected function resolveButtonLabel(Block $block): ?string

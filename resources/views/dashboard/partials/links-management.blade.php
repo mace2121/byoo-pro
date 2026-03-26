@@ -107,7 +107,7 @@
                                     <div class="space-y-5">
                                         <div class="space-y-2">
                                             <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">URL</label>
-                                            <input type="url" name="url" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" placeholder="https://example.com">
+                                            <input type="url" name="url" required class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" placeholder="https://example.com">
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -145,8 +145,8 @@
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground" x-text="buttonType === 'whatsapp' ? 'Telefon / WhatsApp linki' : 'Buton baglantisi'"></label>
-                                            <input type="text" name="button_link" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" :placeholder="buttonType === 'whatsapp' ? '905xxxxxxxxx veya https://wa.me/...' : 'https://example.com/urun'">
+                                            <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground" x-text="buttonType === 'whatsapp' ? 'Telefon / WhatsApp linki' : 'Buton baglantisi (Dış Bağlantı)'"></label>
+                                            <input :type="buttonType === 'whatsapp' ? 'text' : 'url'" name="button_link" required class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary" :placeholder="buttonType === 'whatsapp' ? '905xxxxxxxxx veya https://wa.me/...' : 'https://example.com/urun'">
                                         </div>
 
                                         <template x-if="buttonType === 'whatsapp'">
@@ -299,7 +299,7 @@
                                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                             <div class="space-y-2 md:col-span-2">
                                                 <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">URL</label>
-                                                <input type="url" name="url" value="{{ $block->url }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                                <input type="url" name="url" value="{{ $block->url }}" required class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
                                             </div>
                                             <x-ui.picker name="display_mode" label="Blok yapisi" :options="$displayModeOptions" :value="$displayMode" placeholder="Blok gorunumu sec" />
                                             <x-ui.icon-picker name="icon" label="Ikon" :options="$linkIconOptions" :value="$iconValue" placeholder="Populer ikonlardan sec" />
@@ -343,8 +343,8 @@
                                             </div>
 
                                             <div class="space-y-2">
-                                                <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground" x-text="buttonType === 'whatsapp' ? 'Telefon / WhatsApp linki' : 'Buton baglantisi'"></label>
-                                                <input type="text" name="button_link" value="{{ $block->button_link }}" class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                                <label class="text-xs font-semibold uppercase tracking-widest text-muted-foreground" x-text="buttonType === 'whatsapp' ? 'Telefon / WhatsApp linki' : 'Buton baglantisi (Dış Bağlantı)'"></label>
+                                                <input :type="buttonType === 'whatsapp' ? 'text' : 'url'" name="button_link" value="{{ $block->button_link }}" required class="w-full rounded-2xl border-input bg-background text-sm shadow-sm focus:border-primary focus:ring-primary">
                                             </div>
 
                                             <template x-if="buttonType === 'whatsapp'">

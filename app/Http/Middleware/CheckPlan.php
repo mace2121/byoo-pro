@@ -15,7 +15,7 @@ class CheckPlan
             return redirect()->route('login');
         }
 
-        if (Auth::user()->plan !== $plan) {
+        if (!Auth::user()->is_admin && Auth::user()->plan !== $plan) {
             return redirect()->route('dashboard')->with('error', 'Bu işlem için ' . strtoupper($plan) . ' planına geçmenizi öneririz.');
         }
 

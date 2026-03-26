@@ -11,6 +11,7 @@ class ViewLog extends Model
         'ip',
         'device',
         'country',
+        'city',
         'browser',
         'os',
         'referer',

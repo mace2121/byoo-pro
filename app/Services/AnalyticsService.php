@@ -53,13 +53,13 @@ class AnalyticsService
             $chartData['clicks'][] = $dailyClicks[$date] ?? 0;
         }
 
-        // Top Links
-        $topLinks = $user->links()
+        // Top Blocks (instead of just links)
+        $topLinks = $user->blocks()
             ->orderByDesc('clicks')
-            ->take(5)
+            ->take(10)
             ->get();
 
-        // Top Locations
+        // Top Locations (Countries)
         $topCountries = ViewLog::where('profile_id', $profile->id)
             ->whereNotNull('country')
             ->select('country', DB::raw('count(*) as count'))
@@ -68,12 +68,22 @@ class AnalyticsService
             ->take(5)
             ->get();
 
+        // Top Cities
+        $topCities = ViewLog::where('profile_id', $profile->id)
+            ->whereNotNull('city')
+            ->select('city', 'country', DB::raw('count(*) as count'))
+            ->groupBy('city', 'country')
+            ->orderByDesc('count')
+            ->take(10)
+            ->get();
+
         // Combined Browser Stats
         $viewBrowsers = ViewLog::where('profile_id', $profile->id)
             ->select('browser', DB::raw('count(*) as count'))
             ->groupBy('browser');
         
-        $browserUnion = ClickLog::whereIn('link_id', $linkIds)
+        $blockIds = $user->blocks->pluck('id')->toArray();
+        $browserUnion = ClickLog::whereIn('block_id', $blockIds)
             ->select('browser', DB::raw('count(*) as count'))
             ->groupBy('browser')
             ->unionAll($viewBrowsers);
@@ -91,7 +101,7 @@ class AnalyticsService
             ->select('os', DB::raw('count(*) as count'))
             ->groupBy('os');
         
-        $osUnion = ClickLog::whereIn('link_id', $linkIds)
+        $osUnion = ClickLog::whereIn('block_id', $blockIds)
             ->select('os', DB::raw('count(*) as count'))
             ->groupBy('os')
             ->unionAll($viewOS);
@@ -104,12 +114,21 @@ class AnalyticsService
             ->take(5)
             ->get();
 
+        // Recent Clicks
+        $recentClicks = ClickLog::whereIn('block_id', $blockIds)
+            ->with('block')
+            ->orderByDesc('created_at')
+            ->take(10)
+            ->get();
+
         return [
             'chartData' => $chartData,
             'topLinks' => $topLinks,
             'topCountries' => $topCountries,
+            'topCities' => $topCities,
             'topBrowsers' => $topBrowsers,
             'topOS' => $topOS,
+            'recentClicks' => $recentClicks,
         ];
     }
 }
