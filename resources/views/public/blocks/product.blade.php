@@ -6,7 +6,7 @@
         $variantClass = 'backdrop-blur-md variant-glass';
     }
 
-    $blockData   = is_array($block->data) ? $block->data : json_decode((string) $block->data, true) ?: [];
+    $blockData   = (is_array($block->data) ? $block->data : json_decode((string) $block->data, true)) ?: [];
     $isWhatsapp  = ($block->button_type ?? '') === 'whatsapp';
     $waPhone     = $block->button_link ?? env('WHATSAPP_UPGRADE_NUMBER', '');
     $waPhone     = preg_replace('/\D/', '', $waPhone); // sadece rakam
