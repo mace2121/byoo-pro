@@ -41,17 +41,17 @@
                 </div>
                 <div class="p-6 space-y-6">
                     @forelse($top_browsers as $item)
-                        <div class="space-y-2">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ __($item->browser ?: 'Other') }}</span>
-                                <span class="font-bold">{{ $item->count }}</span>
+                                <span class="text-zinc-400">{{ $item->browser }}</span>
+                                <span class="font-medium text-zinc-300">{{ $item->total }}</span>
                             </div>
-                            <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
-                                <div class="h-full bg-[hsl(var(--primary))] transition-all duration-1000" style="width: {{ ($total_clicks > 0) ? ($item->count / $total_clicks * 100) : 0 }}%"></div>
+                            <div class="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                                <div class="h-full bg-primary transition-all" style="width: {{ $profile_views > 0 ? min(100, ($item->total / $profile_views) * 100) : 0 }}%"></div>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-4 text-xs text-muted-foreground italic">{{ __('No data yet') }}</div>
+                        <p class="text-xs text-zinc-500">{{ __('Henüz veri yok') }}</p>
                     @endforelse
                 </div>
             </div>
@@ -66,17 +66,17 @@
                 </div>
                 <div class="p-6 space-y-6">
                     @forelse($top_os as $item)
-                        <div class="space-y-2">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ __($item->os ?: 'Other') }}</span>
-                                <span class="font-bold">{{ $item->count }}</span>
+                                <span class="text-zinc-400">{{ $item->os }}</span>
+                                <span class="font-medium text-zinc-300">{{ $item->total }}</span>
                             </div>
-                            <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
-                                <div class="h-full bg-[hsl(var(--primary))] transition-all duration-1000" style="width: {{ ($total_clicks > 0) ? ($item->count / $total_clicks * 100) : 0 }}%"></div>
+                            <div class="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                                <div class="h-full bg-zinc-400 transition-all" style="width: {{ $profile_views > 0 ? min(100, ($item->total / $profile_views) * 100) : 0 }}%"></div>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-4 text-xs text-muted-foreground italic">{{ __('No data yet') }}</div>
+                        <p class="text-xs text-zinc-500">{{ __('Henüz veri yok') }}</p>
                     @endforelse
                 </div>
             </div>
@@ -91,17 +91,17 @@
                 </div>
                 <div class="p-6 space-y-6">
                     @forelse($top_countries as $item)
-                        <div class="space-y-2">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-medium text-muted-foreground">{{ __($item->country ?: 'Global') }}</span>
-                                <span class="font-bold">{{ $item->count }}</span>
+                                <span class="text-zinc-400">{{ $item->country }}</span>
+                                <span class="font-medium text-zinc-300">{{ $item->total ?? $item->count }}</span>
                             </div>
-                            <div class="w-full h-1.5 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
-                                <div class="h-full bg-[hsl(var(--primary))] transition-all duration-1000" style="width: {{ ($profile_views > 0) ? ($item->count / $profile_views * 100) : 0 }}%"></div>
+                            <div class="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
+                                <div class="h-full bg-primary/40 transition-all" style="width: {{ $profile_views > 0 ? min(100, (($item->total ?? $item->count) / $profile_views) * 100) : 0 }}%"></div>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-4 text-xs text-muted-foreground italic">{{ __('No data yet') }}</div>
+                        <p class="text-xs text-zinc-500">{{ __('Henüz veri yok') }}</p>
                     @endforelse
                 </div>
             </div>
