@@ -18,7 +18,7 @@ class AnalyticsService
         $profile = $user->profile;
         $startDate = Carbon::now()->subDays($days - 1)->startOfDay();
 
-        // Default empty structure
+        // Default structure
         $defaultStats = [
             'chartData' => ['labels' => [], 'views' => [], 'clicks' => []],
             'topLinks' => collect(),
@@ -37,27 +37,20 @@ class AnalyticsService
             ->where('created_at', '>=', $startDate)
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
             ->groupBy('date')
-            ->orderBy('date')
             ->pluck('count', 'date')
             ->toArray();
 
         // Daily Clicks
-        $linkIds = $user->links->pluck('id')->toArray();
-        $dailyClicks = ClickLog::whereIn('link_id', $linkIds)
+        $blockIds = $user->blocks->pluck('id')->toArray();
+        $dailyClicks = ClickLog::whereIn('block_id', $blockIds)
             ->where('created_at', '>=', $startDate)
             ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
             ->groupBy('date')
-            ->orderBy('date')
             ->pluck('count', 'date')
             ->toArray();
 
-        // Fill missing dates for charts
-        $chartData = [
-            'labels' => [],
-            'views' => [],
-            'clicks' => [],
-        ];
-
+        // Fill chart data
+        $chartData = ['labels' => [], 'views' => [], 'clicks' => []];
         for ($i = 0; $i < $days; $i++) {
             $date = $startDate->copy()->addDays($i)->format('Y-m-d');
             $chartData['labels'][] = Carbon::parse($date)->format('d M');
@@ -65,11 +58,8 @@ class AnalyticsService
             $chartData['clicks'][] = $dailyClicks[$date] ?? 0;
         }
 
-        // Top Blocks (instead of just links)
-        $topLinks = $user->blocks()
-            ->orderByDesc('clicks')
-            ->take(10)
-            ->get();
+        // Top Blocks
+        $topLinks = $user->blocks()->where('clicks', '>', 0)->orderByDesc('clicks')->take(10)->get();
 
         // Top Locations (Countries)
         $topCountries = ViewLog::where('profile_id', $profile->id)
@@ -89,42 +79,39 @@ class AnalyticsService
             ->take(10)
             ->get();
 
-        // Combined Browser Stats
+        // Browser Stats (PHP Level Merge for stability)
         $viewBrowsers = ViewLog::where('profile_id', $profile->id)
             ->select('browser', DB::raw('count(*) as count'))
-            ->groupBy('browser');
+            ->groupBy('browser')
+            ->pluck('count', 'browser')->toArray();
         
-        $blockIds = $user->blocks->pluck('id')->toArray();
-        $browserUnion = ClickLog::whereIn('block_id', $blockIds)
+        $clickBrowsers = ClickLog::whereIn('block_id', $blockIds)
             ->select('browser', DB::raw('count(*) as count'))
             ->groupBy('browser')
-            ->unionAll($viewBrowsers);
+            ->pluck('count', 'browser')->toArray();
 
-        $topBrowsers = DB::table(DB::raw("({$browserUnion->toSql()}) as combined_browsers"))
-            ->mergeBindings($browserUnion->getQuery())
-            ->select('browser', DB::raw('SUM(count) as total'))
-            ->groupBy('browser')
-            ->orderByDesc('total')
-            ->take(5)
-            ->get();
+        $allBrowsers = array_keys(array_merge($viewBrowsers, $clickBrowsers));
+        $topBrowsers = collect($allBrowsers)->map(fn($b) => (object)[
+            'browser' => $b ?: 'Other',
+            'total' => ($viewBrowsers[$b] ?? 0) + ($clickBrowsers[$b] ?? 0)
+        ])->sortByDesc('total')->take(5)->values();
 
-        // Combined OS Stats
+        // OS Stats (PHP Level Merge)
         $viewOS = ViewLog::where('profile_id', $profile->id)
             ->select('os', DB::raw('count(*) as count'))
-            ->groupBy('os');
+            ->groupBy('os')
+            ->pluck('count', 'os')->toArray();
         
-        $osUnion = ClickLog::whereIn('block_id', $blockIds)
+        $clickOS = ClickLog::whereIn('block_id', $blockIds)
             ->select('os', DB::raw('count(*) as count'))
             ->groupBy('os')
-            ->unionAll($viewOS);
+            ->pluck('count', 'os')->toArray();
 
-        $topOS = DB::table(DB::raw("({$osUnion->toSql()}) as combined_os"))
-            ->mergeBindings($osUnion->getQuery())
-            ->select('os', DB::raw('SUM(count) as total'))
-            ->groupBy('os')
-            ->orderByDesc('total')
-            ->take(5)
-            ->get();
+        $allOS = array_keys(array_merge($viewOS, $clickOS));
+        $topOS = collect($allOS)->map(fn($os) => (object)[
+            'os' => $os ?: 'Other',
+            'total' => ($viewOS[$os] ?? 0) + ($clickOS[$os] ?? 0)
+        ])->sortByDesc('total')->take(5)->values();
 
         // Recent Clicks
         $recentClicks = ClickLog::whereIn('block_id', $blockIds)
